@@ -2,6 +2,8 @@
 
 Just drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.min.js) on your page and your ready to deliver your pages in any language.
 
+See the [sample](http://i18next.github.io/i18nextify) ([code](https://github.com/i18next/i18nextify/tree/gh-pages))!!
+
 i18nextify uses virtual-dom to update your page with translations based on the current content. MutationObserver is used to trigger translations on newly added content.
 
 i18nextify comes bundled with [i18next](http://i18next.com/).
