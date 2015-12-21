@@ -2,13 +2,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="/i18nextify.min.js"></script>
-    <!-- <script>
-      window.virtualDomI18next.init({
-        // debug: true,
-        saveMissing: true
+    <script src="/i18nextify/i18nextify.min.js"></script>
+    <script>
+      window.i18nextify.init({
+        backend: {
+          loadPath: '/i18nextify/locales/{{lng}}/{{ns}}.json'
+        }
       });
-    </script> -->
+    </script>
   </head>
   <body class="landing-page" style='display: none'>
     <div>
