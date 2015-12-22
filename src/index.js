@@ -1,6 +1,6 @@
-import i18next from 'i18next';
-import XHR from 'i18next-xhr-backend';
-import LngDet from 'i18next-browser-languagedetector';
+import i18next from 'i18next/lib';
+import XHR from 'i18next-xhr-backend/lib';
+import LngDet from 'i18next-browser-languagedetector/lib';
 
 import Observer from './Observer';
 

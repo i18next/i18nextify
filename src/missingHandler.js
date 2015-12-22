@@ -1,4 +1,4 @@
-import i18next from 'i18next';
+import i18next from 'i18next/lib';
 import { setPath } from 'i18next/lib/utils';
 import * as utils from './utils';
 

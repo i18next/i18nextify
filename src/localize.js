@@ -1,4 +1,4 @@
-import i18next from 'i18next';
+import i18next from 'i18next/lib';
 import { getPath, setPath} from 'i18next/lib/utils'
 import Instrument from './Instrument';
 
