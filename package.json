@@ -1,6 +1,6 @@
 {
   "name": "i18nextify",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "enables localization of any page with zero effort",
   "main": "./bin/index.js",
   "keywords": [
