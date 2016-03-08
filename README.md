@@ -24,7 +24,7 @@ Drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.m
   ...
 ```
 
-Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see i18nextify in action. It will output all missing translations - start serving them from `/locales/lng/translation.json`.
+Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see i18nextify in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
 
 See the [example](https://github.com/i18next/i18nextify/tree/master/example) for details.
 
