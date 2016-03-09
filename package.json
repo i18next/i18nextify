@@ -2,7 +2,7 @@
   "name": "i18nextify",
   "version": "0.1.1",
   "description": "enables localization of any page with zero effort",
-  "main": "dist/commonjs/index.js",
+  "main": "./index.js",
   "jsnext:main": "dist/es/index.js",
   "keywords": [
     "i18next",
