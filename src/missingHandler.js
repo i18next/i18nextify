@@ -1,5 +1,5 @@
-import i18next from 'i18next/lib';
-import { setPath } from 'i18next/lib/utils';
+import i18next from 'i18next';
+import { setPath } from 'i18next/dist/es/utils';
 import * as utils from './utils';
 
 let missings = {};

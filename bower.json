@@ -1,12 +1,11 @@
 {
   "name": "i18nextify",
-  "version": "0.0.5",
-  "main": "./bin/index.js",
+  "main": "./i18nextify.min.js",
   "dependencies": {},
   "ignore": [
     "example/",
     "test/",
-    "lib/",
+    "dist/",
     "src/",
     "coverage/",
     ".babelrc",

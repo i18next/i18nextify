@@ -1,4 +1,4 @@
-import EventEmitter from 'i18next/lib/EventEmitter';
+import EventEmitter from 'i18next/dist/es/EventEmitter';
 
 export default class Observer extends EventEmitter {
 

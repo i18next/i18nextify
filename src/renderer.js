@@ -7,7 +7,7 @@ import Instrument from './Instrument';
 import localize from './localize';
 import * as utils from './utils';
 
-import i18next from 'i18next/lib';
+import i18next from 'i18next';
 
 function createVdom(node) {
   let virtualizeTime = new Instrument();
