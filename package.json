@@ -17,9 +17,9 @@
   "homepage": "https://github.com/i18next/i18nextify",
   "bugs": "https://github.com/i18next/i18nextify/issues",
   "dependencies": {
-    "i18next": "2.3.0",
-    "i18next-browser-languagedetector": "0.2.0",
-    "i18next-xhr-backend": "0.5.0",
+    "i18next": "2.3.2",
+    "i18next-browser-languagedetector": "0.2.2",
+    "i18next-xhr-backend": "0.5.3",
     "udc": "1.0.1",
     "vdom-virtualize": "1.0.1",
     "virtual-dom": "2.1.1"
