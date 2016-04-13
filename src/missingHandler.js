@@ -10,8 +10,12 @@ function log() {
 
 let debouncedLog = utils.debounce(log, 2000);
 
-export function missingHandler(lngs, namespace, key, res) {console.warn('here')
-  setPath(missings, [namespace, key], res);
-  console.warn('there')
-  debouncedLog();
+export function missingHandler(lngs, namespace, key, res) {
+  if (typeof lngs === 'string') lngs = [lngs];
+  if (!lngs) lngs = [];
+
+  lngs.forEach(lng => {
+    setPath(missings, [lng, namespace, key], res);
+    debouncedLog();
+  });
 }
