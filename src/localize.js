@@ -43,11 +43,11 @@ function walk(node, tOptions) {
   if (node.text) node.text = translate(node.text, tOptions);
   if (node.properties) node.properties = translateProps(node.properties, tOptions);
 
-  let nodeIsUnTranslated = isUnTranslated(node);
+  //let nodeIsUnTranslated = isUnTranslated(node);
   if (node.children) {
     node.children.forEach((child) => {
-      if ((nodeIsUnTranslated && child.text) ||
-          (!child.text && isUnTranslated(child))) {
+      if ((/*nodeIsUnTranslated && */child.text) ||
+          (!child.text /*&& isUnTranslated(child)*/)) {
         walk(child, tOptions);
       }
     });
