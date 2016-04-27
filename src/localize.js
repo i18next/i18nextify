@@ -3,6 +3,10 @@ import { getPath, setPath } from 'i18next/dist/es/utils'
 import Instrument from './Instrument';
 
 function isUnTranslated(node) {
+  return !node.properties || !node.properties.attributes || node.properties.attributes.localized !== '';
+}
+
+function isNotExcluded(node) {
   return !node.properties || !node.properties.attributes || node.properties.attributes.translated !== '';
 }
 
@@ -35,20 +39,22 @@ function getTOptions(opts, node) {
     }
   }
 
-  return { ...(optsOnNode || {}), ...(opts || {})};
+  return { ...(optsOnNode || {}), ...(opts || {}) };
 }
 
 function walk(node, tOptions) {
+  const nodeIsNotExcluded = isNotExcluded(node);
+
   if (node.children) {
     node.children.forEach((child) => {
-      if ((/*nodeIsUnTranslated && */child.text) ||
-          (!child.text /*&& isUnTranslated(child)*/)) {
+      if ((nodeIsNotExcluded && child.text) ||
+          (!child.text && isNotExcluded(child))) {
         walk(child, tOptions);
       }
     });
   }
 
-  if (isUnTranslated(node)) {
+  if (nodeIsNotExcluded && isUnTranslated(node)) {
     tOptions = getTOptions(tOptions, node);
     if (node.text) node.text = translate(node.text, tOptions);
     if (node.properties) node.properties = translateProps(node.properties, tOptions);
