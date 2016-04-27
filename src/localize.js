@@ -39,11 +39,6 @@ function getTOptions(opts, node) {
 }
 
 function walk(node, tOptions) {
-  tOptions = getTOptions(tOptions, node);
-  if (node.text) node.text = translate(node.text, tOptions);
-  if (node.properties) node.properties = translateProps(node.properties, tOptions);
-
-  //let nodeIsUnTranslated = isUnTranslated(node);
   if (node.children) {
     node.children.forEach((child) => {
       if ((/*nodeIsUnTranslated && */child.text) ||
@@ -52,7 +47,13 @@ function walk(node, tOptions) {
       }
     });
   }
-  if (node.properties && node.properties.attributes) node.properties.attributes.translated = '';
+
+  if (isUnTranslated(node)) {
+    tOptions = getTOptions(tOptions, node);
+    if (node.text) node.text = translate(node.text, tOptions);
+    if (node.properties) node.properties = translateProps(node.properties, tOptions);
+    if (node.properties && node.properties.attributes) node.properties.attributes.translated = '';
+  }
 
   return node;
 }
