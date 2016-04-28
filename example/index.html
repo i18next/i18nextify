@@ -3,12 +3,15 @@
 <html>
   <head>
     <script src="/i18nextify.min.js"></script>
-    <!-- <script>
-      window.virtualDomI18next.init({
-        // debug: true,
-        saveMissing: true
+    <script>
+      window.i18nextify.init({
+        debug: true,
+        saveMissing: true,
+        // namespace: 'somethingNS'
+        namespaceFromPath: true
       });
-    </script> -->
+      console.warn(window.location.pathname)
+    </script>
   </head>
   <body class="landing-page" style='display: none'>
     <div>

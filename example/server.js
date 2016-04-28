@@ -1,6 +1,6 @@
-var i18next = require('i18next/lib');
-var FsBackend = require('i18next-node-fs-backend/lib');
-var middleware = require('i18next-express-middleware/lib');
+var i18next = require('i18next');
+var FsBackend = require('i18next-node-fs-backend');
+var middleware = require('i18next-express-middleware');
 var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
@@ -39,6 +39,10 @@ app.get('/', function(req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/sub', function(req, res) {
+  res.sendFile(__dirname + '/index.html');
+});
+
 app.get('/i18nextify.min.js', function(req, res) {
   fs.readFile(__dirname + '/../i18nextify.min.js', 'utf-8', function(err, doc) {
     res.send(doc);
@@ -55,4 +59,4 @@ app.get('/i18nextify.min.js', function(req, res) {
 //   var translation = req.t('myKey');
 // });
 
-app.listen(3000);
+app.listen(3003);

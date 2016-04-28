@@ -58,7 +58,7 @@ function walk(node, tOptions) {
     tOptions = getTOptions(tOptions, node);
     if (node.text) node.text = translate(node.text, tOptions);
     if (node.properties) node.properties = translateProps(node.properties, tOptions);
-    if (node.properties && node.properties.attributes) node.properties.attributes.translated = '';
+    if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
   }
 
   return node;

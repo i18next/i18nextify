@@ -41,6 +41,8 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
         autorun: true, // setting to false init will return an object with start function
         ele: document.body, // pass in another element if you like to translate another html element
         ignoreTags: ['SCRIPT'], // tags to ignore
+        namespace: false, // set a filename - default namespace will be translation
+        namespaceFromPath: false // set true will use namepace based on window.location.pathname
 
         // + all options available in i18next
       });
@@ -83,3 +85,11 @@ Options get inherited from parent to child nodes.
 ```
 
 Just set the element style display to none. I18nextify will change it to block when ready.
+
+## Change File to use
+
+You can change the namespace after loading to some other file (eg. before transitioning to another page).
+
+```js
+window.i18nextify.changeNamespace('newNamespace');
+```

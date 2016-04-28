@@ -16,7 +16,9 @@ function getDefaults() {
     nsSeparator: '#||#',
     keySeparator: '#|#',
     debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
-    saveMissing: window.location.search && window.location.search.indexOf('saveMissing=true') > -1
+    saveMissing: window.location.search && window.location.search.indexOf('saveMissing=true') > -1,
+    namespace: false,
+    namespaceFromPath: false
   }
 }
 
@@ -39,9 +41,33 @@ i18next.on('missingKey', missingHandler);
 // store last init options - for case init is called before dom ready
 let lastOptions = {};
 
+function getPathname() {
+  const path = location.pathname;
+  if (path === '/') return 'root';
+  return 'root' + path.replace('/', '_');
+}
+
+function changeNamespace(ns) {
+  if (!ns && lastOptions.namespaceFromPath) ns = getPathname();
+  lastOptions.ns = ns;
+  lastOptions.defaultNS = ns;
+
+  i18next.loadNamespaces(ns, () => {
+    i18next.setDefaultNamespace(ns);
+  });
+}
 
 function init(options = {}) {
   options = {...getDefaults(), ...lastOptions, ...options};
+
+  if (options.namespace) {
+    options.ns = options.namespace;
+    options.defaultNS = options.namespace;
+  } else if (options.namespaceFromPath) {
+    const ns = getPathname();
+    options.ns = ns;
+    options.defaultNS = ns;
+  }
 
   // delay init from domReady
   if (!options.ele) {
@@ -94,7 +120,8 @@ function init(options = {}) {
   if (options.autorun === false) return { start: done };
 }
 
-export default {
-  init: init,
-  i18next: i18next
+export default {
+  init,
+  i18next,
+  changeNamespace
 }
