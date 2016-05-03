@@ -8,9 +8,9 @@
         debug: true,
         saveMissing: true,
         // namespace: 'somethingNS'
-        namespaceFromPath: true
+        namespaceFromPath: true,
+        ns: ['common']
       });
-      console.warn(window.location.pathname)
     </script>
   </head>
   <body class="landing-page" style='display: none'>
@@ -50,6 +50,11 @@
       <div i18next-options='{"foo": "bar"}'>
         <p i18next-options='{"foo2": "bar2"}'>foo {{foo}}; foo2 {{foo2}}</p>
       </div>
+    </div>
+    <hr />
+    <div i18next-options='{"ns": "common"}'>
+      <p>different namespace: i18next-options='{"ns": "common"}'</p>
+      <p>set it on i18next options and assert to add it to <strong>i18next.options.ns array on init</strong></p>
     </div>
     <hr />
     <div>dynamically added:</div>

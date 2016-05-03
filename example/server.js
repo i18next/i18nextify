@@ -43,6 +43,10 @@ app.get('/sub', function(req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/sub/', function(req, res) {
+  res.sendFile(__dirname + '/index.html');
+});
+
 app.get('/i18nextify.min.js', function(req, res) {
   fs.readFile(__dirname + '/../i18nextify.min.js', 'utf-8', function(err, doc) {
     res.send(doc);

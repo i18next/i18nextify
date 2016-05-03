@@ -39,11 +39,12 @@ function getTOptions(opts, node) {
     }
   }
 
-  return { ...(optsOnNode || {}), ...(opts || {}) };
+  return { ...(opts || {}), ...(optsOnNode || {}) };
 }
 
 function walk(node, tOptions) {
   const nodeIsNotExcluded = isNotExcluded(node);
+  tOptions = getTOptions(tOptions, node);
 
   if (node.children) {
     node.children.forEach((child) => {
@@ -55,7 +56,6 @@ function walk(node, tOptions) {
   }
 
   if (nodeIsNotExcluded && isUnTranslated(node)) {
-    tOptions = getTOptions(tOptions, node);
     if (node.text) node.text = translate(node.text, tOptions);
     if (node.properties) node.properties = translateProps(node.properties, tOptions);
     if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';

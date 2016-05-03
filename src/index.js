@@ -18,7 +18,8 @@ function getDefaults() {
     debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
     saveMissing: window.location.search && window.location.search.indexOf('saveMissing=true') > -1,
     namespace: false,
-    namespaceFromPath: false
+    namespaceFromPath: false,
+    ns: []
   }
 }
 
@@ -42,17 +43,25 @@ i18next.on('missingKey', missingHandler);
 let lastOptions = {};
 
 function getPathname() {
-  const path = location.pathname;
+  let path = location.pathname;
   if (path === '/') return 'root';
-  return 'root' + path.replace('/', '_');
+
+  const parts = path.split('/');
+  let ret = 'root';
+
+  parts.forEach(p => {
+    if (p) ret += `_${p}`;
+  });
+
+  return ret;
 }
 
 function changeNamespace(ns) {
   if (!ns && lastOptions.namespaceFromPath) ns = getPathname();
-  lastOptions.ns = ns;
+  lastOptions.ns.push(ns);
   lastOptions.defaultNS = ns;
 
-  i18next.loadNamespaces(ns, () => {
+  i18next.loadNamespaces(lastOptions.ns, () => {
     i18next.setDefaultNamespace(ns);
   });
 }
@@ -61,11 +70,11 @@ function init(options = {}) {
   options = {...getDefaults(), ...lastOptions, ...options};
 
   if (options.namespace) {
-    options.ns = options.namespace;
+    options.ns.push(options.namespace);
     options.defaultNS = options.namespace;
   } else if (options.namespaceFromPath) {
     const ns = getPathname();
-    options.ns = ns;
+    options.ns.push(ns);
     options.defaultNS = ns;
   }
 

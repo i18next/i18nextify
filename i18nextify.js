@@ -5073,11 +5073,12 @@
 	    }
 	  }
 
-	  return babelHelpers.extends({}, optsOnNode || {}, opts || {});
+	  return babelHelpers.extends({}, opts || {}, optsOnNode || {});
 	}
 
 	function walk(node, tOptions) {
 	  var nodeIsNotExcluded = isNotExcluded(node);
+	  tOptions = getTOptions(tOptions, node);
 
 	  if (node.children) {
 	    node.children.forEach(function (child) {
@@ -5088,7 +5089,6 @@
 	  }
 
 	  if (nodeIsNotExcluded && isUnTranslated(node)) {
-	    tOptions = getTOptions(tOptions, node);
 	    if (node.text) node.text = translate(node.text, tOptions);
 	    if (node.properties) node.properties = translateProps(node.properties, tOptions);
 	    if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
@@ -5178,7 +5178,8 @@
 	    debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
 	    saveMissing: window.location.search && window.location.search.indexOf('saveMissing=true') > -1,
 	    namespace: false,
-	    namespaceFromPath: false
+	    namespaceFromPath: false,
+	    ns: []
 	  };
 	}
 
@@ -5203,15 +5204,23 @@
 	function getPathname() {
 	  var path = location.pathname;
 	  if (path === '/') return 'root';
-	  return 'root' + path.replace('/', '_');
+
+	  var parts = path.split('/');
+	  var ret = 'root';
+
+	  parts.forEach(function (p) {
+	    if (p) ret += '_' + p;
+	  });
+
+	  return ret;
 	}
 
 	function changeNamespace(ns) {
 	  if (!ns && lastOptions.namespaceFromPath) ns = getPathname();
-	  lastOptions.ns = ns;
+	  lastOptions.ns.push(ns);
 	  lastOptions.defaultNS = ns;
 
-	  i18next.loadNamespaces(ns, function () {
+	  i18next.loadNamespaces(lastOptions.ns, function () {
 	    i18next.setDefaultNamespace(ns);
 	  });
 	}
@@ -5222,11 +5231,11 @@
 	  options = babelHelpers.extends({}, getDefaults(), lastOptions, options);
 
 	  if (options.namespace) {
-	    options.ns = options.namespace;
+	    options.ns.push(options.namespace);
 	    options.defaultNS = options.namespace;
 	  } else if (options.namespaceFromPath) {
 	    var ns = getPathname();
-	    options.ns = ns;
+	    options.ns.push(ns);
 	    options.defaultNS = ns;
 	  }
 
