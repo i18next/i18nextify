@@ -9,7 +9,9 @@
         saveMissing: true,
         // namespace: 'somethingNS'
         namespaceFromPath: true,
-        ns: ['common']
+        ns: ['common'],
+        ignoreIds: ['ignoreMeId'],
+        ignoreClasses: ['ignoreMeClass']
       });
     </script>
   </head>
@@ -55,6 +57,11 @@
     <div i18next-options='{"ns": "common"}'>
       <p>different namespace: i18next-options='{"ns": "common"}'</p>
       <p>set it on i18next options and assert to add it to <strong>i18next.options.ns array on init</strong></p>
+    </div>
+    <hr />
+    <div>
+      <p id="ignoreMeId">ignored by id</p>
+      <p class="ignoreMeClass">ignored by class</p>
     </div>
     <hr />
     <div>dynamically added:</div>

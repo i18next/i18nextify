@@ -7,7 +7,17 @@ function isUnTranslated(node) {
 }
 
 function isNotExcluded(node) {
-  return !node.properties || !node.properties.attributes || node.properties.attributes.translated !== '';
+  let ret = !node.properties || !node.properties.attributes || node.properties.attributes.translated !== '';
+
+  if (ret && i18next.options.ignoreClasses) {
+    if (i18next.options.ignoreClasses.indexOf(node.properties && node.properties.className) > -1) ret = false;
+  }
+
+  if (ret && i18next.options.ignoreIds) {
+    if (i18next.options.ignoreIds.indexOf(node.properties && node.properties.id) > -1) ret = false;
+  }
+
+  return ret;
 }
 
 function translate(str, options = {}) {
