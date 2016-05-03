@@ -13,6 +13,8 @@ function getDefaults() {
     autorun: true,
     ele: document.body,
     ignoreTags: ['SCRIPT'],
+    ignoreIds: [],
+    ignoreClasses: [],
     nsSeparator: '#||#',
     keySeparator: '#|#',
     debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
@@ -94,7 +96,10 @@ function init(options = {}) {
 
     for (var i = 0; i < children.length; i++) {
       let c = children[i];
-      if (options.ignoreTags.indexOf(c.tagName) < 0 && !c.attributes.translated) {
+      if (options.ignoreTags.indexOf(c.tagName) < 0 &&
+        options.ignoreIds.indexOf(c.id) < 0 &&
+        options.ignoreClasses.indexOf(c.className) < 0 &&
+        !c.attributes.translated) {
         let r = renderer(c, observer);
         renderers.push(r);
         r.render();
