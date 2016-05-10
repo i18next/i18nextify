@@ -21,6 +21,7 @@ function getDefaults() {
     saveMissing: window.location.search && window.location.search.indexOf('saveMissing=true') > -1,
     namespace: false,
     namespaceFromPath: false,
+    missingKeyHandler: missingHandler,
     ns: []
   }
 }
@@ -39,7 +40,7 @@ i18next.use(XHR);
 i18next.use(LngDet);
 
 // log out missings
-i18next.on('missingKey', missingHandler);
+// i18next.on('missingKey', missingHandler);
 
 // store last init options - for case init is called before dom ready
 let lastOptions = {};
