@@ -12,6 +12,10 @@ Should play well with any static or dynamic page not using a own virtual-dom.
 
 # Getting started
 
+The easiest way for guaranteed success is using [locizify](http://locize.com/integration) on [locize.com](locize.com).
+
+Alternatively:
+
 Drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.min.js) on your page.
 
 
