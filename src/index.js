@@ -81,8 +81,6 @@ function init(options = {}) {
     options.defaultNS = ns;
   }
 
-  if (!options.ns) options.ns = ['translation'];
-
   // delay init from domReady
   if (!options.ele) {
     delete options.ele;
