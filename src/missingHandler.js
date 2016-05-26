@@ -18,4 +18,8 @@ export function missingHandler(lngs, namespace, key, res) {
     setPath(missings, [lng, namespace, key], res);
     debouncedLog();
   });
+
+  if (i18next.services.backendConnector && i18next.services.backendConnector.saveMissing) {
+    i18next.services.backendConnector.saveMissing(lngs, namespace, key, res);
+  }
 }

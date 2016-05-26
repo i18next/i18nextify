@@ -1,4 +1,10 @@
 {
   "foo {{foo}}; foo2 {{foo2}}": "foo {{foo}}; foo2 {{foo2}}",
-  "foo {{foo}}": "foo {{foo}}"
+  "foo {{foo}}": "foo {{foo}}",
+  "|": " | ",
+  "_t": "Thu May 26 2016 19:04:17 GMT 0200 (CEST)",
+  "deutsch": "deutsch",
+  "english": "english",
+  "foo bar": "foo bar",
+  "foo bar; foo2 bar2": "foo bar; foo2 bar2"
 }
