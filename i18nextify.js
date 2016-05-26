@@ -5255,6 +5255,8 @@
 	    options.defaultNS = ns;
 	  }
 
+	  if (!options.ns.length) options.ns = ['translation'];
+
 	  // delay init from domReady
 	  if (!options.ele) {
 	    delete options.ele;
