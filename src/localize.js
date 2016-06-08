@@ -65,6 +65,9 @@ function walk(node, tOptions) {
     });
   }
 
+  // ignore comments
+  if (node.text && !node.properties && node.type ==='Widget') return node;
+
   if (nodeIsNotExcluded && isUnTranslated(node)) {
     if (node.text) node.text = translate(node.text, tOptions);
     if (node.properties) node.properties = translateProps(node.properties, tOptions);
