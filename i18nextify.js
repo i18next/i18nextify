@@ -5270,10 +5270,10 @@
 	  initialized = true;
 	  var renderers = [];
 
-	  function addRenderers() {
-	    var ele = options.ele;
-	    var children = ele.children;
+	  var ele = options.ele;
+	  var children = ele.children;
 
+	  function addRenderers() {
 	    for (var i = 0; i < children.length; i++) {
 	      var c = children[i];
 	      if (options.ignoreTags.indexOf(c.tagName) < 0 && options.ignoreIds.indexOf(c.id) < 0 && options.ignoreClasses.indexOf(c.className) < 0 && !c.attributes.localized && !c.attributes.translated) {
@@ -5282,6 +5282,22 @@
 	        r.render();
 	      }
 	    }
+	  }
+
+	  function waitForInitialRender(timeout, callback) {
+	    var allRendered = true;
+	    setTimeout(function () {
+	      for (var i = 0; i < children.length; i++) {
+	        var c = children[i];
+	        if (options.ignoreTags.indexOf(c.tagName) < 0 && options.ignoreIds.indexOf(c.id) < 0 && options.ignoreClasses.indexOf(c.className) < 0 && !c.attributes.localized && !c.attributes.translated) {
+	          if (allRendered) waitForInitialRender(100, callback);
+	          allRendered = false;
+	          break;
+	        }
+	      }
+
+	      if (allRendered) callback();
+	    }, timeout);
 	  }
 
 	  var observer = new Observer(options.ele);
@@ -5301,7 +5317,10 @@
 	    todo = todo - 1;
 	    if (!todo) {
 	      addRenderers();
-	      if (options.ele.style && options.ele.style.display === 'none') options.ele.style.display = 'block';
+
+	      waitForInitialRender(0, function () {
+	        if (options.ele.style && options.ele.style.display === 'none') options.ele.style.display = 'block';
+	      });
 	    }
 	  }
 

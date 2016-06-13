@@ -2,7 +2,7 @@
   "foo {{foo}}; foo2 {{foo2}}": "foo {{foo}}; foo2 {{foo2}}",
   "foo {{foo}}": "foo {{foo}}",
   "|": " | ",
-  "_t": "Wed Jun 08 2016 17:20:06 GMT 0200 (CEST)",
+  "_t": "Mon Jun 13 2016 08:36:13 GMT 0200 (CEST)",
   "deutsch": "deutsch",
   "english": "english",
   "foo bar": "foo bar",
