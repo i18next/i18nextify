@@ -28,6 +28,6 @@ export default {
     commonjs()
   ].concat(compress ? uglify() : []),
   moduleName: 'i18nextify',
-  moduleId: 'i18nextify',
+  //moduleId: 'i18nextify',
   dest
 };

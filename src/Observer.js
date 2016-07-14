@@ -48,5 +48,3 @@ export default class Observer extends EventEmitter {
     this.internalChange = true;
   }
 }
-
-export default Observer;
