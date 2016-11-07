@@ -2,7 +2,7 @@
   "foo {{foo}}; foo2 {{foo2}}": "foo {{foo}}; foo2 {{foo2}}",
   "foo {{foo}}": "foo {{foo}}",
   "|": " | ",
-  "_t": "Thu Jul 14 2016 18:59:28 GMT 0200 (CEST)",
+  "_t": "Mon Nov 07 2016 20:03:59 GMT 0100 (CET)",
   "deutsch": "deutsch",
   "english": "english",
   "foo bar": "foo bar",
@@ -28,5 +28,6 @@
   "Nutzung von Optionen:": "\n      Nutzung von Optionen:\n      ",
   "style? Kein problem…": " style? Kein problem…",
   "Dynamisch hinzugefügt:": "Dynamisch hinzugefügt:",
-  "Schweb über mir (hover)": "Schweb über mir (hover)"
+  "Schweb über mir (hover)": "Schweb über mir (hover)",
+  "CLICK ME INNER": "CLICK ME INNER"
 }

@@ -60,7 +60,7 @@
       <p>set it on i18next options and assert to add it to <strong>i18next.options.ns array on init</strong></p>
     </div>
     <hr />
-    <div>
+    <div id="appendToInner">
       <p id="ignoreMeId">ignored by id</p>
       <p class="ignoreMeClass">ignored by class</p>
     </div>
@@ -77,6 +77,18 @@
         btn.appendChild(t);
 
         console.log('appendingFromOutside');
+        ele.appendChild(btn);
+      }, 5000);
+
+
+      setTimeout(function () {
+        var ele = document.getElementById('appendToInner');
+
+        var btn = document.createElement("BUTTON");
+        var t = document.createTextNode("CLICK ME INNER");
+        btn.appendChild(t);
+
+        console.log('appendingFromOutsideToInner');
         ele.appendChild(btn);
       }, 5000);
     </script>
