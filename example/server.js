@@ -48,7 +48,7 @@ app.get('/sub/', function(req, res) {
 });
 
 app.get('/i18nextify.min.js', function(req, res) {
-  fs.readFile(__dirname + '/../i18nextify.min.js', 'utf-8', function(err, doc) {
+  fs.readFile(__dirname + '/../i18nextify.js', 'utf-8', function(err, doc) {
     res.send(doc);
   });
 });

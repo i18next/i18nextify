@@ -5401,16 +5401,14 @@
 	  if (!options.ele) {
 	    delete options.ele;
 	    lastOptions = options;
-	    return;
 	  }
 
 	  initialized = true;
 	  var renderers = [];
 
-	  var ele = options.ele;
-	  var children = ele.children;
+	  var observer = void 0;
 
-	  function addRenderers() {
+	  function addRenderers(children) {
 	    for (var i = 0; i < children.length; i++) {
 	      var c = children[i];
 	      if (options.ignoreTags.indexOf(c.tagName) < 0 && options.ignoreIds.indexOf(c.id) < 0 && options.ignoreClasses.indexOf(c.className) < 0 && !c.attributes.localized && !c.attributes.translated) {
@@ -5421,13 +5419,14 @@
 	    }
 	  }
 
-	  function waitForInitialRender(timeout, callback) {
+	  function waitForInitialRender(children, timeout, callback) {
 	    var allRendered = true;
 	    setTimeout(function () {
 	      for (var i = 0; i < children.length; i++) {
 	        var c = children[i];
 	        if (options.ignoreTags.indexOf(c.tagName) < 0 && options.ignoreIds.indexOf(c.id) < 0 && options.ignoreClasses.indexOf(c.className) < 0 && !c.attributes.localized && !c.attributes.translated) {
-	          if (allRendered) waitForInitialRender(100, callback);
+	          console.warn('here');
+	          if (allRendered) waitForInitialRender(children, 100, callback);
 	          allRendered = false;
 	          break;
 	        }
@@ -5437,33 +5436,37 @@
 	    }, timeout);
 	  }
 
-	  var observer = new Observer(options.ele);
-
-	  observer.on('changed', function (mutations) {
-	    renderers.forEach(function (r) {
-	      return r.debouncedRender();
-	    });
-	    addRenderers();
-	  });
-
 	  var todo = 1;
-	  if (options.autorun && !domReady) todo++;
+	  if (!domReady) todo++;
 	  if (options.autorun === false) todo++;
 
 	  function done() {
 	    todo = todo - 1;
 	    if (!todo) {
-	      addRenderers();
+	      (function () {
+	        if (!options.ele) options.ele = document.body;
+	        var children = options.ele.children;
 
-	      waitForInitialRender(0, function () {
-	        if (options.ele.style && options.ele.style.display === 'none') options.ele.style.display = 'block';
-	      });
+	        observer = new Observer(options.ele);
+	        addRenderers(children);
+
+	        observer.on('changed', function (mutations) {
+	          renderers.forEach(function (r) {
+	            return r.debouncedRender();
+	          });
+	          addRenderers(children);
+	        });
+
+	        waitForInitialRender(children, 0, function () {
+	          if (options.ele.style && options.ele.style.display === 'none') options.ele.style.display = 'block';
+	        });
+	      })();
 	    }
 	  }
 
 	  i18next.init(options, done);
 
-	  if (options.autorun !== false && !domReady) {
+	  if (!domReady) {
 	    docReady(done);
 	  }
 	  if (options.autorun === false) return { start: done };

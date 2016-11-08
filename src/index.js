@@ -87,17 +87,14 @@ function init(options = {}) {
   if (!options.ele) {
     delete options.ele;
     lastOptions = options;
-    return;
   }
 
   initialized = true;
   let renderers = [];
 
+  let observer;
 
-  let ele = options.ele;
-  let children = ele.children;
-
-  function addRenderers() {
+  function addRenderers(children) {
     for (var i = 0; i < children.length; i++) {
       let c = children[i];
       if (options.ignoreTags.indexOf(c.tagName) < 0 &&
@@ -112,7 +109,7 @@ function init(options = {}) {
     }
   }
 
-  function waitForInitialRender(timeout, callback) {
+  function waitForInitialRender(children, timeout, callback) {
     let allRendered = true;
     setTimeout(() => {
       for (var i = 0; i < children.length; i++) {
@@ -121,8 +118,8 @@ function init(options = {}) {
           options.ignoreIds.indexOf(c.id) < 0 &&
           options.ignoreClasses.indexOf(c.className) < 0 &&
           !c.attributes.localized &&
-          !c.attributes.translated) {
-          if (allRendered) waitForInitialRender(100, callback);
+          !c.attributes.translated) {console.warn('here')
+          if (allRendered) waitForInitialRender(children, 100, callback);
           allRendered = false;
           break;
         }
@@ -132,23 +129,25 @@ function init(options = {}) {
     }, timeout);
   }
 
-  let observer = new Observer(options.ele);
-
-  observer.on('changed', (mutations) => {
-    renderers.forEach(r => r.debouncedRender());
-    addRenderers();
-  });
-
   let todo = 1;
-  if (options.autorun && !domReady) todo++;
+  if (!domReady) todo++;
   if (options.autorun === false) todo++;
 
   function done() {
     todo = todo - 1;
     if (!todo) {
-      addRenderers();
+      if (!options.ele) options.ele = document.body;
+      let children = options.ele.children;
 
-      waitForInitialRender(0, () => {
+      observer = new Observer(options.ele);
+      addRenderers(children);
+
+      observer.on('changed', (mutations) => {
+        renderers.forEach(r => r.debouncedRender());
+        addRenderers(children);
+      });
+
+      waitForInitialRender(children, 0, () => {
         if (options.ele.style && options.ele.style.display === 'none') options.ele.style.display = 'block';
       });
     }
@@ -156,7 +155,7 @@ function init(options = {}) {
 
   i18next.init(options, done);
 
-  if (options.autorun !== false && !domReady) {
+  if (!domReady) {
     docReady(done);
   }
   if (options.autorun === false) return { start: done };
