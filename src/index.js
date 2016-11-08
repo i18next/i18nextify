@@ -140,7 +140,7 @@ function init(options = {}) {
   });
 
   let todo = 1;
-  if (!domReady) todo++;
+  if (options.autorun && !domReady) todo++;
   if (options.autorun === false) todo++;
 
   function done() {
