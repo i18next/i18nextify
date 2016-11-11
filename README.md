@@ -62,6 +62,20 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
   ...
 ```
 
+## Fragment replacement for links and images
+
+```html
+<img src="/images/{{a.png}}" alt="big A" />
+```
+
+You will find `a.png` to be a key in your translation files - it's value can be replaced to eg. `a-de.png` for german (all other languages will fallback to `a.png`)
+
+```html
+<a href="/{{statistic}}">Open my statistics</a>
+```
+
+`statistic` will be a regular key that can be translated. But be aware you will need to provide that routes - eg. using [localized routes on the server](https://github.com/i18next/i18next-express-middleware#add-localized-routes)
+
 ## Avoid translating
 
 #### an element

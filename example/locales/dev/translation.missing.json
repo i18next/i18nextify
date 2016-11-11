@@ -2,7 +2,7 @@
   "foo {{foo}}; foo2 {{foo2}}": "foo {{foo}}; foo2 {{foo2}}",
   "foo {{foo}}": "foo {{foo}}",
   "|": " | ",
-  "_t": "Tue Nov 08 2016 13:57:28 GMT 0100 (CET)",
+  "_t": "Fri Nov 11 2016 11:29:16 GMT 0100 (CET)",
   "deutsch": "deutsch",
   "english": "english",
   "foo bar": "foo bar",
@@ -30,5 +30,14 @@
   "Dynamisch hinzugefügt:": "Dynamisch hinzugefügt:",
   "Schweb über mir (hover)": "Schweb über mir (hover)",
   "CLICK ME INNER": "CLICK ME INNER",
-  "KLICK MICH INNER": "KLICK MICH INNER"
+  "KLICK MICH INNER": "KLICK MICH INNER",
+  "image - alt tag:": "image - alt tag:",
+  "big a": "big a",
+  "image - src replacement:": "image - src replacement:",
+  "http://localhost:3003/": "big a",
+  "a.png": "a.png",
+  "anchor - href replacement:": "anchor - href replacement:",
+  "statistic": "statistic",
+  "explore the link": "explore the link",
+  "Link hat anderen href": "Link hat anderen href"
 }

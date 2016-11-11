@@ -53,6 +53,14 @@ app.get('/i18nextify.min.js', function(req, res) {
   });
 });
 
+app.get('/a.png', function(req, res) {
+  res.sendFile(__dirname + '/assets/a.png');
+});
+
+app.get('/b.jpeg', function(req, res) {
+  res.sendFile(__dirname + '/assets/b.jpeg');
+});
+
 // in your request handler
 // app.get('myRoute', function(req, res) {
 //   var lng = req.language; // 'de-CH'

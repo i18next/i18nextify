@@ -69,6 +69,19 @@
       <p class="ignoreMeClass">ignored by class</p>
     </div>
     <hr />
+    <div>
+      <p>image - alt tag:</p>
+      <img src="/a.png" alt="big a" />
+
+      <p>image - src replacement:</p>
+      <img src="/{{a.png}}" alt="big a" />
+    </div>
+    <hr />
+    <div>
+      <p>anchor - href replacement:</p>
+      <a href="/{{statistic}}" alt="big a">explore the link</a>
+    </div>
+    <hr />
     <div>dynamically added:</div>
     <script>
       // window.virtualDomI18next.run(document.getElementById('react-mount'));

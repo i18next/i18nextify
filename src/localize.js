@@ -27,13 +27,34 @@ function translate(str, options = {}) {
   return str
 }
 
-let toTranslate = ['placeholder', 'title'];
+let toTranslate = ['placeholder', 'title', 'alt'];
+let replaceInside = ['src', 'href'];
+const REGEXP = new RegExp('%7B%7B(.+?)%7D%7D', 'g'); // urlEncoded {{}}
 function translateProps(props, options = {}) {
   if (!props) return props;
 
   toTranslate.forEach((attr) => {
     let value = getPath(props, attr);
-    if (value) setPath(props, attr, translate(value, options));
+    if (value) setPath(props, attr, translate(value, { ...options }));
+  });
+
+  replaceInside.forEach((attr) => {
+    let value = getPath(props, attr);
+    if (value && value.indexOf('%7B') > -1) {
+      const arr = [];
+
+      value.split(REGEXP).reduce((mem, match, index) => {
+        if (match.length === 0) return mem;
+
+        if (!index || index % 2 === 0) {
+          mem.push(match)
+        } else {
+          mem.push(translate(match, { ...options }));
+        }
+        return mem;
+      }, arr);
+      if (arr.length) setPath(props, attr, arr.join(''));
+    }
   });
 
   return props;
