@@ -1,0 +1,18 @@
+{
+  "deutsch": "deutsch",
+  "_t": "Tue Nov 15 2016 14:57:28 GMT 0100 (CET)",
+  "|": " | ",
+  "english": "english",
+  "foo {{foo}}": "foo {{foo}}",
+  "foo {{foo}}; foo2 {{foo2}}": "foo {{foo}}; foo2 {{foo2}}",
+  "image - alt tag:": "image - alt tag:",
+  "big a": "big a",
+  "image - src replacement:": "image - src replacement:",
+  "a.png": "a.png",
+  "anchor - href replacement:": "anchor - href replacement:",
+  "explore the link": "explore the link",
+  "statistic": "statistic",
+  "foo bar": "foo bar",
+  "foo bar; foo2 bar2": "foo bar; foo2 bar2",
+  "CLICK ME INNER": "CLICK ME INNER"
+}
