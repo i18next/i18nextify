@@ -108,6 +108,18 @@
         console.log('appendingFromOutsideToInner');
         ele.appendChild(btn);
       }, 5000);
+
+      setTimeout(function () {
+        var ele = document.getElementById('appendToInner');
+
+        var btn = document.createElement("BUTTON");
+        btn.className = "ignoreMeClass"
+        var t = document.createTextNode("CLICK ME INNER _ IGNORED BY CLASS");
+        btn.appendChild(t);
+
+        console.log('appendingFromOutsideToInnerIgnoreClass');
+        ele.appendChild(btn);
+      }, 5000);
     </script>
   </body>
 </html>
