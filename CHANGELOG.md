@@ -1,3 +1,7 @@
+### 1.1.2
+- allow ignoreTags to be caseinsensitive
+- ignoreTags in translations
+
 ### 1.1.1
 - fix ignore classes if being not the only class on element
 

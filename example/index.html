@@ -10,6 +10,7 @@
         namespace: 'translation',
         // namespaceFromPath: true,
         ns: ['common'],
+        ignoreTags: ['script', 'h6'],
         ignoreIds: ['ignoreMeId'],
         ignoreClasses: ['ignoreMeClass'],
         //autorun: false
@@ -68,6 +69,7 @@
       <p id="ignoreMeId">ignored by id</p>
       <p class="ignoreMeClass">ignored by class</p>
       <p class="ignoreMeClass someBeautyStyle">ignored by class having other class too</p>
+      <h6>ignored by tag</h6>
     </div>
     <hr />
     <div>

@@ -9,6 +9,8 @@ function isUnTranslated(node) {
 function isNotExcluded(node) {
   let ret = !node.properties || !node.properties.attributes || node.properties.attributes.translated !== '';
 
+  if (ret && node.tagName && i18next.options.ignoreTags.indexOf(node.tagName) > -1) ret = false;
+
   if (ret && i18next.options.ignoreClasses && node.properties && node.properties.className) {
     const p = node.properties.className.split(' ');
     p.forEach(cls => {

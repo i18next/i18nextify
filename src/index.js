@@ -89,6 +89,8 @@ function init(options = {}) {
     lastOptions = options;
   }
 
+  if (options.ignoreTags) options.ignoreTags = options.ignoreTags.map(s => s.toUpperCase());
+
   initialized = true;
   let renderers = [];
 

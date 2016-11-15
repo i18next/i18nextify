@@ -5175,6 +5175,8 @@
 	function isNotExcluded(node) {
 	  var ret = !node.properties || !node.properties.attributes || node.properties.attributes.translated !== '';
 
+	  if (ret && node.tagName && i18next.options.ignoreTags.indexOf(node.tagName) > -1) ret = false;
+
 	  if (ret && i18next.options.ignoreClasses && node.properties && node.properties.className) {
 	    var p = node.properties.className.split(' ');
 	    p.forEach(function (cls) {
@@ -5427,6 +5429,10 @@
 	    delete options.ele;
 	    lastOptions = options;
 	  }
+
+	  if (options.ignoreTags) options.ignoreTags = options.ignoreTags.map(function (s) {
+	    return s.toUpperCase();
+	  });
 
 	  initialized = true;
 	  var renderers = [];
