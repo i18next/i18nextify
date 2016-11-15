@@ -5175,8 +5175,12 @@
 	function isNotExcluded(node) {
 	  var ret = !node.properties || !node.properties.attributes || node.properties.attributes.translated !== '';
 
-	  if (ret && i18next.options.ignoreClasses) {
-	    if (i18next.options.ignoreClasses.indexOf(node.properties && node.properties.className) > -1) ret = false;
+	  if (ret && i18next.options.ignoreClasses && node.properties && node.properties.className) {
+	    var p = node.properties.className.split(' ');
+	    p.forEach(function (cls) {
+	      if (!ret) return;
+	      if (i18next.options.ignoreClasses.indexOf(cls) > -1) ret = false;
+	    });
 	  }
 
 	  if (ret && i18next.options.ignoreIds) {
