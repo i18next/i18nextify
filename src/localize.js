@@ -80,22 +80,22 @@ function getTOptions(opts, node) {
 }
 
 function walk(node, tOptions) {
-  const nodeIsNotExcluded = isNotExcluded(node);
+  var nodeIsNotExcluded = isNotExcluded(node);
+  var nodeIsUnTranslated = isUnTranslated(node);
   tOptions = getTOptions(tOptions, node);
 
   if (node.children) {
-    node.children.forEach((child) => {
-      if ((nodeIsNotExcluded && child.text) ||
-          (!child.text && isNotExcluded(child))) {
+    node.children.forEach(function (child) {
+      if ((nodeIsNotExcluded && nodeIsUnTranslated && child.text) || (!child.text && isNotExcluded(child))) {
         walk(child, tOptions);
       }
     });
   }
 
   // ignore comments
-  if (node.text && !node.properties && node.type ==='Widget') return node;
+  if (node.text && !node.properties && node.type === 'Widget') return node;
 
-  if (nodeIsNotExcluded && isUnTranslated(node)) {
+  if (nodeIsNotExcluded && nodeIsUnTranslated) {
     if (node.text) node.text = translate(node.text, tOptions);
     if (node.properties) node.properties = translateProps(node.properties, tOptions);
     if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
