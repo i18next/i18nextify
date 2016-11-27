@@ -1,3 +1,6 @@
+### 1.1.3
+- avoid retranslating virtual text nodes inside a node
+
 ### 1.1.2
 - allow ignoreTags to be caseinsensitive
 - ignoreTags in translations
