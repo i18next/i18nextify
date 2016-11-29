@@ -9,7 +9,7 @@
         saveMissing: true,
         namespace: 'translation',
         // namespaceFromPath: true,
-        ns: ['common'],
+        ns: ['common', 'commonNested'],
         ignoreTags: ['script', 'h6'],
         ignoreIds: ['ignoreMeId'],
         ignoreClasses: ['ignoreMeClass'],
@@ -61,9 +61,11 @@
       </div>
     </div>
     <hr />
+    <p i18next-options='{"ns": "common"}'>Also works on node directly</p>
     <div i18next-options='{"ns": "common"}'>
       <p>different namespace: i18next-options='{"ns": "common"}'</p>
       <p>set it on i18next options and assert to add it to <strong>i18next.options.ns array on init</strong></p>
+      <p i18next-options='{"ns": "commonNested"}'>Also can change inside on node directly</p>
     </div>
     <hr />
     <div id="appendToInner">
