@@ -1,3 +1,6 @@
+### 1.1.4
+- fixes fragment replacement in safari (some how that comes unencoded)
+
 ### 1.1.3
 - avoid retranslating virtual text nodes inside a node
 

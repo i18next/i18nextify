@@ -5103,6 +5103,7 @@
 
 	  replaceInside.forEach(function (attr) {
 	    var value = getPath(props, attr);
+	    if (value) value = value.replace(/\{\{/g, '%7B%7B').replace(/\}\}/g, '%7D%7D'); // fix for safari
 	    if (value && value.indexOf('%7B') > -1) {
 	      var arr = [];
 
