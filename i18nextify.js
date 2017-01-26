@@ -6551,20 +6551,30 @@
 	  return _extends$6({}, opts || {}, optsOnNode || {});
 	}
 
+	function removeIndent(str) {
+	  console.warn(str, console.warn(str.indexOf('\n')));
+	  if (!i18next.options.cleanupIndent) return str;
+	  var p = str.split('\n');console.warn(p, p.length);
+	  if (str.indexOf('\n') === 0 && p.length === 3) return p[1].replace(/^\s+/, '');
+	  if (str.indexOf('\n') === 0 && p.length === 2) return p[1].replace(/^\s+/, '');
+	  if (str.indexOf('\n') > 0 && p.length === 2) return p[0];
+	  return str;
+	}
+
 	function walk(node, tOptions) {
 	  var nodeIsNotExcluded = isNotExcluded(node);
 	  var nodeIsUnTranslated = isUnTranslated(node);
 	  tOptions = getTOptions(tOptions, node);
 
-	  console.warn('attr', getAttribute(node, 'merge'));
-
-	  console.warn(node, tOptions);
-	  console.warn(toHTML(node));
+	  // console.warn('attr', getAttribute(node, 'merge'))
+	  //
+	  // console.warn(node, tOptions)
+	  // console.warn(toHTML(node))
 
 	  // translate node as one block
 	  if (getAttribute(node, 'merge') === '' && nodeIsNotExcluded && nodeIsUnTranslated) {
 	    console.warn('here');
-	    var translation = translate(toHTML(node), tOptions);
+	    var translation = translate(toHTML(node), tOptions); // TODO: remove indent
 	    return parser((translation || '').trim());
 	  }
 
@@ -6580,7 +6590,7 @@
 	  if (node.text && !node.properties && node.type === 'Widget') return node;
 
 	  if (nodeIsNotExcluded && nodeIsUnTranslated) {
-	    if (node.text) node.text = translate(node.text, tOptions);
+	    if (node.text) node.text = translate(removeIndent(node.text), tOptions);
 	    if (node.properties) node.properties = translateProps(node.properties, tOptions);
 	    if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
 	  }
