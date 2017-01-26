@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/i18nextify.min.js"></script>
+    <script>
+      var translation = window.i18nextify.init({
+        debug: true,
+        saveMissing: true,
+        namespace: 'translation',
+        // namespaceFromPath: true,
+        ns: ['common', 'commonNested'],
+        ignoreTags: ['script', 'h6'],
+        ignoreIds: ['ignoreMeId'],
+        ignoreClasses: ['ignoreMeClass'],
+        //autorun: false
+      });
+      // setTimeout(function () {
+      //   translation.start();
+      // }, 4000);
+    </script>
+  </head>
+  <body class="landing-page" style='display: none'>
+    <div>
+      <p merge>
+        Before text
+        <br />
+        some <span class="someCSS">with a span</span> and
+        <strong>a strong thing</strong>
+      </p>
+    </div>
+  </body>
+</html>

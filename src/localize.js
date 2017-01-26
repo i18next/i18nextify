@@ -1,5 +1,8 @@
+import toHTML from 'vdom-to-html';
+import parser from 'vdom-parser';
 import i18next from 'i18next';
-import { getPath, setPath } from 'i18next/dist/es/utils'
+import { getPath, setPath } from 'i18next/dist/es/utils';
+import { getAttribute } from './utils'
 import Instrument from './Instrument';
 
 function isUnTranslated(node) {
@@ -68,7 +71,7 @@ function translateProps(props, options = {}) {
 }
 
 function getTOptions(opts, node) {
-  let optsOnNode = node.properties && node.properties.attributes && node.properties.attributes['i18next-options'];
+  let optsOnNode = getAttribute(node, 'i18next-options');
   if (optsOnNode) {
     try {
       optsOnNode = JSON.parse(optsOnNode);
@@ -84,6 +87,17 @@ function walk(node, tOptions) {
   var nodeIsNotExcluded = isNotExcluded(node);
   var nodeIsUnTranslated = isUnTranslated(node);
   tOptions = getTOptions(tOptions, node);
+
+  console.warn('attr', getAttribute(node, 'merge'))
+
+  console.warn(node, tOptions)
+  console.warn(toHTML(node))
+
+  // translate node as one block
+  if (getAttribute(node, 'merge') === '' && nodeIsNotExcluded && nodeIsUnTranslated) {console.warn('here')
+    const translation = translate(toHTML(node), tOptions);
+    return parser((translation || '').trim());
+  }
 
   if (node.children) {
     node.children.forEach(function (child) {

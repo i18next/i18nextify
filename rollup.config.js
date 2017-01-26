@@ -1,6 +1,7 @@
 import babel from 'rollup-plugin-babel';
 import uglify from 'rollup-plugin-uglify';
 import nodeResolve from 'rollup-plugin-node-resolve';
+import json from 'rollup-plugin-json';
 import commonjs from 'rollup-plugin-commonjs';
 import { argv } from 'yargs';
 
@@ -25,6 +26,13 @@ export default {
   plugins: [
     babel(babelOptions),
     nodeResolve({ jsnext: true, main: true }),
+    // json({
+    //   // All JSON files will be parsed by default,
+    //   // but you can also specifically include/exclude files
+    //   include: ['node_modules/entities/**', 'node_modules/ent/**'],  // Default: undefined
+    //   //exclude: [ 'node_modules/foo/**', 'node_modules/bar/**' ],  // Default: undefined
+    //   preferConst: false, // Default: false
+    // }),
     commonjs()
   ].concat(compress ? uglify() : []),
   moduleName: 'i18nextify',

@@ -120,7 +120,7 @@ function init(options = {}) {
           options.ignoreIds.indexOf(c.id) < 0 &&
           options.ignoreClasses.indexOf(c.className) < 0 &&
           !c.attributes.localized &&
-          !c.attributes.translated) {console.warn('here')
+          !c.attributes.translated) {
           if (allRendered) waitForInitialRender(children, 100, callback);
           allRendered = false;
           break;

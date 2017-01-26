@@ -12,3 +12,7 @@ export function debounce(func, wait, immediate) {
 		if (callNow) func.apply(context, args);
 	};
 };
+
+export function getAttribute(node, attr) {
+	return node.properties && node.properties.attributes && node.properties.attributes[attr];
+}

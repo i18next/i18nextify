@@ -36,7 +36,7 @@ app.post('/locales/add/:lng/:ns', middleware.missingKeyHandler(i18next));
 // });
 
 app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/temp.html');
 });
 
 app.get('/sub', function(req, res) {
