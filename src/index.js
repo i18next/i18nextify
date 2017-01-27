@@ -15,6 +15,10 @@ function getDefaults() {
     ignoreTags: ['SCRIPT'],
     ignoreIds: [],
     ignoreClasses: [],
+    inlineTags: [],
+    cleanIndent: false,
+    ignoreCleanIndentFor: ['PRE', 'CODE'],
+    cleanWhitespace: false,
     nsSeparator: '#||#',
     keySeparator: '#|#',
     debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
@@ -23,7 +27,7 @@ function getDefaults() {
     namespaceFromPath: false,
     missingKeyHandler: missingHandler,
     ns: []
-  }
+  };
 }
 
 
@@ -90,6 +94,8 @@ function init(options = {}) {
   }
 
   if (options.ignoreTags) options.ignoreTags = options.ignoreTags.map(s => s.toUpperCase());
+  if (options.ignoreCleanIndentFor) options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map(s => s.toUpperCase());
+  if (options.inlineTags) options.inlineTags = options.inlineTags.map(s => s.toUpperCase());
 
   initialized = true;
   let renderers = [];

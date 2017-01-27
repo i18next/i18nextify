@@ -6547,41 +6547,57 @@
 	      console.warn('failed parsing options on node', node);
 	    }
 	  }
+	  if (optsOnNode && optsOnNode.inlineTags) optsOnNode.inlineTags = optsOnNode.inlineTags.map(function (s) {
+	    return s.toUpperCase();
+	  });
 
 	  return _extends$6({}, opts || {}, optsOnNode || {});
 	}
 
-	function removeIndent(str) {
-	  console.warn(str, console.warn(str.indexOf('\n')));
-	  if (!i18next.options.cleanupIndent) return str;
-	  var p = str.split('\n');console.warn(p, p.length);
-	  if (str.indexOf('\n') === 0 && p.length === 3) return p[1].replace(/^\s+/, '');
-	  if (str.indexOf('\n') === 0 && p.length === 2) return p[1].replace(/^\s+/, '');
-	  if (str.indexOf('\n') > 0 && p.length === 2) return p[0];
-	  return str;
+	function removeIndent(str, substitution) {
+	  if (!i18next.options.cleanIndent) return str;
+	  // const p = str.split('\n');
+	  // if (str.indexOf('\n') === 0 && p.length === 3) return p[1].replace(/^\s+/, '');
+	  // if (str.indexOf('\n') === 0 && p.length === 2) return p[1].replace(/^\s+/, '');
+	  // if (str.indexOf('\n') > 0 && p.length === 2) return p[0];
+	  var ret = str.replace(/\n +/g, substitution);
+	  return ret;
 	}
 
-	function walk(node, tOptions) {
+	function canInline(node, tOptions) {
+	  if (!node.children || !node.children.length) return false;
+
+	  var baseTags = tOptions.inlineTags || i18next.options.inlineTags;
+	  var inlineTags = tOptions.additionalInlineTags ? baseTags.concat(tOptions.additionalInlineTags) : baseTags;
+
+	  var inlineable = true;
+	  var hadNonTextNode = false;
+	  node.children.forEach(function (child) {
+	    if (!child.text && inlineTags.indexOf(child.tagName) < 0) inlineable = false;
+	    if (child.tagName) hadNonTextNode = true;
+	  });
+
+	  return inlineable && hadNonTextNode;
+	}
+
+	function walk(node, tOptions, parent) {
 	  var nodeIsNotExcluded = isNotExcluded(node);
 	  var nodeIsUnTranslated = isUnTranslated(node);
 	  tOptions = getTOptions(tOptions, node);
 
-	  // console.warn('attr', getAttribute(node, 'merge'))
-	  //
-	  // console.warn(node, tOptions)
-	  // console.warn(toHTML(node))
-
 	  // translate node as one block
-	  if (getAttribute(node, 'merge') === '' && nodeIsNotExcluded && nodeIsUnTranslated) {
-	    console.warn('here');
-	    var translation = translate(toHTML(node), tOptions); // TODO: remove indent
-	    return parser((translation || '').trim());
+	  if ((getAttribute(node, 'merge') === '' || canInline(node, tOptions)) && nodeIsNotExcluded && nodeIsUnTranslated) {
+	    var translation = translate(removeIndent(toHTML(node), ''), tOptions);
+	    var newNode = parser((translation || '').trim());
+
+	    if (newNode.properties && newNode.properties.attributes) newNode.properties.attributes.localized = '';
+	    return newNode;
 	  }
 
 	  if (node.children) {
 	    node.children.forEach(function (child) {
 	      if (nodeIsNotExcluded && nodeIsUnTranslated && child.text || !child.text && isNotExcluded(child)) {
-	        walk(child, tOptions);
+	        walk(child, tOptions, node);
 	      }
 	    });
 	  }
@@ -6590,7 +6606,28 @@
 	  if (node.text && !node.properties && node.type === 'Widget') return node;
 
 	  if (nodeIsNotExcluded && nodeIsUnTranslated) {
-	    if (node.text) node.text = translate(removeIndent(node.text), tOptions);
+	    if (node.text) {
+	      var match = void 0;
+	      var txt = node.text;
+
+	      // exclude whitespace replacement eg on PRE, CODE
+	      var ignore = i18next.options.ignoreCleanIndentFor.indexOf(parent.tagName) > -1;
+
+	      if (!ignore) {
+	        txt = removeIndent(node.text, '\n');
+	        if (i18next.options.cleanWhitespace) {
+	          var regex = /^\s*(.*[^\s])\s*$/g;
+	          match = regex.exec(txt);
+	        }
+	      }
+
+	      if (!ignore && match && match.length > 1 && i18next.options.cleanWhitespace) {
+	        var _translation = translate(match[1], tOptions);
+	        node.text = txt.replace(match[1], _translation);
+	      } else {
+	        node.text = translate(txt, tOptions);
+	      }
+	    }
 	    if (node.properties) node.properties = translateProps(node.properties, tOptions);
 	    if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
 	  }
@@ -6664,6 +6701,10 @@
 	    ignoreTags: ['SCRIPT'],
 	    ignoreIds: [],
 	    ignoreClasses: [],
+	    inlineTags: [],
+	    cleanIndent: false,
+	    ignoreCleanIndentFor: ['PRE', 'CODE'],
+	    cleanWhitespace: false,
 	    nsSeparator: '#||#',
 	    keySeparator: '#|#',
 	    debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
@@ -6740,6 +6781,12 @@
 	  }
 
 	  if (options.ignoreTags) options.ignoreTags = options.ignoreTags.map(function (s) {
+	    return s.toUpperCase();
+	  });
+	  if (options.ignoreCleanIndentFor) options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map(function (s) {
+	    return s.toUpperCase();
+	  });
+	  if (options.inlineTags) options.inlineTags = options.inlineTags.map(function (s) {
 	    return s.toUpperCase();
 	  });
 

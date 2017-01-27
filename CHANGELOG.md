@@ -1,3 +1,6 @@
+### 1.2.0
+- adds cleanups and merge feature (currently enabling needs setting init options)
+
 ### 1.1.4
 - fixes fragment replacement in safari (some how that comes unencoded)
 
