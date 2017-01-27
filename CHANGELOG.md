@@ -1,3 +1,6 @@
+### 1.2.1
+- only merge if we have a parent - asserts we trigger done on observer
+
 ### 1.2.0
 - adds cleanups and merge feature (currently enabling needs setting init options)
 

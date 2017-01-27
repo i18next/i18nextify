@@ -116,7 +116,7 @@ function walk(node, tOptions, parent) {
   tOptions = getTOptions(tOptions, node);
 
   // translate node as one block
-  if ((getAttribute(node, 'merge') === '' || canInline(node, tOptions)) && nodeIsNotExcluded && nodeIsUnTranslated) {
+  if (parent && (getAttribute(node, 'merge') === '' || canInline(node, tOptions)) && nodeIsNotExcluded && nodeIsUnTranslated) {
     const translation = translate(removeIndent(toHTML(node), ''), tOptions);
     const newNode = parser((translation || '').trim());
 

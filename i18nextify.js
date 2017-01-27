@@ -6586,7 +6586,7 @@
 	  tOptions = getTOptions(tOptions, node);
 
 	  // translate node as one block
-	  if ((getAttribute(node, 'merge') === '' || canInline(node, tOptions)) && nodeIsNotExcluded && nodeIsUnTranslated) {
+	  if (parent && (getAttribute(node, 'merge') === '' || canInline(node, tOptions)) && nodeIsNotExcluded && nodeIsUnTranslated) {
 	    var translation = translate(removeIndent(toHTML(node), ''), tOptions);
 	    var newNode = parser((translation || '').trim());
 
