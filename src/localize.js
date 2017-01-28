@@ -1,5 +1,6 @@
 import toHTML from 'vdom-to-html';
 import parser from 'vdom-parser';
+import VNode from 'virtual-dom/vnode/vnode';
 import i18next from 'i18next';
 import { getPath, setPath } from 'i18next/dist/es/utils';
 import { getAttribute } from './utils'
@@ -95,7 +96,7 @@ function removeIndent(str, substitution) {
 }
 
 function canInline(node, tOptions) {
-  if (!node.children || !node.children.length) return false;
+  if (!node.children || !node.children.length || i18next.options.ignoreInlineOn.indexOf(node.tagName) > -1) return false;
 
   const baseTags = tOptions.inlineTags || i18next.options.inlineTags;
   const inlineTags = tOptions.additionalInlineTags ? baseTags.concat(tOptions.additionalInlineTags) : baseTags;
@@ -116,12 +117,22 @@ function walk(node, tOptions, parent) {
   tOptions = getTOptions(tOptions, node);
 
   // translate node as one block
-  if (parent && (getAttribute(node, 'merge') === '' || canInline(node, tOptions)) && nodeIsNotExcluded && nodeIsUnTranslated) {
-    const translation = translate(removeIndent(toHTML(node), ''), tOptions);
+  const mergeFlag = getAttribute(node, 'merge');
+  if (mergeFlag !== 'false' && (mergeFlag === '' || canInline(node, tOptions)) && nodeIsNotExcluded && nodeIsUnTranslated) {
+
+    // wrap children into dummy node and remove that outer from translation
+    const dummyNode = new VNode('I18NEXTIFYDUMMY', null, node.children);
+    const key = removeIndent(toHTML(dummyNode), '').replace('<i18nextifydummy>', '').replace('</i18nextifydummy>', '');
+
+    // translate that's children and surround it again with a dummy node to parse to vdom
+    const translation = `<i18nextifydummy>${translate(key, tOptions)}</i18nextifydummy>`;
     const newNode = parser((translation || '').trim());
 
-    if (newNode.properties && newNode.properties.attributes) newNode.properties.attributes.localized = '';
-    return newNode;
+    // replace children on passed in node
+    node.children = newNode.children;
+
+    if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
+    return node;
   }
 
   if (node.children) {

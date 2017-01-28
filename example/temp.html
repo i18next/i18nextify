@@ -13,8 +13,10 @@
         ignoreTags: ['script', 'h6'],
         ignoreIds: ['ignoreMeId'],
         ignoreClasses: ['ignoreMeClass'],
-        inlineTags: ['br', 'strong'],
+        inlineTags: ['br', 'strong', 'span'],
+        ignoreInlineOn: ['td'],
         cleanIndent: true,
+        ignoreCleanIndentFor: ['PRE', 'CODE'],
         cleanWhitespace: true
         //autorun: false
       });
@@ -24,6 +26,12 @@
     </script>
   </head>
   <body class="landing-page" style='display: none'>
+    <p>
+      Now we can have that on root
+      <br />
+      cool <span class="someCSS">with a span</span> and
+      <strong> a strong thing</strong>
+    </p>
     <div>
       <p>
         Before text
@@ -39,6 +47,22 @@
         lorem ipsum
         ipsum dipsum
       </p>
+      <table>
+          <tbody>
+            <tr>
+              <td>Words</sup></td>
+              <td translated>2,000</td>
+            </tr>
+            <tr>
+              <td>Sessions</td>
+              <td translated>40,000</td>
+            </tr>
+            <tr>
+              <td><strong>Estimate</strong></td>
+              <td translated><strong>$29</strong></td>
+            </tr>
+          </tbody>
+        </table>
     </div>
   </body>
 </html>

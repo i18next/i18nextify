@@ -16,6 +16,7 @@ function getDefaults() {
     ignoreIds: [],
     ignoreClasses: [],
     inlineTags: [],
+    ignoreInlineOn: [],
     cleanIndent: false,
     ignoreCleanIndentFor: ['PRE', 'CODE'],
     cleanWhitespace: false,
@@ -96,6 +97,7 @@ function init(options = {}) {
   if (options.ignoreTags) options.ignoreTags = options.ignoreTags.map(s => s.toUpperCase());
   if (options.ignoreCleanIndentFor) options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map(s => s.toUpperCase());
   if (options.inlineTags) options.inlineTags = options.inlineTags.map(s => s.toUpperCase());
+  if (options.ignoreInlineOn) options.ignoreInlineOn = options.ignoreInlineOn.map(s => s.toUpperCase());
 
   initialized = true;
   let renderers = [];

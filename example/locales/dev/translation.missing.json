@@ -3,7 +3,7 @@
   "807": "807",
   "1168": "1168",
   "deutsch": "deutsch",
-  "_t": "Fri Jan 27 2017 21:22:35 GMT 0100 (CET)",
+  "_t": "Sat Jan 28 2017 12:36:19 GMT 0100 (CET)",
   "|": " | ",
   "english": "english",
   "foo {{foo}}": "foo {{foo}}",
@@ -69,5 +69,14 @@
   "lorem ipsum\n        ipsum dipsum": "        lorem ipsum\n        ipsum dipsum\n      ",
   "lorem ipsum\nipsum dipsum": "\nlorem ipsum\nipsum dipsum\n",
   "/": "/",
-  "/lorem ipsum/ipsum dipsum/": "/lorem ipsum/ipsum dipsum/"
+  "/lorem ipsum/ipsum dipsum/": "/lorem ipsum/ipsum dipsum/",
+  "Words": "Words",
+  "Sessions": "Sessions",
+  "<td colspan=\"1\" rowspan=\"1\"><strong>Estimate</strong></td>": "<td colspan=\"1\" rowspan=\"1\"><strong>Estimate</strong></td>",
+  "Estimate": "Estimate",
+  "<i18nextifydummy>\n        Before text\n        <br>\n        some <span class=\"someCSS\">with a span</span> and\n        <strong> a strong thing</strong>\n      </i18nextifydummy>": "<i18nextifydummy>\n        Before text\n        <br>\n        some <span class=\"someCSS\">with a span</span> and\n        <strong> a strong thing</strong>\n      </i18nextifydummy>",
+  "Before text<br>some <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>": "Before text<br>some <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>",
+  "Now we can have that on root": "Now we can have that on root",
+  "cool": "cool",
+  "Now we can have that on root<br>cool <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>": "Now we can have that on root<br>cool <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>"
 }

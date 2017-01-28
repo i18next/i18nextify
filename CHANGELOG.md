@@ -1,3 +1,9 @@
+### 1.3.0
+- adds ignoreInlineOn to exclude tags from being merged
+- merging now also works on root elements
+- merging now excludes surrounding element from being passed in key
+- setting merge to false on element will now exclude it
+
 ### 1.2.1
 - only merge if we have a parent - asserts we trigger done on observer
 
