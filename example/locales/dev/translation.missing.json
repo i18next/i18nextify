@@ -3,7 +3,7 @@
   "807": "807",
   "1168": "1168",
   "deutsch": "deutsch",
-  "_t": "Sat Jan 28 2017 12:36:19 GMT 0100 (CET)",
+  "_t": "Wed Feb 01 2017 13:47:53 GMT 0100 (CET)",
   "|": " | ",
   "english": "english",
   "foo {{foo}}": "foo {{foo}}",
@@ -78,5 +78,7 @@
   "Before text<br>some <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>": "Before text<br>some <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>",
   "Now we can have that on root": "Now we can have that on root",
   "cool": "cool",
-  "Now we can have that on root<br>cool <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>": "Now we can have that on root<br>cool <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>"
+  "Now we can have that on root<br>cool <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>": "Now we can have that on root<br>cool <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>",
+  "CLICK ME INNER _ IGNORED BY CLASS": "CLICK ME INNER _ IGNORED BY CLASS",
+  "BAD TRIGGER": "BAD TRIGGER"
 }

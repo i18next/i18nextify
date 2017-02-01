@@ -13,7 +13,9 @@
         ignoreTags: ['script', 'h6'],
         ignoreIds: ['ignoreMeId'],
         ignoreClasses: ['ignoreMeClass'],
-        inlineTags: ['br', 'strong', 'span'],
+
+        mergeTags: ['p'],
+        // inlineTags: ['br', 'strong', 'span'],
         ignoreInlineOn: ['td'],
         cleanIndent: true,
         ignoreCleanIndentFor: ['PRE', 'CODE'],
@@ -26,13 +28,13 @@
     </script>
   </head>
   <body class="landing-page" style='display: none'>
-    <p>
+    <p id="appendToInner2">
       Now we can have that on root
       <br />
       cool <span class="someCSS">with a span</span> and
       <strong> a strong thing</strong>
     </p>
-    <div>
+    <div id="appendToInner">
       <p>
         Before text
         <br />
@@ -64,5 +66,18 @@
           </tbody>
         </table>
     </div>
+    <script>
+    setTimeout(function () {
+      var ele = document.getElementById('appendToInner');
+
+      var btn = document.createElement("BUTTON");
+      //btn.className = "ignoreMeClass"
+      var t = document.createTextNode("BAD TRIGGER");
+      btn.appendChild(t);
+
+      console.log('appendingFromOutsideToInner');
+      ele.appendChild(btn);
+    }, 5000);
+  </script>
   </body>
 </html>

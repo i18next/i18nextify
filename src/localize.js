@@ -87,16 +87,14 @@ function getTOptions(opts, node) {
 
 function removeIndent(str, substitution) {
   if (!i18next.options.cleanIndent) return str;
-  // const p = str.split('\n');
-  // if (str.indexOf('\n') === 0 && p.length === 3) return p[1].replace(/^\s+/, '');
-  // if (str.indexOf('\n') === 0 && p.length === 2) return p[1].replace(/^\s+/, '');
-  // if (str.indexOf('\n') > 0 && p.length === 2) return p[0];
+
   const ret = str.replace(/\n +/g, substitution);
   return ret;
 }
 
 function canInline(node, tOptions) {
   if (!node.children || !node.children.length || i18next.options.ignoreInlineOn.indexOf(node.tagName) > -1) return false;
+  if (i18next.options.mergeTags.indexOf(node.tagName) > -1) return true;
 
   const baseTags = tOptions.inlineTags || i18next.options.inlineTags;
   const inlineTags = tOptions.additionalInlineTags ? baseTags.concat(tOptions.additionalInlineTags) : baseTags;
@@ -118,20 +116,22 @@ function walk(node, tOptions, parent) {
 
   // translate node as one block
   const mergeFlag = getAttribute(node, 'merge');
-  if (mergeFlag !== 'false' && (mergeFlag === '' || canInline(node, tOptions)) && nodeIsNotExcluded && nodeIsUnTranslated) {
+  if (mergeFlag !== 'false' && (mergeFlag === '' || canInline(node, tOptions))) {
+    if (nodeIsNotExcluded && nodeIsUnTranslated) {
+      // wrap children into dummy node and remove that outer from translation
+      const dummyNode = new VNode('I18NEXTIFYDUMMY', null, node.children);
+      const key = removeIndent(toHTML(dummyNode), '').replace('<i18nextifydummy>', '').replace('</i18nextifydummy>', '');
 
-    // wrap children into dummy node and remove that outer from translation
-    const dummyNode = new VNode('I18NEXTIFYDUMMY', null, node.children);
-    const key = removeIndent(toHTML(dummyNode), '').replace('<i18nextifydummy>', '').replace('</i18nextifydummy>', '');
+      // translate that's children and surround it again with a dummy node to parse to vdom
+      const translation = `<i18nextifydummy>${translate(key, tOptions)}</i18nextifydummy>`;
+      const newNode = parser((translation || '').trim());
 
-    // translate that's children and surround it again with a dummy node to parse to vdom
-    const translation = `<i18nextifydummy>${translate(key, tOptions)}</i18nextifydummy>`;
-    const newNode = parser((translation || '').trim());
+      // replace children on passed in node
+      node.children = newNode.children;
 
-    // replace children on passed in node
-    node.children = newNode.children;
+      if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
+    }
 
-    if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
     return node;
   }
 

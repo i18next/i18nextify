@@ -1,3 +1,6 @@
+### 1.4.0
+- option mergeTags will merge innerhtml of those as content/key
+
 ### 1.3.0
 - adds ignoreInlineOn to exclude tags from being merged
 - merging now also works on root elements

@@ -15,6 +15,7 @@ function getDefaults() {
     ignoreTags: ['SCRIPT'],
     ignoreIds: [],
     ignoreClasses: [],
+    mergeTags: [],
     inlineTags: [],
     ignoreInlineOn: [],
     cleanIndent: false,
@@ -98,6 +99,7 @@ function init(options = {}) {
   if (options.ignoreCleanIndentFor) options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map(s => s.toUpperCase());
   if (options.inlineTags) options.inlineTags = options.inlineTags.map(s => s.toUpperCase());
   if (options.ignoreInlineOn) options.ignoreInlineOn = options.ignoreInlineOn.map(s => s.toUpperCase());
+  if (options.mergeTags) options.mergeTags = options.mergeTags.map(s => s.toUpperCase());
 
   initialized = true;
   let renderers = [];
