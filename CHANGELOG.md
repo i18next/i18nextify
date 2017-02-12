@@ -1,3 +1,7 @@
+### 1.5.0
+- update i18next dependencies
+- allow setting translateAttributes in init options (incl. conditions)
+
 ### 1.4.0
 - option mergeTags will merge innerhtml of those as content/key
 

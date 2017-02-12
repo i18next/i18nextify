@@ -13,7 +13,7 @@
         ignoreTags: ['script', 'h6'],
         ignoreIds: ['ignoreMeId'],
         ignoreClasses: ['ignoreMeClass'],
-
+        translateAttributes: ['placeholder', 'title', 'alt', 'data-translate', 'value#input.type=button'],
         mergeTags: ['p'],
         // inlineTags: ['br', 'strong', 'span'],
         ignoreInlineOn: ['td'],
@@ -50,21 +50,24 @@
         ipsum dipsum
       </p>
       <table>
-          <tbody>
-            <tr>
-              <td>Words</sup></td>
-              <td translated>2,000</td>
-            </tr>
-            <tr>
-              <td>Sessions</td>
-              <td translated>40,000</td>
-            </tr>
-            <tr>
-              <td><strong>Estimate</strong></td>
-              <td translated><strong>$29</strong></td>
-            </tr>
-          </tbody>
-        </table>
+        <tbody>
+          <tr>
+            <td>Words</sup></td>
+            <td translated>2,000</td>
+          </tr>
+          <tr>
+            <td>Sessions</td>
+            <td translated>40,000</td>
+          </tr>
+          <tr>
+            <td><strong>Estimate</strong></td>
+            <td translated><strong>$29</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <div data-translate="translate me please">there is more</div>
+      <input type="button" value="A button" />
+      <input type="Button" value="A button" />
     </div>
     <script>
     setTimeout(function () {

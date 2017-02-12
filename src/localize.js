@@ -37,15 +37,20 @@ function translate(str, options = {}) {
   return str
 }
 
-let toTranslate = ['placeholder', 'title', 'alt'];
 let replaceInside = ['src', 'href'];
 const REGEXP = new RegExp('%7B%7B(.+?)%7D%7D', 'g'); // urlEncoded {{}}
-function translateProps(props, options = {}) {
+function translateProps(node, props, options = {}) {
   if (!props) return props;
 
-  toTranslate.forEach((attr) => {
-    let value = getPath(props, attr);
-    if (value) setPath(props, attr, translate(value, { ...options }));
+  i18next.options.translateAttributes.forEach((item) => {
+    if (item.ele && node.tagName !== item.ele) return;
+    if (item.cond && item.cond.length === 2) {
+      const condValue = getPath(props, item.cond[0]);
+      if (!condValue || condValue !== item.cond[1]) return;
+    }
+
+    const value = getPath(props, item.attr);
+    if (value) setPath(props, item.attr, translate(value, { ...options }));
   });
 
   replaceInside.forEach((attr) => {
@@ -169,7 +174,7 @@ function walk(node, tOptions, parent) {
         node.text = translate(txt, tOptions);
       }
     }
-    if (node.properties) node.properties = translateProps(node.properties, tOptions);
+    if (node.properties) node.properties = translateProps(node, node.properties, tOptions);
     if (node.properties && node.properties.attributes) node.properties.attributes.localized = '';
   }
 

@@ -15,6 +15,7 @@ function getDefaults() {
     ignoreTags: ['SCRIPT'],
     ignoreIds: [],
     ignoreClasses: [],
+    translateAttributes: ['placeholder', 'title', 'alt', 'value#input.type=button'],
     mergeTags: [],
     inlineTags: [],
     ignoreInlineOn: [],
@@ -100,6 +101,23 @@ function init(options = {}) {
   if (options.inlineTags) options.inlineTags = options.inlineTags.map(s => s.toUpperCase());
   if (options.ignoreInlineOn) options.ignoreInlineOn = options.ignoreInlineOn.map(s => s.toUpperCase());
   if (options.mergeTags) options.mergeTags = options.mergeTags.map(s => s.toUpperCase());
+  options.translateAttributes = options.translateAttributes.reduce((mem, attr) => {
+    const res = { attr };
+    if (attr.indexOf('#') > -1) {
+      const [a, c] = attr.split('#');
+      res.attr = a;
+      if (c.indexOf('.') > -1) {
+        const [e, b] = c.split('.');
+        res.ele = e.toUpperCase();
+        res.cond = b.toLowerCase().split('=');
+      } else {
+        res.cond = c.toLowerCase().split('=');
+      }
+    }
+    mem.push(res);
+    return mem;
+  }, []);
+
 
   initialized = true;
   let renderers = [];
