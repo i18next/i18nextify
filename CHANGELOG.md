@@ -1,3 +1,6 @@
+### 1.5.1
+- fixes taking attributes not only properties of node for translation
+
 ### 1.5.0
 - update i18next dependencies
 - allow setting translateAttributes in init options (incl. conditions)

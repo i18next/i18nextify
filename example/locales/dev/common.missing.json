@@ -1,6 +1,6 @@
 {
   "different namespace: i18next-options='{\"ns\": \"common\"}'": "different namespace: i18next-options='{\"ns\": \"common\"}'",
-  "_t": "Sun Feb 12 2017 20:29:56 GMT 0100 (CET)",
+  "_t": "Mon Feb 13 2017 19:43:51 GMT 0100 (CET)",
   "set it on i18next options and assert to add it to": "set it on i18next options and assert to add it to ",
   "i18next.options.ns array on init": "i18next.options.ns array on init",
   "Also works on node directly": "Also works on node directly"

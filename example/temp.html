@@ -7,7 +7,7 @@
       var translation = window.i18nextify.init({
         debug: true,
         saveMissing: true,
-        namespace: 'translation',
+        namespace: 'translationTmp',
         // namespaceFromPath: true,
         ns: ['common', 'commonNested'],
         ignoreTags: ['script', 'h6'],
@@ -66,8 +66,9 @@
         </tbody>
       </table>
       <div data-translate="translate me please">there is more</div>
-      <input type="button" value="A button" />
+      <input type="button" value="A button" placeholder="a placeholder" />
       <input type="Button" value="A button" />
+      <img src="/a.png" alt="big a" />
     </div>
     <script>
     setTimeout(function () {

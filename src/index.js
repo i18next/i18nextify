@@ -110,8 +110,10 @@ function init(options = {}) {
         const [e, b] = c.split('.');
         res.ele = e.toUpperCase();
         res.cond = b.toLowerCase().split('=');
-      } else {
+      } else if (c.indexOf('=') > -1) {
         res.cond = c.toLowerCase().split('=');
+      } else {
+        res.ele = c.toUpperCase();
       }
     }
     mem.push(res);

@@ -6590,12 +6590,17 @@
 	  i18next.options.translateAttributes.forEach(function (item) {
 	    if (item.ele && node.tagName !== item.ele) return;
 	    if (item.cond && item.cond.length === 2) {
-	      var condValue = getPath(props, item.cond[0]);
+	      var condValue = getPath(props, item.cond[0]) || getPath(props.attributes, item.cond[0]);
 	      if (!condValue || condValue !== item.cond[1]) return;
 	    }
 
+	    var wasOnAttr = false;
 	    var value = getPath(props, item.attr);
-	    if (value) setPath(props, item.attr, translate(value, _extends$7({}, options)));
+	    if (!value) {
+	      value = getPath(props.attributes, item.attr);
+	      if (value) wasOnAttr = true;
+	    }
+	    if (value) setPath(wasOnAttr ? props.attributes : props, item.attr, translate(value, _extends$7({}, options)));
 	  });
 
 	  replaceInside.forEach(function (attr) {
@@ -6912,8 +6917,10 @@
 
 	        res.ele = e.toUpperCase();
 	        res.cond = b.toLowerCase().split('=');
-	      } else {
+	      } else if (c.indexOf('=') > -1) {
 	        res.cond = c.toLowerCase().split('=');
+	      } else {
+	        res.ele = c.toUpperCase();
 	      }
 	    }
 	    mem.push(res);

@@ -3,7 +3,7 @@
   "807": "807",
   "1168": "1168",
   "deutsch": "deutsch",
-  "_t": "Sun Feb 12 2017 20:30:12 GMT 0100 (CET)",
+  "_t": "Mon Feb 13 2017 19:57:55 GMT 0100 (CET)",
   "|": " | ",
   "english": "english",
   "foo {{foo}}": "foo {{foo}}",
@@ -82,5 +82,7 @@
   "CLICK ME INNER _ IGNORED BY CLASS": "CLICK ME INNER _ IGNORED BY CLASS",
   "BAD TRIGGER": "BAD TRIGGER",
   "there is more": "there is more",
-  "A button": "A button"
+  "A button": "A button",
+  "a placeholder": "a placeholder",
+  "translate me please": "translate me please"
 }

@@ -45,12 +45,17 @@ function translateProps(node, props, options = {}) {
   i18next.options.translateAttributes.forEach((item) => {
     if (item.ele && node.tagName !== item.ele) return;
     if (item.cond && item.cond.length === 2) {
-      const condValue = getPath(props, item.cond[0]);
+      const condValue = getPath(props, item.cond[0]) || getPath(props.attributes, item.cond[0]);
       if (!condValue || condValue !== item.cond[1]) return;
     }
 
-    const value = getPath(props, item.attr);
-    if (value) setPath(props, item.attr, translate(value, { ...options }));
+    let wasOnAttr = false;
+    let value = getPath(props, item.attr);
+    if (!value) {
+      value = getPath(props.attributes, item.attr);
+      if (value) wasOnAttr = true;
+    }
+    if (value) setPath(wasOnAttr ? props.attributes : props, item.attr, translate(value, { ...options }));
   });
 
   replaceInside.forEach((attr) => {
