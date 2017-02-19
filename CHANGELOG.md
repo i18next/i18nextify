@@ -1,3 +1,6 @@
+### 2.0.0
+- change options enabling cleanup as default (cleanIndent, cleanWhitespace)
+
 ### 1.5.1
 - fixes taking attributes not only properties of node for translation
 

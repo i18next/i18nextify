@@ -51,6 +51,19 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
         ignoreIds: ['ignoreMeId'],
         ignoreClasses: ['ignoreMeClass'],
 
+        // attributes to translate
+        translateAttributes: ['placeholder', 'title', 'alt', 'value#input.type=button', 'value#input.type=submit'],
+
+        // merging content (eg. a tags in p tags)
+        mergeTags: [], // tags to merge innerHtml to one key
+        inlineTags: [], // tags to inline (eg. a, span, abbr, ...)
+        ignoreInlineOn: [], // tags to ignore inlining tags under inlineTags
+
+        // cleanup for keys
+        cleanIndent: true, // removes indent, eg. if a p tag spans multiple lines
+        ignoreCleanIndentFor: ['PRE', 'CODE'], // ignores cleaning up of indent for those tags needing that extra spaceing
+        cleanWhitespace: true, // removes surrounding whitespace from key
+
         namespace: false, // set a filename - default namespace will be translation
         namespaceFromPath: false // set true will use namepace based on window.location.pathname
         ns: ['common'] // -> only set if accessing more then one namepace
@@ -60,6 +73,23 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
     </script>
   </head>
   ...
+```
+
+## Merge content
+
+Just set translated attribute:
+
+```html
+<p merge>all inside will be used as on segment, even if having other <a>elements inside</a></p>
+
+// key = all inside will be used as on segment, even if having other <a>elements inside</a>
+```
+Same could be done using options:
+
+```html
+mergeTags: [], // tags to merge innerHtml to one key
+inlineTags: [], // tags to inline (eg. a, span, abbr, ...)
+ignoreInlineOn: [], // tags to ignore inlining tags under inlineTags
 ```
 
 ## Fragment replacement for links and images
@@ -75,6 +105,7 @@ You will find `a.png` to be a key in your translation files - it's value can be 
 ```
 
 `statistic` will be a regular key that can be translated. But be aware you will need to provide that routes - eg. using [localized routes on the server](https://github.com/i18next/i18next-express-middleware#add-localized-routes)
+
 
 ## Avoid translating
 

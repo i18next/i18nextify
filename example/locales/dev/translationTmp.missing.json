@@ -1,0 +1,16 @@
+{
+  "Now we can have that on root<br>cool <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>": "Now we can have that on root<br>cool <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>",
+  "_t": "Mon Feb 13 2017 20:06:56 GMT 0100 (CET)",
+  "Before text<br>some <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>": "Before text<br>some <span class=\"someCSS\">with a span</span> and<strong> a strong thing</strong>",
+  "lorem ipsum\n        ipsum dipsum": "        lorem ipsum\n        ipsum dipsum\n      ",
+  "lorem ipsumipsum dipsum": "lorem ipsumipsum dipsum",
+  "Words": "Words",
+  "Sessions": "Sessions",
+  "Estimate": "Estimate",
+  "there is more": "there is more",
+  "translate me please": "translate me please",
+  "a placeholder": "a placeholder",
+  "A button": "A button",
+  "big a": "big a",
+  "BAD TRIGGER": "BAD TRIGGER"
+}
