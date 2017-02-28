@@ -1836,10 +1836,6 @@
 	        s.languageDetector.init(s, this.options.detection, this.options);
 	      }
 
-	      this.modules.external.forEach(function (m) {
-	        if (m.init) m.init(_this2);
-	      });
-
 	      this.translator = new Translator(this.services, this.options);
 	      // pipe events from translator
 	      this.translator.on('*', function (event) {
@@ -1848,6 +1844,10 @@
 	        }
 
 	        _this2.emit.apply(_this2, [event].concat(args));
+	      });
+
+	      this.modules.external.forEach(function (m) {
+	        if (m.init) m.init(_this2);
 	      });
 	    }
 
@@ -1948,7 +1948,7 @@
 	      postProcessor.addPostProcessor(module);
 	    }
 
-	    if (!module.type) {
+	    if (module.type === '3rdParty') {
 	      this.modules.external.push(module);
 	    }
 
