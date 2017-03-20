@@ -1,3 +1,6 @@
+### 2.1.0
+- adds onInitialTranslate options to be called on translated initially
+
 ### 2.0.2
 - update dependencies
 

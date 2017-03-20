@@ -6817,7 +6817,8 @@
 	    namespace: false,
 	    namespaceFromPath: false,
 	    missingKeyHandler: missingHandler,
-	    ns: []
+	    ns: [],
+	    onInitialTranslate: function onInitialTranslate() {}
 	  };
 	}
 
@@ -6986,6 +6987,7 @@
 
 	        waitForInitialRender(children, 0, function () {
 	          if (options.ele.style && options.ele.style.display === 'none') options.ele.style.display = 'block';
+	          options.onInitialTranslate();
 	        });
 	      })();
 	    }

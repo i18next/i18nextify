@@ -29,7 +29,8 @@ function getDefaults() {
     namespace: false,
     namespaceFromPath: false,
     missingKeyHandler: missingHandler,
-    ns: []
+    ns: [],
+    onInitialTranslate: () => {}
   };
 }
 
@@ -181,6 +182,7 @@ function init(options = {}) {
 
       waitForInitialRender(children, 0, () => {
         if (options.ele.style && options.ele.style.display === 'none') options.ele.style.display = 'block';
+        options.onInitialTranslate();
       });
     }
   }
