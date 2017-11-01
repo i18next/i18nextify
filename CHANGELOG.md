@@ -1,3 +1,6 @@
+### 2.2.0
+- nothing special - just an update to latest dependencies incl. i18next
+
 ### 2.1.0
 - adds onInitialTranslate options to be called on translated initially
 
