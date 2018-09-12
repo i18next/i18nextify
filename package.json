@@ -1,6 +1,6 @@
 {
   "name": "i18nextify",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "enables localization of any page with zero effort",
   "main": "./index.js",
   "jsnext:main": "dist/es/index.js",
@@ -17,9 +17,9 @@
   "homepage": "https://github.com/i18next/i18nextify",
   "bugs": "https://github.com/i18next/i18nextify/issues",
   "dependencies": {
-    "i18next": "10.0.7",
-    "i18next-browser-languagedetector": "2.0.0",
-    "i18next-xhr-backend": "1.4.3",
+    "i18next": "11.9.0",
+    "i18next-browser-languagedetector": "2.2.3",
+    "i18next-xhr-backend": "1.5.1",
     "udc": "1.0.1",
     "vdom-parser": "1.4.1",
     "vdom-to-html": "2.3.1",
