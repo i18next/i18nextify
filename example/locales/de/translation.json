@@ -1,6 +1,6 @@
 {
   "Flexible connection to": "Flexible Verbindung zu ",
-  "i18next provides:": "i18next bietet:",
+  "i18next provides:": "i18next&nbsp;<strong>bietet:</strong>",
   "backend": "backend",
   "(loading translations via xhr, …)": " (Übersetzungen via xhr laden, …)",
   "Optional": "Optional ",

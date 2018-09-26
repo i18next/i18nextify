@@ -9,6 +9,7 @@ i18next
   .use(FsBackend)
   .init({
     lng: 'en',
+    preload: ['de', 'en'],
     saveMissing: true,
     debug: true,
     backend: {

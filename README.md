@@ -18,7 +18,6 @@ Alternatively:
 
 Drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.min.js) on your page.
 
-
 ```html
 <!DOCTYPE html>
 <html>
@@ -31,7 +30,6 @@ Drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.m
 Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see i18nextify in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
 
 See the [example](https://github.com/i18next/i18nextify/tree/master/example) for details.
-
 
 ## Initialize with options
 
@@ -75,7 +73,7 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
   ...
 ```
 
-## Merge content
+## Merge content / using html in translations
 
 Just set translated attribute:
 
@@ -84,6 +82,7 @@ Just set translated attribute:
 
 // key = all inside will be used as on segment, even if having other <a>elements inside</a>
 ```
+
 Same could be done using options:
 
 ```html
@@ -106,7 +105,6 @@ You will find `a.png` to be a key in your translation files - it's value can be 
 
 `statistic` will be a regular key that can be translated. But be aware you will need to provide that routes - eg. using [localized routes on the server](https://github.com/i18next/i18next-express-middleware#add-localized-routes)
 
-
 ## Avoid translating
 
 #### an element
@@ -123,9 +121,9 @@ Just add needed items to the specific array:
 
 ```js
 window.i18nextify.init({
-  ignoreTags: ['SCRIPT'], // need to be uppercased
-  ignoreIds: ['ignoreMeId'],
-  ignoreClasses: ['ignoreMeClass'],
+  ignoreTags: ["SCRIPT"], // need to be uppercased
+  ignoreIds: ["ignoreMeId"],
+  ignoreClasses: ["ignoreMeClass"]
 });
 ```
 
@@ -148,6 +146,28 @@ For [extended translations](http://i18next.com/translate/) like plurals, interpo
 </div>
 ```
 
+## Translating javascript code
+
+You can use the [i18next](https://i18next.com) instance used to provide the translation functionality directly. Just make sure the instance is initialized already:
+
+```js
+<script>
+  // use t function of i18next
+  // https://www.i18next.com/translation-function/essentials
+  function useI18next() {
+    var translated = i18nextify.i18next.t('some key');
+  }
+
+  if (i18nextify.i18next.isInitialized) {
+    useI18next();
+  } else {
+    i18nextify.i18next.on('initialized', function(options) {
+      useI18next();
+    })
+  }
+</script>
+```
+
 Options get inherited from parent to child nodes.
 
 ## Set different namespaces
@@ -158,7 +178,7 @@ Default would be translation.
 
 ```js
 window.i18nextify.init({
-  namespace: 'myNamespace'
+  namespace: "myNamespace"
 });
 ```
 
@@ -176,8 +196,8 @@ This is useful for reused elements that are on every page, eg. like footer,... a
 
 ```js
 window.i18nextify.init({
-  namespace: 'translation', // -> set the default namespace
-  ns: ['common'] // -> add additional namespaces to load
+  namespace: "translation", // -> set the default namespace
+  ns: ["common"] // -> add additional namespaces to load
 });
 ```
 
@@ -187,8 +207,6 @@ window.i18nextify.init({
   <p>set it on i18next options and assert to add it to <strong>i18next.options.ns array on init</strong></p>
 </div>
 ```
-
-
 
 ## Avoid flickering on initial load
 
@@ -209,10 +227,10 @@ Just set the element style display to none. I18nextify will change it to block w
 You can change the namespace after loading to some other file (eg. before transitioning to another page).
 
 ```js
-window.i18nextify.changeNamespace('newNamespace');
+window.i18nextify.changeNamespace("newNamespace");
 ```
 
---------------
+---
 
 <h3 align="center">Gold Sponsors</h3>
 

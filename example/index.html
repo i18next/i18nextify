@@ -1,131 +1,136 @@
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="/i18nextify.min.js"></script>
-    <script>
-      var translation = window.i18nextify.init({
-        debug: true,
-        saveMissing: true,
-        namespace: 'translation',
-        // namespaceFromPath: true,
-        ns: ['common', 'commonNested'],
-        ignoreTags: ['script', 'h6'],
-        ignoreIds: ['ignoreMeId'],
-        ignoreClasses: ['ignoreMeClass'],
-        //autorun: false
-      });
+
+<head>
+  <script src="/i18nextify.min.js"></script>
+  <script>
+    var translation = window.i18nextify.init({
+      debug: true,
+      saveMissing: true,
+      namespace: 'translation',
+      // namespaceFromPath: true,
+      ns: ['common', 'commonNested'],
+      ignoreTags: ['script', 'h6'],
+      ignoreIds: ['ignoreMeId'],
+      ignoreClasses: ['ignoreMeClass'],
+      //autorun: false,
+      //dangerouslyUseInnerHtml: true
+    });
       // setTimeout(function () {
       //   translation.start();
       // }, 4000);
-    </script>
-  </head>
-  <body class="landing-page" style='display: none'>
-    <h1>Test on text node</h1>
-    <div>
-      <!-- ignore comments -->
-      <a href='/?lng=de'>deutsch</a>
-      <span> | </span>
-      <a href='/?lng=en'>english</a>
+  </script>
+</head>
+
+<body class="landing-page" style='display: none'>
+  <h1>Test on text node</h1>
+  <div>
+    <!-- ignore comments -->
+    <a href='/?lng=de'>deutsch</a>
+    <span> | </span>
+    <a href='/?lng=en'>english</a>
+  </div>
+  <div>
+    <p merge>i18next provides:</p>
+  </div>
+  <div>
+    <ul>
+      <li>Flexible connection to <a href="/docs/ecosystem/#backends">backend</a> (loading translations via xhr, …)</li>
+      <li>Optional <a href="/docs/ecosystem/#caches">caching</a>, user <a href="/docs/ecosystem/#languagedetector">language
+          detection</a>, …</li>
+      <li>Proper <a href="/translate/pluralSimple/">pluralizations</a></li>
+      <li>Translation <a href="/translate/context/">context</a></li>
+      <li><a href="/translate/nesting/">Nesting</a>, <a href="/translate/interpolation/">Variable replacement</a></li>
+      <li>Flexibility: prefer <a href="/translate/">keybased</a> or <a href="translate/keyBasedFallback/">gettext</a>
+        style? No problem…</li>
+      <li>Extensibility: eg. <a href="/docs/ecosystem/#postprocessors">sprintf</a></li>
+      <li>…</li>
+    </ul>
+  </div>
+  <hr />
+  <div>
+    Some more tests on attributes:
+    <h4>title:</h4>
+    <a href="/docs/ecosystem/#postprocessors" title="Works on title">hover me</a>
+    <h4>placeholder:</h4>
+    <input type="text" placeholder="translated placeholder" />
+  </div>
+  <hr />
+  <div>
+    Using options:
+    <p i18next-options='{"foo": "bar"}'>foo {{foo}}</p>
+    <a i18next-options='{"foo": "bar"}' href="/docs/ecosystem/#postprocessors" title="foo {{foo}}">hover me</a>
+    <div i18next-options='{"foo": "bar"}'>
+      <p i18next-options='{"foo2": "bar2"}'>foo {{foo}}; foo2 {{foo2}}</p>
     </div>
-    <div>
-      <p>i18next provides:</p>
-    </div>
-    <div>
-      <ul>
-        <li>Flexible connection to <a href="/docs/ecosystem/#backends">backend</a> (loading translations via xhr, …)</li>
-        <li>Optional <a href="/docs/ecosystem/#caches">caching</a>, user <a href="/docs/ecosystem/#languagedetector">language detection</a>, …</li>
-        <li>Proper <a href="/translate/pluralSimple/">pluralizations</a></li>
-        <li>Translation <a href="/translate/context/">context</a></li>
-        <li><a href="/translate/nesting/">Nesting</a>, <a href="/translate/interpolation/">Variable replacement</a></li>
-        <li>Flexibility: prefer <a href="/translate/">keybased</a> or <a href="translate/keyBasedFallback/">gettext</a> style? No problem…</li>
-        <li>Extensibility: eg. <a href="/docs/ecosystem/#postprocessors">sprintf</a></li>
-        <li>…</li>
-      </ul>
-    </div>
-    <hr />
-    <div>
-      Some more tests on attributes:
-      <h4>title:</h4>
-      <a href="/docs/ecosystem/#postprocessors" title="Works on title">hover me</a>
-      <h4>placeholder:</h4>
-      <input type="text" placeholder="translated placeholder" />
-    </div>
-    <hr />
-    <div>
-      Using options:
-      <p i18next-options='{"foo": "bar"}'>foo {{foo}}</p>
-      <a i18next-options='{"foo": "bar"}' href="/docs/ecosystem/#postprocessors" title="foo {{foo}}">hover me</a>
-      <div i18next-options='{"foo": "bar"}'>
-        <p i18next-options='{"foo2": "bar2"}'>foo {{foo}}; foo2 {{foo2}}</p>
-      </div>
-    </div>
-    <hr />
-    <p i18next-options='{"ns": "common"}'>Also works on node directly</p>
-    <div i18next-options='{"ns": "common"}'>
-      <p>different namespace: i18next-options='{"ns": "common"}'</p>
-      <p>set it on i18next options and assert to add it to <strong>i18next.options.ns array on init</strong></p>
-      <p i18next-options='{"ns": "commonNested"}'>Also can change inside on node directly</p>
-    </div>
-    <hr />
-    <div id="appendToInner">
-      <p id="ignoreMeId">ignored by id</p>
-      <p class="ignoreMeClass">ignored by class</p>
-      <p class="ignoreMeClass someBeautyStyle">ignored by class having other class too</p>
-      <h6>ignored by tag</h6>
-    </div>
-    <hr />
-    <div>
-      <p>image - alt tag:</p>
-      <img src="/a.png" alt="big a" />
+  </div>
+  <hr />
+  <p i18next-options='{"ns": "common"}'>Also works on node directly</p>
+  <div i18next-options='{"ns": "common"}'>
+    <p>different namespace: i18next-options='{"ns": "common"}'</p>
+    <p>set it on i18next options and assert to add it to <strong>i18next.options.ns array on init</strong></p>
+    <p i18next-options='{"ns": "commonNested"}'>Also can change inside on node directly</p>
+  </div>
+  <hr />
+  <div id="appendToInner">
+    <p id="ignoreMeId">ignored by id</p>
+    <p class="ignoreMeClass">ignored by class</p>
+    <p class="ignoreMeClass someBeautyStyle">ignored by class having other class too</p>
+    <h6>ignored by tag</h6>
+  </div>
+  <hr />
+  <div>
+    <p>image - alt tag:</p>
+    <img src="/a.png" alt="big a" />
 
-      <p>image - src replacement:</p>
-      <img src="/{{a.png}}" alt="big a" />
-    </div>
-    <hr />
-    <div>
-      <p>anchor - href replacement:</p>
-      <a href="/{{statistic}}" alt="big a">explore the link</a>
-    </div>
-    <hr />
-    <div>dynamically added:</div>
-    <script>
-      // window.virtualDomI18next.run(document.getElementById('react-mount'));
+    <p>image - src replacement:</p>
+    <img src="/{{a.png}}" alt="big a" />
+  </div>
+  <hr />
+  <div>
+    <p>anchor - href replacement:</p>
+    <a href="/{{statistic}}" alt="big a">explore the link</a>
+  </div>
+  <hr />
+  <div>dynamically added:</div>
+  <script>
+    // window.virtualDomI18next.run(document.getElementById('react-mount'));
 
-      setTimeout(function () {
-        var ele = document.body;
+    setTimeout(function () {
+      var ele = document.body;
 
-        var btn = document.createElement("BUTTON");
-        var t = document.createTextNode("CLICK ME");
-        btn.appendChild(t);
+      var btn = document.createElement("BUTTON");
+      var t = document.createTextNode("CLICK ME");
+      btn.appendChild(t);
 
-        console.log('appendingFromOutside');
-        ele.appendChild(btn);
-      }, 5000);
+      console.log('appendingFromOutside');
+      ele.appendChild(btn);
+    }, 5000);
 
 
-      setTimeout(function () {
-        var ele = document.getElementById('appendToInner');
+    setTimeout(function () {
+      var ele = document.getElementById('appendToInner');
 
-        var btn = document.createElement("BUTTON");
-        var t = document.createTextNode("CLICK ME INNER");
-        btn.appendChild(t);
+      var btn = document.createElement("BUTTON");
+      var t = document.createTextNode("CLICK ME INNER");
+      btn.appendChild(t);
 
-        console.log('appendingFromOutsideToInner');
-        ele.appendChild(btn);
-      }, 5000);
+      console.log('appendingFromOutsideToInner');
+      ele.appendChild(btn);
+    }, 5000);
 
-      setTimeout(function () {
-        var ele = document.getElementById('appendToInner');
+    setTimeout(function () {
+      var ele = document.getElementById('appendToInner');
 
-        var btn = document.createElement("BUTTON");
-        btn.className = "ignoreMeClass"
-        var t = document.createTextNode("CLICK ME INNER _ IGNORED BY CLASS");
-        btn.appendChild(t);
+      var btn = document.createElement("BUTTON");
+      btn.className = "ignoreMeClass"
+      var t = document.createTextNode("CLICK ME INNER _ IGNORED BY CLASS");
+      btn.appendChild(t);
 
-        console.log('appendingFromOutsideToInnerIgnoreClass');
-        ele.appendChild(btn);
-      }, 5000);
-    </script>
-  </body>
+      console.log('appendingFromOutsideToInnerIgnoreClass');
+      ele.appendChild(btn);
+    }, 5000);
+  </script>
+</body>
+
 </html>
