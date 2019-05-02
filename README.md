@@ -25,6 +25,7 @@ Drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.m
     <script src="/i18nextify.min.js"></script>
   </head>
   ...
+</html>
 ```
 
 Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see i18nextify in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
@@ -44,6 +45,10 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
         autorun: true, // setting to false init will return an object with start function
         ele: document.body, // pass in another element if you like to translate another html element
         ignoreTags: ['SCRIPT'], // tags to ignore
+
+        // using keys instead of content as keys
+        keyAttr: 'i18next-key', // node attribute to use as key
+        ignoreWithoutKey: false, // set to true to only support nodes having a key
 
         // per default not set
         ignoreIds: ['ignoreMeId'],
@@ -71,6 +76,7 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
     </script>
   </head>
   ...
+</html>
 ```
 
 ## Merge content / using html in translations
@@ -78,17 +84,21 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
 Just set translated attribute:
 
 ```html
-<p merge>all inside will be used as on segment, even if having other <a>elements inside</a></p>
+<p merge>
+  all inside will be used as on segment, even if having other
+  <a>elements inside</a>
+</p>
 
-// key = all inside will be used as on segment, even if having other <a>elements inside</a>
+// key = all inside will be used as on segment, even if having other
+<a>elements inside</a>
 ```
 
 Same could be done using options:
 
 ```html
-mergeTags: [], // tags to merge innerHtml to one key
-inlineTags: [], // tags to inline (eg. a, span, abbr, ...)
-ignoreInlineOn: [], // tags to ignore inlining tags under inlineTags
+mergeTags: [], // tags to merge innerHtml to one key inlineTags: [], // tags to
+inline (eg. a, span, abbr, ...) ignoreInlineOn: [], // tags to ignore inlining
+tags under inlineTags
 ```
 
 ## Fragment replacement for links and images
@@ -128,9 +138,15 @@ window.i18nextify.init({
 ```
 
 ```html
-<SCRIPT>this won't get translated - nor this elements children</SCRIPT>
-<div id="ignoreMeId">this won't get translated - nor this elements children</div>
-<div class="ignoreMeClass">this won't get translated - nor this elements children</div>
+<script>
+  this won't get translated - nor this elements children
+</script>
+<div id="ignoreMeId">
+  this won't get translated - nor this elements children
+</div>
+<div class="ignoreMeClass">
+  this won't get translated - nor this elements children
+</div>
 ```
 
 Just add `translated`-attribute
@@ -204,7 +220,10 @@ window.i18nextify.init({
 ```html
 <div i18next-options='{"ns": "common"}'>
   <p>different namespace: i18next-options='{"ns": "common"}'</p>
-  <p>set it on i18next options and assert to add it to <strong>i18next.options.ns array on init</strong></p>
+  <p>
+    set it on i18next options and assert to add it to
+    <strong>i18next.options.ns array on init</strong>
+  </p>
 </div>
 ```
 
@@ -217,7 +236,9 @@ window.i18nextify.init({
     <script src="/i18nextify.min.js"></script>
   </head>
   <body style="display: none">
-  ...
+    ...
+  </body>
+</html>
 ```
 
 Just set the element style display to none. I18nextify will change it to block when ready.

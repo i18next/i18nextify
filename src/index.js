@@ -12,10 +12,18 @@ function getDefaults() {
   return {
     autorun: true,
     ele: document.body,
+    keyAttr: 'i18next-key',
+    ignoreWithoutKey: false,
     ignoreTags: ['SCRIPT'],
     ignoreIds: [],
     ignoreClasses: [],
-    translateAttributes: ['placeholder', 'title', 'alt', 'value#input.type=button', 'value#input.type=submit'],
+    translateAttributes: [
+      'placeholder',
+      'title',
+      'alt',
+      'value#input.type=button',
+      'value#input.type=submit'
+    ],
     mergeTags: [],
     inlineTags: [],
     ignoreInlineOn: [],
@@ -24,8 +32,12 @@ function getDefaults() {
     cleanWhitespace: true,
     nsSeparator: '#||#',
     keySeparator: '#|#',
-    debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
-    saveMissing: window.location.search && window.location.search.indexOf('saveMissing=true') > -1,
+    debug:
+      window.location.search &&
+      window.location.search.indexOf('debug=true') > -1,
+    saveMissing:
+      window.location.search &&
+      window.location.search.indexOf('saveMissing=true') > -1,
     namespace: false,
     namespaceFromPath: false,
     missingKeyHandler: missingHandler,
@@ -34,11 +46,10 @@ function getDefaults() {
   };
 }
 
-
 // auto initialize on dom ready
 let domReady = false;
 let initialized = false;
-docReady(function() {
+docReady(() => {
   domReady = true;
   if (!initialized) init();
 });
@@ -54,13 +65,13 @@ i18next.use(LngDet);
 let lastOptions = {};
 
 function getPathname() {
-  let path = location.pathname;
+  const path = location.pathname;
   if (path === '/') return 'root';
 
   const parts = path.split('/');
   let ret = 'root';
 
-  parts.forEach(p => {
+  parts.forEach((p) => {
     if (p) ret += `_${p}`;
   });
 
@@ -78,7 +89,7 @@ function changeNamespace(ns) {
 }
 
 function init(options = {}) {
-  options = {...getDefaults(), ...lastOptions, ...options};
+  options = { ...getDefaults(), ...lastOptions, ...options };
 
   if (options.namespace) {
     options.ns.push(options.namespace);
@@ -97,45 +108,60 @@ function init(options = {}) {
     lastOptions = options;
   }
 
-  if (options.ignoreTags) options.ignoreTags = options.ignoreTags.map(s => s.toUpperCase());
-  if (options.ignoreCleanIndentFor) options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map(s => s.toUpperCase());
-  if (options.inlineTags) options.inlineTags = options.inlineTags.map(s => s.toUpperCase());
-  if (options.ignoreInlineOn) options.ignoreInlineOn = options.ignoreInlineOn.map(s => s.toUpperCase());
-  if (options.mergeTags) options.mergeTags = options.mergeTags.map(s => s.toUpperCase());
-  options.translateAttributes = options.translateAttributes.reduce((mem, attr) => {
-    const res = { attr };
-    if (attr.indexOf('#') > -1) {
-      const [a, c] = attr.split('#');
-      res.attr = a;
-      if (c.indexOf('.') > -1) {
-        const [e, b] = c.split('.');
-        res.ele = e.toUpperCase();
-        res.cond = b.toLowerCase().split('=');
-      } else if (c.indexOf('=') > -1) {
-        res.cond = c.toLowerCase().split('=');
-      } else {
-        res.ele = c.toUpperCase();
+  if (options.ignoreTags) {
+    options.ignoreTags = options.ignoreTags.map(s => s.toUpperCase());
+  }
+  if (options.ignoreCleanIndentFor) {
+    options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map(s =>
+      s.toUpperCase());
+  }
+  if (options.inlineTags) {
+    options.inlineTags = options.inlineTags.map(s => s.toUpperCase());
+  }
+  if (options.ignoreInlineOn) {
+    options.ignoreInlineOn = options.ignoreInlineOn.map(s => s.toUpperCase());
+  }
+  if (options.mergeTags) {
+    options.mergeTags = options.mergeTags.map(s => s.toUpperCase());
+  }
+  options.translateAttributes = options.translateAttributes.reduce(
+    (mem, attr) => {
+      const res = { attr };
+      if (attr.indexOf('#') > -1) {
+        const [a, c] = attr.split('#');
+        res.attr = a;
+        if (c.indexOf('.') > -1) {
+          const [e, b] = c.split('.');
+          res.ele = e.toUpperCase();
+          res.cond = b.toLowerCase().split('=');
+        } else if (c.indexOf('=') > -1) {
+          res.cond = c.toLowerCase().split('=');
+        } else {
+          res.ele = c.toUpperCase();
+        }
       }
-    }
-    mem.push(res);
-    return mem;
-  }, []);
-
+      mem.push(res);
+      return mem;
+    },
+    []
+  );
 
   initialized = true;
-  let renderers = [];
+  const renderers = [];
 
   let observer;
 
   function addRenderers(children) {
-    for (var i = 0; i < children.length; i++) {
-      let c = children[i];
-      if (options.ignoreTags.indexOf(c.tagName) < 0 &&
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i];
+      if (
+        options.ignoreTags.indexOf(c.tagName) < 0 &&
         options.ignoreIds.indexOf(c.id) < 0 &&
         options.ignoreClasses.indexOf(c.className) < 0 &&
         !c.attributes.localized &&
-        !c.attributes.translated) {
-        let r = renderer(c, observer);
+        !c.attributes.translated
+      ) {
+        const r = renderer(c, observer);
         renderers.push(r);
         r.render();
       }
@@ -145,13 +171,15 @@ function init(options = {}) {
   function waitForInitialRender(children, timeout, callback) {
     let allRendered = true;
     setTimeout(() => {
-      for (var i = 0; i < children.length; i++) {
-        let c = children[i];
-        if (options.ignoreTags.indexOf(c.tagName) < 0 &&
+      for (let i = 0; i < children.length; i++) {
+        const c = children[i];
+        if (
+          options.ignoreTags.indexOf(c.tagName) < 0 &&
           options.ignoreIds.indexOf(c.id) < 0 &&
           options.ignoreClasses.indexOf(c.className) < 0 &&
           !c.attributes.localized &&
-          !c.attributes.translated) {
+          !c.attributes.translated
+        ) {
           if (allRendered) waitForInitialRender(children, 100, callback);
           allRendered = false;
           break;
@@ -167,10 +195,10 @@ function init(options = {}) {
   if (options.autorun === false) todo++;
 
   function done() {
-    todo = todo - 1;
+    todo -= 1;
     if (!todo) {
       if (!options.ele) options.ele = document.body;
-      let children = options.ele.children;
+      const children = options.ele.children;
 
       observer = new Observer(options.ele);
       addRenderers(children);
@@ -181,7 +209,9 @@ function init(options = {}) {
       });
 
       waitForInitialRender(children, 0, () => {
-        if (options.ele.style && options.ele.style.display === 'none') options.ele.style.display = 'block';
+        if (options.ele.style && options.ele.style.display === 'none') {
+          options.ele.style.display = 'block';
+        }
         options.onInitialTranslate();
       });
     }
@@ -199,4 +229,4 @@ export default {
   init,
   i18next,
   changeNamespace
-}
+};

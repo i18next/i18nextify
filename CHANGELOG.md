@@ -1,3 +1,7 @@
+### 2.4.0
+
+- introducing key usage `keyAttr: 'i18next-key'`, `ignoreWithoutKey: false`
+
 ### 2.3.0
 
 - nothing special - just an update to latest dependencies incl. i18next
