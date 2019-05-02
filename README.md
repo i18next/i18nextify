@@ -1,22 +1,22 @@
 # i18nextify
 
-Just drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.min.js) on your page and your ready to deliver your pages in any language.
+Just drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.min.js) on your page and you're ready to deliver your pages in any language.
 
-See the [sample](http://i18next.github.io/i18nextify) ([code](https://github.com/i18next/i18nextify/tree/gh-pages))!!
+See the [sample](https://i18next.github.io/i18nextify) ([code](https://github.com/i18next/i18nextify/tree/gh-pages))!
 
-i18nextify uses virtual-dom to update your page with translations based on the current content. MutationObserver is used to trigger translations on newly added content.
+*i18nextify* uses Virtual DOM to update your page with translations based on the current content. `MutationObserver` is used to trigger translations on newly added content.
 
-i18nextify comes bundled with [i18next](http://i18next.com/).
+*i18nextify* comes bundled with [i18next](https://i18next.com).
 
-Should play well with any static or dynamic page not using a own virtual-dom.
+Should play well with any static or dynamic page not using its own Virtual DOM.
 
 # Getting started
 
-The easiest way for guaranteed success is using [locizify](http://locize.com/integration) on [locize.com](locize.com).
+The easiest way for guaranteed success is using [locizify](https://www.npmjs.com/package/locizify) on [locize.com](https://locize.com).
 
 Alternatively:
 
-Drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.min.js) on your page.
+Drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.min.js) on your page.
 
 ```html
 <!DOCTYPE html>
@@ -28,7 +28,7 @@ Drop the [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.m
 </html>
 ```
 
-Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see i18nextify in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
+Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see *i18nextify* in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
 
 See the [example](https://github.com/i18next/i18nextify/tree/master/example) for details.
 
@@ -95,10 +95,17 @@ Just set translated attribute:
 
 Same could be done using options:
 
+<<<<<<< HEAD
 ```html
 mergeTags: [], // tags to merge innerHtml to one key inlineTags: [], // tags to
 inline (eg. a, span, abbr, ...) ignoreInlineOn: [], // tags to ignore inlining
 tags under inlineTags
+=======
+```js
+mergeTags: [], // tags to merge innerHtml to one key
+inlineTags: [], // tags to inline (eg. a, span, abbr, ...)
+ignoreInlineOn: [], // tags to ignore inlining tags under inlineTags
+>>>>>>> 9cbf92f5b65fd6c6a1a3e06e2aef2ad1e6065905
 ```
 
 ## Fragment replacement for links and images
@@ -107,7 +114,7 @@ tags under inlineTags
 <img src="/images/{{a.png}}" alt="big A" />
 ```
 
-You will find `a.png` to be a key in your translation files - it's value can be replaced to eg. `a-de.png` for german (all other languages will fallback to `a.png`)
+You will find `a.png` to be a key in your translation files - it's value can be replaced to eg. `a-de.png` for German (all other languages will fallback to `a.png`)
 
 ```html
 <a href="/{{statistic}}">Open my statistics</a>
@@ -138,6 +145,7 @@ window.i18nextify.init({
 ```
 
 ```html
+<<<<<<< HEAD
 <script>
   this won't get translated - nor this elements children
 </script>
@@ -147,13 +155,18 @@ window.i18nextify.init({
 <div class="ignoreMeClass">
   this won't get translated - nor this elements children
 </div>
+=======
+<SCRIPT>// this won't get translated - nor this elements children</SCRIPT>
+<div id="ignoreMeId">this won't get translated - nor this elements children</div>
+<div class="ignoreMeClass">this won't get translated - nor this elements children</div>
+>>>>>>> 9cbf92f5b65fd6c6a1a3e06e2aef2ad1e6065905
 ```
 
 Just add `translated`-attribute
 
 ## Translating an element with options
 
-For [extended translations](http://i18next.com/translate/) like plurals, interpolation, ... you need to add options to the element
+For [extended translations](https://www.i18next.com/translation-function) like plurals, interpolation, ... you need to add options to the element
 
 ```html
 <div i18next-options='{"foo": "bar"}'>
@@ -162,7 +175,7 @@ For [extended translations](http://i18next.com/translate/) like plurals, interpo
 </div>
 ```
 
-## Translating javascript code
+## Translating JavaScript code
 
 You can use the [i18next](https://i18next.com) instance used to provide the translation functionality directly. Just make sure the instance is initialized already:
 
@@ -241,7 +254,7 @@ window.i18nextify.init({
 </html>
 ```
 
-Just set the element style display to none. I18nextify will change it to block when ready.
+Just set the element style display to none. *i18nextify* will change it to block when ready.
 
 ## Change File to use
 
