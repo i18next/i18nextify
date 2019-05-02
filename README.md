@@ -4,9 +4,9 @@ Just drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nex
 
 See the [sample](https://i18next.github.io/i18nextify) ([code](https://github.com/i18next/i18nextify/tree/gh-pages))!
 
-*i18nextify* uses Virtual DOM to update your page with translations based on the current content. `MutationObserver` is used to trigger translations on newly added content.
+_i18nextify_ uses Virtual DOM to update your page with translations based on the current content. `MutationObserver` is used to trigger translations on newly added content.
 
-*i18nextify* comes bundled with [i18next](https://i18next.com).
+_i18nextify_ comes bundled with [i18next](https://i18next.com).
 
 Should play well with any static or dynamic page not using its own Virtual DOM.
 
@@ -28,7 +28,7 @@ Drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.
 </html>
 ```
 
-Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see *i18nextify* in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
+Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see _i18nextify_ in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
 
 See the [example](https://github.com/i18next/i18nextify/tree/master/example) for details.
 
@@ -95,17 +95,10 @@ Just set translated attribute:
 
 Same could be done using options:
 
-<<<<<<< HEAD
-```html
-mergeTags: [], // tags to merge innerHtml to one key inlineTags: [], // tags to
-inline (eg. a, span, abbr, ...) ignoreInlineOn: [], // tags to ignore inlining
-tags under inlineTags
-=======
 ```js
 mergeTags: [], // tags to merge innerHtml to one key
 inlineTags: [], // tags to inline (eg. a, span, abbr, ...)
 ignoreInlineOn: [], // tags to ignore inlining tags under inlineTags
->>>>>>> 9cbf92f5b65fd6c6a1a3e06e2aef2ad1e6065905
 ```
 
 ## Fragment replacement for links and images
@@ -145,9 +138,8 @@ window.i18nextify.init({
 ```
 
 ```html
-<<<<<<< HEAD
 <script>
-  this won't get translated - nor this elements children
+  // this won't get translated - nor this elements children
 </script>
 <div id="ignoreMeId">
   this won't get translated - nor this elements children
@@ -155,11 +147,6 @@ window.i18nextify.init({
 <div class="ignoreMeClass">
   this won't get translated - nor this elements children
 </div>
-=======
-<SCRIPT>// this won't get translated - nor this elements children</SCRIPT>
-<div id="ignoreMeId">this won't get translated - nor this elements children</div>
-<div class="ignoreMeClass">this won't get translated - nor this elements children</div>
->>>>>>> 9cbf92f5b65fd6c6a1a3e06e2aef2ad1e6065905
 ```
 
 Just add `translated`-attribute
@@ -254,7 +241,7 @@ window.i18nextify.init({
 </html>
 ```
 
-Just set the element style display to none. *i18nextify* will change it to block when ready.
+Just set the element style display to none. _i18nextify_ will change it to block when ready.
 
 ## Change File to use
 
