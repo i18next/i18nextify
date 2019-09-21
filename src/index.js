@@ -88,6 +88,8 @@ function changeNamespace(ns) {
   });
 }
 
+const renderers = [];
+
 function init(options = {}) {
   options = { ...getDefaults(), ...lastOptions, ...options };
 
@@ -147,7 +149,6 @@ function init(options = {}) {
   );
 
   initialized = true;
-  const renderers = [];
 
   let observer;
 
@@ -225,8 +226,15 @@ function init(options = {}) {
   if (options.autorun === false) return { start: done };
 }
 
+function forceRerender() {
+  renderers.forEach((r) => {
+    r.render(true); // enforce a rerender
+  });
+}
+
 export default {
   init,
   i18next,
-  changeNamespace
+  changeNamespace,
+  forceRerender
 };

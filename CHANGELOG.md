@@ -1,3 +1,8 @@
+### 2.5.0
+
+- save original content on nodes
+- function to enforce a retranslation
+
 ### 2.4.0
 
 - introducing key usage `keyAttr: 'i18next-key'`, `ignoreWithoutKey: false`

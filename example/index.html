@@ -6,24 +6,29 @@
       var translation = window.i18nextify.init({
         debug: true,
         saveMissing: true,
-        keyAttr: "i18next-key__Disabled",
+        keyAttr: 'i18next-key__Disabled',
         ignoreWithoutKey: false,
-        namespace: "translation",
+        namespace: 'translation',
         // namespaceFromPath: true,
-        ns: ["common", "commonNested"],
-        ignoreTags: ["script", "h6"],
-        ignoreIds: ["ignoreMeId"],
-        ignoreClasses: ["ignoreMeClass"]
+        ns: ['common', 'commonNested'],
+        ignoreTags: ['script', 'h6'],
+        ignoreIds: ['ignoreMeId'],
+        ignoreClasses: ['ignoreMeClass']
         //autorun: false,
         //dangerouslyUseInnerHtml: true
       });
       // setTimeout(function () {
       //   translation.start();
       // }, 4000);
+
+      setTimeout(() => {
+        window.i18nextify.forceRerender();
+      }, 5000);
     </script>
   </head>
 
   <body class="landing-page" style="display: none">
+    <h1>Test on text node 2</h1>
     <h1 i18next-key="test">Test on text node</h1>
     <div i18next-key="languageSelect">
       <!-- ignore comments -->
@@ -131,34 +136,34 @@
       setTimeout(function() {
         var ele = document.body;
 
-        var btn = document.createElement("BUTTON");
-        var t = document.createTextNode("CLICK ME");
+        var btn = document.createElement('BUTTON');
+        var t = document.createTextNode('CLICK ME');
         btn.appendChild(t);
 
-        console.log("appendingFromOutside");
+        console.log('appendingFromOutside');
         ele.appendChild(btn);
       }, 5000);
 
       setTimeout(function() {
-        var ele = document.getElementById("appendToInner");
+        var ele = document.getElementById('appendToInner');
 
-        var btn = document.createElement("BUTTON");
-        var t = document.createTextNode("CLICK ME INNER");
+        var btn = document.createElement('BUTTON');
+        var t = document.createTextNode('CLICK ME INNER');
         btn.appendChild(t);
 
-        console.log("appendingFromOutsideToInner");
+        console.log('appendingFromOutsideToInner');
         ele.appendChild(btn);
       }, 5000);
 
       setTimeout(function() {
-        var ele = document.getElementById("appendToInner");
+        var ele = document.getElementById('appendToInner');
 
-        var btn = document.createElement("BUTTON");
-        btn.className = "ignoreMeClass";
-        var t = document.createTextNode("CLICK ME INNER _ IGNORED BY CLASS");
+        var btn = document.createElement('BUTTON');
+        btn.className = 'ignoreMeClass';
+        var t = document.createTextNode('CLICK ME INNER _ IGNORED BY CLASS');
         btn.appendChild(t);
 
-        console.log("appendingFromOutsideToInnerIgnoreClass");
+        console.log('appendingFromOutsideToInnerIgnoreClass');
         ele.appendChild(btn);
       }, 5000);
     </script>

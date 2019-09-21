@@ -131,9 +131,9 @@ Just add needed items to the specific array:
 
 ```js
 window.i18nextify.init({
-  ignoreTags: ["SCRIPT"], // need to be uppercased
-  ignoreIds: ["ignoreMeId"],
-  ignoreClasses: ["ignoreMeClass"]
+  ignoreTags: ['SCRIPT'], // need to be uppercased
+  ignoreIds: ['ignoreMeId'],
+  ignoreClasses: ['ignoreMeClass']
 });
 ```
 
@@ -194,7 +194,7 @@ Default would be translation.
 
 ```js
 window.i18nextify.init({
-  namespace: "myNamespace"
+  namespace: 'myNamespace'
 });
 ```
 
@@ -212,8 +212,8 @@ This is useful for reused elements that are on every page, eg. like footer,... a
 
 ```js
 window.i18nextify.init({
-  namespace: "translation", // -> set the default namespace
-  ns: ["common"] // -> add additional namespaces to load
+  namespace: 'translation', // -> set the default namespace
+  ns: ['common'] // -> add additional namespaces to load
 });
 ```
 
@@ -248,7 +248,7 @@ Just set the element style display to none. _i18nextify_ will change it to block
 You can change the namespace after loading to some other file (eg. before transitioning to another page).
 
 ```js
-window.i18nextify.changeNamespace("newNamespace");
+window.i18nextify.changeNamespace('newNamespace');
 ```
 
 ---
@@ -260,3 +260,9 @@ window.i18nextify.changeNamespace("newNamespace");
     <img src="https://raw.githubusercontent.com/i18next/i18next/master/assets/locize_sponsor_240.gif" width="240px">
   </a>
 </p>
+
+## force a retranslation:
+
+```js
+window.i18nextify.forceRerender();
+```

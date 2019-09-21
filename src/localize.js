@@ -6,7 +6,8 @@ import { getPath, setPath } from 'i18next/dist/es/utils';
 import { getAttribute } from './utils';
 import Instrument from './Instrument';
 
-function isUnTranslated(node) {
+function isUnTranslated(node, opts = { retranslate: false }) {
+  if (opts && opts.retranslate) return true;
   return (
     !node.properties ||
     !node.properties.attributes ||
@@ -68,7 +69,7 @@ function translate(str, options = {}, overrideKey) {
 
 const replaceInside = ['src', 'href'];
 const REGEXP = new RegExp('%7B%7B(.+?)%7D%7D', 'g'); // urlEncoded {{}}
-function translateProps(node, props, options = {}, overrideKey) {
+function translateProps(node, props, tOptions = {}, overrideKey, opts) {
   if (!props) return props;
 
   i18next.options.translateAttributes.forEach((item) => {
@@ -85,13 +86,26 @@ function translateProps(node, props, options = {}, overrideKey) {
       value = getPath(props.attributes, item.attr);
       if (value) wasOnAttr = true;
     }
+
+    if (opts.retranslate) {
+      value =
+        (node.properties &&
+          node.properties &&
+          node.properties.attributes[`${item.attr}-locize-original-content`]) ||
+        value;
+    }
+
     if (value) {
+      node.properties.attributes[
+        `${item.attr}-locize-original-content`
+      ] = value;
+
       setPath(
         wasOnAttr ? props.attributes : props,
         item.attr,
         translate(
           value,
-          { ...options },
+          { ...tOptions },
           overrideKey ? `${overrideKey}.${item.attr}` : ''
         )
       );
@@ -113,10 +127,10 @@ function translateProps(node, props, options = {}, overrideKey) {
           mem.push(match);
         } else {
           mem.push(translate(
-              match,
-              { ...options },
-              overrideKey ? `${overrideKey}.${attr}` : ''
-            ));
+            match,
+            { ...tOptions },
+            overrideKey ? `${overrideKey}.${attr}` : ''
+          ));
         }
         return mem;
       }, arr);
@@ -177,9 +191,16 @@ function canInline(node, tOptions) {
   return inlineable && hadNonTextNode;
 }
 
-function walk(node, tOptions, parent, parentOverrideKey, currentDepth = 0) {
+function walk(
+  node,
+  tOptions,
+  parent,
+  parentOverrideKey,
+  currentDepth = 0,
+  opts
+) {
   const nodeIsNotExcluded = isNotExcluded(node);
-  const nodeIsUnTranslated = isUnTranslated(node);
+  const nodeIsUnTranslated = isUnTranslated(node, opts);
   tOptions = getTOptions(tOptions, node);
   let parentKey = currentDepth === 0 ? parentOverrideKey : '';
   if (
@@ -200,9 +221,24 @@ function walk(node, tOptions, parent, parentOverrideKey, currentDepth = 0) {
     if (nodeIsNotExcluded && nodeIsUnTranslated) {
       // wrap children into dummy node and remove that outer from translation
       const dummyNode = new VNode('I18NEXTIFYDUMMY', null, node.children);
-      const key = removeIndent(toHTML(dummyNode), '')
+      let key = removeIndent(toHTML(dummyNode), '')
         .replace('<i18nextifydummy>', '')
         .replace('</i18nextifydummy>', '');
+
+      // grab orginial text if we enforce a retranslate
+      if (opts.retranslate) {
+        const usedKey =
+          (node.properties &&
+            node.properties.attributes &&
+            node.properties.attributes['locize-original-content']) ||
+          (parent &&
+            parent.properties &&
+            parent.properties.attributes &&
+            parent.properties.attributes['locize-original-content']) ||
+          key;
+
+        key = usedKey;
+      }
 
       // translate that's children and surround it again with a dummy node to parse to vdom
       const translation = `<i18nextifydummy>${translate(
@@ -214,6 +250,13 @@ function walk(node, tOptions, parent, parentOverrideKey, currentDepth = 0) {
 
       // replace children on passed in node
       node.children = newNode.children;
+
+      // persist original key for future retranslate
+      if (node.properties && node.properties.attributes) {
+        node.properties.attributes['locize-original-content'] = key;
+      } else if (parent && parent.properties && parent.properties.attributes) {
+        parent.properties.attributes['locize-original-content'] = key;
+      }
 
       if (node.properties && node.properties.attributes) {
         node.properties.attributes.localized = '';
@@ -234,7 +277,8 @@ function walk(node, tOptions, parent, parentOverrideKey, currentDepth = 0) {
           tOptions,
           node,
           overrideKey,
-          node.children.length > 1 ? i + 1 : i // if only a inner text node - keep it index 0, else add a index number + 1
+          node.children.length > 1 ? i + 1 : i, // if only a inner text node - keep it index 0, else add a index number + 1
+          opts
         );
       }
     });
@@ -247,6 +291,23 @@ function walk(node, tOptions, parent, parentOverrideKey, currentDepth = 0) {
     if (node.text) {
       let match;
       let txt = node.text;
+      let originalText = node.text;
+
+      // grab orginial text if we enforce a retranslate
+      if (opts.retranslate) {
+        const usedText =
+          (node.properties &&
+            node.properties.attributes &&
+            node.properties.attributes['locize-original-content']) ||
+          (parent &&
+            parent.properties &&
+            parent.properties.attributes &&
+            parent.properties.attributes['locize-original-content']) ||
+          node.text;
+
+        txt = usedText;
+        originalText = usedText;
+      }
 
       // exclude whitespace replacement eg on PRE, CODE
       const ignore =
@@ -271,15 +332,33 @@ function walk(node, tOptions, parent, parentOverrideKey, currentDepth = 0) {
       } else {
         node.text = translate(txt, tOptions, overrideKey || '');
       }
+
+      // persist original text (key) for future retranslate
+      if (node.properties && node.properties.attributes) {
+        if (originalText) {
+          node.properties.attributes['locize-original-content'] = originalText;
+        }
+      } else if (parent && parent.properties && parent.properties.attributes) {
+        if (originalText) {
+          parent.properties.attributes[
+            'locize-original-content'
+          ] = originalText;
+        }
+      }
     }
+
+    // translate propertied
     if (node.properties) {
       node.properties = translateProps(
         node,
         node.properties,
         tOptions,
-        overrideKey
+        overrideKey,
+        opts
       );
     }
+
+    // set translated
     if (node.properties && node.properties.attributes) {
       node.properties.attributes.localized = '';
     }
@@ -288,13 +367,13 @@ function walk(node, tOptions, parent, parentOverrideKey, currentDepth = 0) {
   return node;
 }
 
-export default function localize(node) {
+export default function localize(node, retranslate) {
   const recurseTime = new Instrument();
   recurseTime.start();
 
-  const localized = walk(node);
+  const localized = walk(node, null, null, null, null, { retranslate });
 
-  i18next.services.logger.log('localization took: ' + recurseTime.end() + 'ms');
+  i18next.services.logger.log(`localization took: ${recurseTime.end()}ms`);
 
   return localized;
 }

@@ -1,0 +1,21 @@
+{
+  "Test on text node": "Test on text node",
+  "_t": "Sat Sep 21 2019 11:08:36 GMT+0200 (Central European Summer Time)",
+  "deutsch": "deutsch",
+  "|": "|",
+  "image - src replacement:": "image - src replacement:",
+  "%20a.png%20": "%20a.png%20",
+  "anchor - href replacement:": "anchor - href replacement:",
+  "explore the link": "explore the link",
+  "%20statistic%20": "%20statistic%20",
+  "CLICK ME INNER": "CLICK ME INNER",
+  "english": "english",
+  "Flexible connection to<a draggable=\"true\" href=\"http://localhost:3003/docs/ecosystem/#backends\"> backend</a> (loading translationsvia xhr, …)": "Flexible connection to<a draggable=\"true\" href=\"http://localhost:3003/docs/ecosystem/#backends\"> backend</a> (loading translationsvia xhr, …)",
+  "foo {{ foo }}": "foo {{ foo }}",
+  "foo {{ foo }}; foo2 {{ foo2 }}": "foo {{ foo }}; foo2 {{ foo2 }}",
+  "big a": "big a",
+  "image - alt tag:": "image - alt tag:",
+  "Test on text node 2": "Test on text node 2",
+  "foo bar": "foo bar",
+  "foo bar; foo2 bar2": "foo bar; foo2 bar2"
+}
