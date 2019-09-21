@@ -6402,7 +6402,9 @@ function translateProps(node, props) {
     }
 
     if (opts.retranslate) {
-      value = node.properties && node.properties && node.properties.attributes[item.attr + '-locize-original-content'] || value;
+      var usedValue = node.properties && node.properties && node.properties.attributes[item.attr + '-locize-original-content'];
+      if (!usedValue) usedValue = value;
+      value = usedValue;
     }
 
     if (value) {
@@ -6506,7 +6508,11 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
-        var usedKey = node.properties && node.properties.attributes && node.properties.attributes['locize-original-content'] || parent && parent.properties && parent.properties.attributes && parent.properties.attributes['locize-original-content'] || key;
+        var usedKey = node.properties && node.properties.attributes && node.properties.attributes['locize-original-content'];
+        if (!usedKey) {
+          usedKey = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['locize-original-content'];
+        }
+        if (!usedKey) usedKey = key;
 
         key = usedKey;
       }
@@ -6553,7 +6559,11 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
-        var usedText = node.properties && node.properties.attributes && node.properties.attributes['locize-original-content'] || parent && parent.properties && parent.properties.attributes && parent.properties.attributes['locize-original-content'] || node.text;
+        var usedText = node.properties && node.properties.attributes && node.properties.attributes['locize-original-content'];
+        if (!usedText) {
+          usedText = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['locize-original-content'];
+        }
+        if (!usedText) usedText = node.text;
 
         txt = usedText;
         originalText = usedText;

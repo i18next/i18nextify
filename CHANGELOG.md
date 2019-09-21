@@ -1,3 +1,7 @@
+### 2.5.1
+
+- fixes usedValue/Key for reforced translation
+
 ### 2.5.0
 
 - save original content on nodes

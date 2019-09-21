@@ -88,11 +88,12 @@ function translateProps(node, props, tOptions = {}, overrideKey, opts) {
     }
 
     if (opts.retranslate) {
-      value =
-        (node.properties &&
-          node.properties &&
-          node.properties.attributes[`${item.attr}-locize-original-content`]) ||
-        value;
+      let usedValue =
+        node.properties &&
+        node.properties &&
+        node.properties.attributes[`${item.attr}-locize-original-content`];
+      if (!usedValue) usedValue = value;
+      value = usedValue;
     }
 
     if (value) {
@@ -227,15 +228,18 @@ function walk(
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
-        const usedKey =
-          (node.properties &&
-            node.properties.attributes &&
-            node.properties.attributes['locize-original-content']) ||
-          (parent &&
+        let usedKey =
+          node.properties &&
+          node.properties.attributes &&
+          node.properties.attributes['locize-original-content'];
+        if (!usedKey) {
+          usedKey =
+            parent &&
             parent.properties &&
             parent.properties.attributes &&
-            parent.properties.attributes['locize-original-content']) ||
-          key;
+            parent.properties.attributes['locize-original-content'];
+        }
+        if (!usedKey) usedKey = key;
 
         key = usedKey;
       }
@@ -295,15 +299,18 @@ function walk(
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
-        const usedText =
-          (node.properties &&
-            node.properties.attributes &&
-            node.properties.attributes['locize-original-content']) ||
-          (parent &&
+        let usedText =
+          node.properties &&
+          node.properties.attributes &&
+          node.properties.attributes['locize-original-content'];
+        if (!usedText) {
+          usedText =
+            parent &&
             parent.properties &&
             parent.properties.attributes &&
-            parent.properties.attributes['locize-original-content']) ||
-          node.text;
+            parent.properties.attributes['locize-original-content'];
+        }
+        if (!usedText) usedText = node.text;
 
         txt = usedText;
         originalText = usedText;
