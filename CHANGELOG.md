@@ -1,3 +1,7 @@
+### 2.5.4
+
+- do never set key attribute for orginal Value if already translated (avoid sideeffects)
+
 ### 2.5.3
 
 - lowercased attribute

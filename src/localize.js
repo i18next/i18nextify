@@ -69,7 +69,7 @@ function translate(str, options = {}, overrideKey) {
 
 const replaceInside = ['src', 'href'];
 const REGEXP = new RegExp('%7B%7B(.+?)%7D%7D', 'g'); // urlEncoded {{}}
-function translateProps(node, props, tOptions = {}, overrideKey, opts) {
+function translateProps(node, props, tOptions = {}, overrideKey, realNodeIsUnTranslated, opts) {
   if (!props) return props;
 
   i18next.options.translateAttributes.forEach((item) => {
@@ -97,7 +97,7 @@ function translateProps(node, props, tOptions = {}, overrideKey, opts) {
     }
 
     if (value) {
-      node.properties.attributes[`${item.attr}-i18next-orgval`] = value;
+      if (realNodeIsUnTranslated) { node.properties.attributes[`${item.attr}-i18next-orgval`] = value; }
 
       setPath(
         wasOnAttr ? props.attributes : props,
@@ -200,6 +200,7 @@ function walk(
 ) {
   const nodeIsNotExcluded = isNotExcluded(node);
   const nodeIsUnTranslated = isUnTranslated(node, opts);
+  const realNodeIsUnTranslated = isUnTranslated(node); // ignoring forced threatment
   tOptions = getTOptions(tOptions, node);
   let parentKey = currentDepth === 0 ? parentOverrideKey : '';
   if (
@@ -254,9 +255,18 @@ function walk(
       node.children = newNode.children;
 
       // persist original key for future retranslate
-      if (node.properties && node.properties.attributes) {
+      if (
+        realNodeIsUnTranslated &&
+        node.properties &&
+        node.properties.attributes
+      ) {
         node.properties.attributes['i18next-orgval'] = key;
-      } else if (parent && parent.properties && parent.properties.attributes) {
+      } else if (
+        realNodeIsUnTranslated &&
+        parent &&
+        parent.properties &&
+        parent.properties.attributes
+      ) {
         parent.properties.attributes[`i18next-orgval-${currentDepth}`] = key;
       }
 
@@ -339,13 +349,24 @@ function walk(
       }
 
       // persist original text (key) for future retranslate
-      if (node.properties && node.properties.attributes) {
+      if (
+        realNodeIsUnTranslated &&
+        node.properties &&
+        node.properties.attributes
+      ) {
         if (originalText) {
           node.properties.attributes['i18next-orgval'] = originalText;
         }
-      } else if (parent && parent.properties && parent.properties.attributes) {
+      } else if (
+        realNodeIsUnTranslated &&
+        parent &&
+        parent.properties &&
+        parent.properties.attributes
+      ) {
         if (originalText) {
-          parent.properties.attributes[`i18next-orgval-${currentDepth}`] = originalText;
+          parent.properties.attributes[
+            `i18next-orgval-${currentDepth}`
+          ] = originalText;
         }
       }
     }
@@ -357,6 +378,7 @@ function walk(
         node.properties,
         tOptions,
         overrideKey,
+        realNodeIsUnTranslated,
         opts
       );
     }
