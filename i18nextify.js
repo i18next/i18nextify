@@ -6402,13 +6402,13 @@ function translateProps(node, props) {
     }
 
     if (opts.retranslate) {
-      var usedValue = node.properties && node.properties && node.properties.attributes[item.attr + '-i18next-orgVal'];
+      var usedValue = node.properties && node.properties && node.properties.attributes[item.attr + '-i18next-orgval'];
       if (!usedValue) usedValue = value;
       value = usedValue;
     }
 
     if (value) {
-      node.properties.attributes[item.attr + '-i18next-orgVal'] = value;
+      node.properties.attributes[item.attr + '-i18next-orgval'] = value;
 
       setPath(wasOnAttr ? props.attributes : props, item.attr, translate(value, _extends$6({}, tOptions), overrideKey ? overrideKey + '.' + item.attr : ''));
     }
@@ -6508,9 +6508,9 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
-        var usedKey = node.properties && node.properties.attributes && node.properties.attributes['i18next-orgVal'];
+        var usedKey = node.properties && node.properties.attributes && node.properties.attributes['i18next-orgval'];
         if (!usedKey) {
-          usedKey = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['i18next-orgVal-' + currentDepth];
+          usedKey = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['i18next-orgval-' + currentDepth];
         }
         if (!usedKey) usedKey = key;
 
@@ -6526,9 +6526,9 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
 
       // persist original key for future retranslate
       if (node.properties && node.properties.attributes) {
-        node.properties.attributes['i18next-orgVal'] = key;
+        node.properties.attributes['i18next-orgval'] = key;
       } else if (parent && parent.properties && parent.properties.attributes) {
-        parent.properties.attributes['i18next-orgVal-' + currentDepth] = key;
+        parent.properties.attributes['i18next-orgval-' + currentDepth] = key;
       }
 
       if (node.properties && node.properties.attributes) {
@@ -6559,9 +6559,9 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
-        var usedText = node.properties && node.properties.attributes && node.properties.attributes['i18next-orgVal'];
+        var usedText = node.properties && node.properties.attributes && node.properties.attributes['i18next-orgval'];
         if (!usedText) {
-          usedText = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['i18next-orgVal-' + currentDepth];
+          usedText = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['i18next-orgval-' + currentDepth];
         }
         if (!usedText) usedText = node.text;
 
@@ -6590,11 +6590,11 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
       // persist original text (key) for future retranslate
       if (node.properties && node.properties.attributes) {
         if (originalText) {
-          node.properties.attributes['i18next-orgVal'] = originalText;
+          node.properties.attributes['i18next-orgval'] = originalText;
         }
       } else if (parent && parent.properties && parent.properties.attributes) {
         if (originalText) {
-          parent.properties.attributes['i18next-orgVal-' + currentDepth] = originalText;
+          parent.properties.attributes['i18next-orgval-' + currentDepth] = originalText;
         }
       }
     }

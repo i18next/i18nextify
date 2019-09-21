@@ -91,13 +91,13 @@ function translateProps(node, props, tOptions = {}, overrideKey, opts) {
       let usedValue =
         node.properties &&
         node.properties &&
-        node.properties.attributes[`${item.attr}-i18next-orgVal`];
+        node.properties.attributes[`${item.attr}-i18next-orgval`];
       if (!usedValue) usedValue = value;
       value = usedValue;
     }
 
     if (value) {
-      node.properties.attributes[`${item.attr}-i18next-orgVal`] = value;
+      node.properties.attributes[`${item.attr}-i18next-orgval`] = value;
 
       setPath(
         wasOnAttr ? props.attributes : props,
@@ -229,13 +229,13 @@ function walk(
         let usedKey =
           node.properties &&
           node.properties.attributes &&
-          node.properties.attributes['i18next-orgVal'];
+          node.properties.attributes['i18next-orgval'];
         if (!usedKey) {
           usedKey =
             parent &&
             parent.properties &&
             parent.properties.attributes &&
-            parent.properties.attributes[`i18next-orgVal-${currentDepth}`];
+            parent.properties.attributes[`i18next-orgval-${currentDepth}`];
         }
         if (!usedKey) usedKey = key;
 
@@ -255,9 +255,9 @@ function walk(
 
       // persist original key for future retranslate
       if (node.properties && node.properties.attributes) {
-        node.properties.attributes['i18next-orgVal'] = key;
+        node.properties.attributes['i18next-orgval'] = key;
       } else if (parent && parent.properties && parent.properties.attributes) {
-        parent.properties.attributes[`i18next-orgVal-${currentDepth}`] = key;
+        parent.properties.attributes[`i18next-orgval-${currentDepth}`] = key;
       }
 
       if (node.properties && node.properties.attributes) {
@@ -300,13 +300,13 @@ function walk(
         let usedText =
           node.properties &&
           node.properties.attributes &&
-          node.properties.attributes[`i18next-orgVal`];
+          node.properties.attributes['i18next-orgval'];
         if (!usedText) {
           usedText =
             parent &&
             parent.properties &&
             parent.properties.attributes &&
-            parent.properties.attributes[`i18next-orgVal-${currentDepth}`];
+            parent.properties.attributes[`i18next-orgval-${currentDepth}`];
         }
         if (!usedText) usedText = node.text;
 
@@ -341,11 +341,11 @@ function walk(
       // persist original text (key) for future retranslate
       if (node.properties && node.properties.attributes) {
         if (originalText) {
-          node.properties.attributes['i18next-orgVal'] = originalText;
+          node.properties.attributes['i18next-orgval'] = originalText;
         }
       } else if (parent && parent.properties && parent.properties.attributes) {
         if (originalText) {
-          parent.properties.attributes[`i18next-orgVal-${currentDepth}`] = originalText;
+          parent.properties.attributes[`i18next-orgval-${currentDepth}`] = originalText;
         }
       }
     }

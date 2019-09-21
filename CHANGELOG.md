@@ -1,3 +1,7 @@
+### 2.5.3
+
+- lowercased attribute
+
 ### 2.5.2
 
 - use deept on appending name on parent
