@@ -1,3 +1,7 @@
+### 2.5.2
+
+- use deept on appending name on parent
+
 ### 2.5.1
 
 - fixes usedValue/Key for reforced translation

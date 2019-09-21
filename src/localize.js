@@ -91,15 +91,13 @@ function translateProps(node, props, tOptions = {}, overrideKey, opts) {
       let usedValue =
         node.properties &&
         node.properties &&
-        node.properties.attributes[`${item.attr}-locize-original-content`];
+        node.properties.attributes[`${item.attr}-i18next-orgVal`];
       if (!usedValue) usedValue = value;
       value = usedValue;
     }
 
     if (value) {
-      node.properties.attributes[
-        `${item.attr}-locize-original-content`
-      ] = value;
+      node.properties.attributes[`${item.attr}-i18next-orgVal`] = value;
 
       setPath(
         wasOnAttr ? props.attributes : props,
@@ -231,13 +229,13 @@ function walk(
         let usedKey =
           node.properties &&
           node.properties.attributes &&
-          node.properties.attributes['locize-original-content'];
+          node.properties.attributes['i18next-orgVal'];
         if (!usedKey) {
           usedKey =
             parent &&
             parent.properties &&
             parent.properties.attributes &&
-            parent.properties.attributes['locize-original-content'];
+            parent.properties.attributes[`i18next-orgVal-${currentDepth}`];
         }
         if (!usedKey) usedKey = key;
 
@@ -257,9 +255,9 @@ function walk(
 
       // persist original key for future retranslate
       if (node.properties && node.properties.attributes) {
-        node.properties.attributes['locize-original-content'] = key;
+        node.properties.attributes['i18next-orgVal'] = key;
       } else if (parent && parent.properties && parent.properties.attributes) {
-        parent.properties.attributes['locize-original-content'] = key;
+        parent.properties.attributes[`i18next-orgVal-${currentDepth}`] = key;
       }
 
       if (node.properties && node.properties.attributes) {
@@ -302,13 +300,13 @@ function walk(
         let usedText =
           node.properties &&
           node.properties.attributes &&
-          node.properties.attributes['locize-original-content'];
+          node.properties.attributes[`i18next-orgVal`];
         if (!usedText) {
           usedText =
             parent &&
             parent.properties &&
             parent.properties.attributes &&
-            parent.properties.attributes['locize-original-content'];
+            parent.properties.attributes[`i18next-orgVal-${currentDepth}`];
         }
         if (!usedText) usedText = node.text;
 
@@ -321,7 +319,7 @@ function walk(
         i18next.options.ignoreCleanIndentFor.indexOf(parent.tagName) > -1;
 
       if (!ignore) {
-        txt = removeIndent(node.text, '\n');
+        txt = removeIndent(txt, '\n');
         if (i18next.options.cleanWhitespace) {
           const regex = /^\s*(.*[^\s])\s*$/g;
           match = regex.exec(txt);
@@ -343,13 +341,11 @@ function walk(
       // persist original text (key) for future retranslate
       if (node.properties && node.properties.attributes) {
         if (originalText) {
-          node.properties.attributes['locize-original-content'] = originalText;
+          node.properties.attributes['i18next-orgVal'] = originalText;
         }
       } else if (parent && parent.properties && parent.properties.attributes) {
         if (originalText) {
-          parent.properties.attributes[
-            'locize-original-content'
-          ] = originalText;
+          parent.properties.attributes[`i18next-orgVal-${currentDepth}`] = originalText;
         }
       }
     }

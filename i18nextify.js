@@ -6402,13 +6402,13 @@ function translateProps(node, props) {
     }
 
     if (opts.retranslate) {
-      var usedValue = node.properties && node.properties && node.properties.attributes[item.attr + '-locize-original-content'];
+      var usedValue = node.properties && node.properties && node.properties.attributes[item.attr + '-i18next-orgVal'];
       if (!usedValue) usedValue = value;
       value = usedValue;
     }
 
     if (value) {
-      node.properties.attributes[item.attr + '-locize-original-content'] = value;
+      node.properties.attributes[item.attr + '-i18next-orgVal'] = value;
 
       setPath(wasOnAttr ? props.attributes : props, item.attr, translate(value, _extends$6({}, tOptions), overrideKey ? overrideKey + '.' + item.attr : ''));
     }
@@ -6508,9 +6508,9 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
-        var usedKey = node.properties && node.properties.attributes && node.properties.attributes['locize-original-content'];
+        var usedKey = node.properties && node.properties.attributes && node.properties.attributes['i18next-orgVal'];
         if (!usedKey) {
-          usedKey = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['locize-original-content'];
+          usedKey = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['i18next-orgVal-' + currentDepth];
         }
         if (!usedKey) usedKey = key;
 
@@ -6526,9 +6526,9 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
 
       // persist original key for future retranslate
       if (node.properties && node.properties.attributes) {
-        node.properties.attributes['locize-original-content'] = key;
+        node.properties.attributes['i18next-orgVal'] = key;
       } else if (parent && parent.properties && parent.properties.attributes) {
-        parent.properties.attributes['locize-original-content'] = key;
+        parent.properties.attributes['i18next-orgVal-' + currentDepth] = key;
       }
 
       if (node.properties && node.properties.attributes) {
@@ -6559,9 +6559,9 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
-        var usedText = node.properties && node.properties.attributes && node.properties.attributes['locize-original-content'];
+        var usedText = node.properties && node.properties.attributes && node.properties.attributes['i18next-orgVal'];
         if (!usedText) {
-          usedText = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['locize-original-content'];
+          usedText = parent && parent.properties && parent.properties.attributes && parent.properties.attributes['i18next-orgVal-' + currentDepth];
         }
         if (!usedText) usedText = node.text;
 
@@ -6573,7 +6573,7 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
       var ignore = i18next$1.options.ignoreCleanIndentFor.indexOf(parent.tagName) > -1;
 
       if (!ignore) {
-        txt = removeIndent(node.text, '\n');
+        txt = removeIndent(txt, '\n');
         if (i18next$1.options.cleanWhitespace) {
           var regex = /^\s*(.*[^\s])\s*$/g;
           match = regex.exec(txt);
@@ -6590,11 +6590,11 @@ function walk$1(node, tOptions, parent, parentOverrideKey) {
       // persist original text (key) for future retranslate
       if (node.properties && node.properties.attributes) {
         if (originalText) {
-          node.properties.attributes['locize-original-content'] = originalText;
+          node.properties.attributes['i18next-orgVal'] = originalText;
         }
       } else if (parent && parent.properties && parent.properties.attributes) {
         if (originalText) {
-          parent.properties.attributes['locize-original-content'] = originalText;
+          parent.properties.attributes['i18next-orgVal-' + currentDepth] = originalText;
         }
       }
     }

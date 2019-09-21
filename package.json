@@ -1,6 +1,6 @@
 {
   "name": "i18nextify",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "enables localization of any page with zero effort",
   "main": "./index.js",
   "jsnext:main": "dist/es/index.js",
