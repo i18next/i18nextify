@@ -1,6 +1,6 @@
 {
   "Also works on node directly": "Also works on node directly",
-  "_t": "Sat Sep 21 2019 11:28:23 GMT+0200 (Central European Summer Time)",
+  "_t": "Thu Oct 03 2019 10:23:49 GMT+0200 (Central European Summer Time)",
   "different namespace: i18next-options='{\"ns\": \"common\"}'": "different namespace: i18next-options='{\"ns\": \"common\"}'",
   "set it on i18next options and assert to add it to": "set it on i18next options and assert to add it to",
   "i18next.options.ns array on init": "i18next.options.ns array on init"

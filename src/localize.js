@@ -2,8 +2,7 @@ import toHTML from 'vdom-to-html';
 import parser from 'vdom-parser';
 import VNode from 'virtual-dom/vnode/vnode';
 import i18next from 'i18next';
-import { getPath, setPath } from 'i18next/dist/es/utils';
-import { getAttribute } from './utils';
+import { getAttribute, getPath, setPath } from './utils';
 import Instrument from './Instrument';
 
 function isUnTranslated(node, opts = { retranslate: false }) {

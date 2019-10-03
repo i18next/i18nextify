@@ -1,13 +1,14 @@
 {
   "env": {
     "development": {
-      "presets": [ "es2015", "stage-0" ]
-    },
-    "rollup": {
-      "presets": [ "es2015-rollup", "stage-0"  ]
+      "presets": ["@babel/preset-env"],
+      "plugins": ["@babel/plugin-transform-runtime"]
     },
     "jsnext": {
-      "presets": [ "es2015-native-modules", "stage-0"  ]
+      "presets": [
+        ["@babel/preset-env", { "modules": false, "useBuiltIns": false }]
+      ],
+      "plugins": ["@babel/plugin-transform-runtime"]
     }
   }
 }

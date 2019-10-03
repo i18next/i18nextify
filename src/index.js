@@ -7,6 +7,7 @@ import Observer from './Observer';
 import docReady from './docReady';
 import renderer from './renderer';
 import { missingHandler } from './missingHandler';
+import { parseOptions, getPathname } from './utils';
 
 function getDefaults() {
   return {
@@ -64,20 +65,6 @@ i18next.use(LngDet);
 // store last init options - for case init is called before dom ready
 let lastOptions = {};
 
-function getPathname() {
-  const path = location.pathname;
-  if (path === '/') return 'root';
-
-  const parts = path.split('/');
-  let ret = 'root';
-
-  parts.forEach((p) => {
-    if (p) ret += `_${p}`;
-  });
-
-  return ret;
-}
-
 function changeNamespace(ns) {
   if (!ns && lastOptions.namespaceFromPath) ns = getPathname();
   lastOptions.ns.push(ns);
@@ -93,60 +80,13 @@ const renderers = [];
 function init(options = {}) {
   options = { ...getDefaults(), ...lastOptions, ...options };
 
-  if (options.namespace) {
-    options.ns.push(options.namespace);
-    options.defaultNS = options.namespace;
-  } else if (options.namespaceFromPath) {
-    const ns = getPathname();
-    options.ns.push(ns);
-    options.defaultNS = ns;
-  }
-
-  if (!options.ns.length) options.ns = ['translation'];
+  options = parseOptions(options);
 
   // delay init from domReady
   if (!options.ele) {
     delete options.ele;
     lastOptions = options;
   }
-
-  if (options.ignoreTags) {
-    options.ignoreTags = options.ignoreTags.map(s => s.toUpperCase());
-  }
-  if (options.ignoreCleanIndentFor) {
-    options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map(s =>
-      s.toUpperCase());
-  }
-  if (options.inlineTags) {
-    options.inlineTags = options.inlineTags.map(s => s.toUpperCase());
-  }
-  if (options.ignoreInlineOn) {
-    options.ignoreInlineOn = options.ignoreInlineOn.map(s => s.toUpperCase());
-  }
-  if (options.mergeTags) {
-    options.mergeTags = options.mergeTags.map(s => s.toUpperCase());
-  }
-  options.translateAttributes = options.translateAttributes.reduce(
-    (mem, attr) => {
-      const res = { attr };
-      if (attr.indexOf('#') > -1) {
-        const [a, c] = attr.split('#');
-        res.attr = a;
-        if (c.indexOf('.') > -1) {
-          const [e, b] = c.split('.');
-          res.ele = e.toUpperCase();
-          res.cond = b.toLowerCase().split('=');
-        } else if (c.indexOf('=') > -1) {
-          res.cond = c.toLowerCase().split('=');
-        } else {
-          res.ele = c.toUpperCase();
-        }
-      }
-      mem.push(res);
-      return mem;
-    },
-    []
-  );
 
   initialized = true;
 
