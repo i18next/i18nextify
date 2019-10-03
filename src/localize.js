@@ -68,7 +68,14 @@ function translate(str, options = {}, overrideKey) {
 
 const replaceInside = ['src', 'href'];
 const REGEXP = new RegExp('%7B%7B(.+?)%7D%7D', 'g'); // urlEncoded {{}}
-function translateProps(node, props, tOptions = {}, overrideKey, realNodeIsUnTranslated, opts) {
+function translateProps(
+  node,
+  props,
+  tOptions = {},
+  overrideKey,
+  realNodeIsUnTranslated,
+  opts
+) {
   if (!props) return props;
 
   i18next.options.translateAttributes.forEach((item) => {
@@ -96,7 +103,9 @@ function translateProps(node, props, tOptions = {}, overrideKey, realNodeIsUnTra
     }
 
     if (value) {
-      if (realNodeIsUnTranslated) { node.properties.attributes[`${item.attr}-i18next-orgval`] = value; }
+      if (realNodeIsUnTranslated) {
+        node.properties.attributes[`${item.attr}-i18next-orgval`] = value;
+      }
 
       setPath(
         wasOnAttr ? props.attributes : props,
@@ -180,7 +189,11 @@ function canInline(node, tOptions) {
   let inlineable = true;
   let hadNonTextNode = false;
   node.children.forEach((child) => {
-    if (!child.text && inlineTags.indexOf(child.tagName) < 0) {
+    if (
+      !child.text &&
+      child.tagName &&
+      inlineTags.indexOf(child.tagName.toUpperCase()) < 0
+    ) {
       inlineable = false;
     }
     if (child.tagName) hadNonTextNode = true;

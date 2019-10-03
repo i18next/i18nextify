@@ -40,9 +40,9 @@ module.exports = {
   resetOptions(opts) {
     this.options = parseOptions({ ...options, ...opts });
   },
-  t(k, opts) {
+  t(k, opts = {}) {
     tCalls.push({ k, opts });
-    return `#${k}#`;
+    return `#${opts.defaultValue || k}#`;
   },
   getCalls(reset = true) {
     const calls = tCalls;

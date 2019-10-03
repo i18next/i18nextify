@@ -14,7 +14,7 @@ import toHTML from 'vdom-to-html';
 import localize from '../src/localize';
 
 export function run(source, expectedResult, expectedKeys, debug = false) {
-  const node = convertHTML(source);
+  const node = convertHTML(source.trim());
 
   const result = toHTML(localize(node));
   const calls = i18next.getCalls();
@@ -28,6 +28,9 @@ export function run(source, expectedResult, expectedKeys, debug = false) {
     expectedKeys.forEach((k, i) => {
       if (typeof k === 'string') {
         expect(calls[i].k).toEqual(k);
+      } else if (k.k && k.v) {
+        expect(calls[i].k).toEqual(k.k);
+        expect(calls[i].opts.defaultValue).toEqual(k.v);
       }
     });
   }
