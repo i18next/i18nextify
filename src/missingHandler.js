@@ -1,5 +1,4 @@
 import i18next from 'i18next';
-import { setPath } from 'i18next/dist/es/utils';
 import * as utils from './utils';
 
 let missings = {};
@@ -15,7 +14,7 @@ export function missingHandler(lngs, namespace, key, res) {
   if (!lngs) lngs = [];
 
   lngs.forEach(lng => {
-    setPath(missings, [lng, namespace, key], res);
+    utils.setPath(missings, [lng, namespace, key], res);
     debouncedLog();
   });
 

@@ -1,10 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('i18next/dist/es/EventEmitter'), require('i18next/dist/es/utils')) :
-  typeof define === 'function' && define.amd ? define(['i18next/dist/es/EventEmitter', 'i18next/dist/es/utils'], factory) :
-  (global = global || self, global.i18nextify = factory(global.EventEmitter$1, global.utils));
-}(this, (function (EventEmitter$1, utils) { 'use strict';
-
-  EventEmitter$1 = EventEmitter$1 && EventEmitter$1.hasOwnProperty('default') ? EventEmitter$1['default'] : EventEmitter$1;
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global = global || self, global.i18nextify = factory());
+}(this, (function () { 'use strict';
 
   function _defineProperty(obj, key, value) {
     if (key in obj) {
@@ -3034,6 +3032,53 @@
   }();
 
   Browser.type = 'languageDetector';
+
+  class EventEmitter$1 {
+    constructor() {
+      this.observers = {};
+    }
+
+    on(events, listener) {
+      events.split(' ').forEach(event => {
+        this.observers[event] = this.observers[event] || [];
+        this.observers[event].push(listener);
+      });
+      return this;
+    }
+
+    off(event, listener) {
+      if (!this.observers[event]) return;
+
+      if (!listener) {
+        delete this.observers[event];
+        return;
+      }
+
+      this.observers[event] = this.observers[event].filter(l => l !== listener);
+    }
+
+    emit(event) {
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      if (this.observers[event]) {
+        var cloned = [].concat(this.observers[event]);
+        cloned.forEach(observer => {
+          observer(...args);
+        });
+      }
+
+      if (this.observers['*']) {
+        var _cloned = [].concat(this.observers['*']);
+
+        _cloned.forEach(observer => {
+          observer.apply(observer, [event, ...args]);
+        });
+      }
+    }
+
+  }
 
   class Observer extends EventEmitter$1 {
     constructor(ele) {
@@ -6903,7 +6948,7 @@
     if (typeof lngs === 'string') lngs = [lngs];
     if (!lngs) lngs = [];
     lngs.forEach(lng => {
-      utils.setPath(missings, [lng, namespace, key], res);
+      setPath$1(missings, [lng, namespace, key], res);
       debouncedLog();
     });
 
