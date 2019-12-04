@@ -11,7 +11,7 @@
   "dependencies": {
     "body-parser": "1.15.2",
     "express": "4.14.0",
-    "i18next": "3.4.1",
+    "i18next": "19.0.1",
     "i18next-express-middleware": "1.0.1",
     "i18next-node-fs-backend": "0.1.2"
   }
