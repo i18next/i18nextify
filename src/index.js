@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import XHR from 'i18next-xhr-backend';
+import HttpApi from 'i18next-http-backend';
 import LngDet from 'i18next-browser-languagedetector';
 
 import Observer from './Observer';
@@ -56,7 +56,7 @@ docReady(() => {
 });
 
 // extend i18next with default extensions
-i18next.use(XHR);
+i18next.use(HttpApi);
 i18next.use(LngDet);
 
 // log out missings

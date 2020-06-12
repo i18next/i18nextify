@@ -1,3 +1,7 @@
+### 2.5.7
+
+- update dependencies
+
 ### 2.5.6
 
 - update not using internals of i18next
