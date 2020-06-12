@@ -251,6 +251,13 @@ You can change the namespace after loading to some other file (eg. before transi
 window.i18nextify.changeNamespace('newNamespace');
 ```
 
+## force a retranslation:
+
+```js
+window.i18nextify.forceRerender();
+```
+
+
 ---
 
 <h3 align="center">Gold Sponsors</h3>
@@ -260,9 +267,3 @@ window.i18nextify.changeNamespace('newNamespace');
     <img src="https://raw.githubusercontent.com/i18next/i18next/master/assets/locize_sponsor_240.gif" width="240px">
   </a>
 </p>
-
-## force a retranslation:
-
-```js
-window.i18nextify.forceRerender();
-```
