@@ -1059,6 +1059,7 @@
           });
         }
 
+        if (!found) found = this.getFallbackCodes(this.options.fallbackLng)[0];
         return found;
       }
     }, {
