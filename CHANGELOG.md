@@ -1,3 +1,7 @@
+### 2.5.9
+
+- update i18next dependency
+
 ### 2.5.8
 
 - update i18next dependencies

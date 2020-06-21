@@ -18,7 +18,7 @@
   "bugs": "https://github.com/i18next/i18nextify/issues",
   "dependencies": {
     "@babel/runtime": "^7.6.2",
-    "i18next": "19.5.0",
+    "i18next": "19.5.1",
     "i18next-browser-languagedetector": "5.0.0",
     "i18next-http-backend": "1.0.15",
     "udc": "1.0.1",
