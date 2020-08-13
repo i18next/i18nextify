@@ -415,14 +415,16 @@
 
   function deepExtend(target, source, overwrite) {
     for (var prop in source) {
-      if (prop in target) {
-        if (typeof target[prop] === 'string' || target[prop] instanceof String || typeof source[prop] === 'string' || source[prop] instanceof String) {
-          if (overwrite) target[prop] = source[prop];
+      if (prop !== '__proto__') {
+        if (prop in target) {
+          if (typeof target[prop] === 'string' || target[prop] instanceof String || typeof source[prop] === 'string' || source[prop] instanceof String) {
+            if (overwrite) target[prop] = source[prop];
+          } else {
+            deepExtend(target[prop], source[prop], overwrite);
+          }
         } else {
-          deepExtend(target[prop], source[prop], overwrite);
+          target[prop] = source[prop];
         }
-      } else {
-        target[prop] = source[prop];
       }
     }
 
@@ -674,12 +676,21 @@
     }, {
       key: "extractFromKey",
       value: function extractFromKey(key, options) {
-        var nsSeparator = options.nsSeparator || this.options.nsSeparator;
+        var nsSeparator = options.nsSeparator !== undefined ? options.nsSeparator : this.options.nsSeparator;
         if (nsSeparator === undefined) nsSeparator = ':';
         var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
         var namespaces = options.ns || this.options.defaultNS;
 
         if (nsSeparator && key.indexOf(nsSeparator) > -1) {
+          var m = key.match(this.interpolator.nestingRegexp);
+
+          if (m && m.length > 0) {
+            return {
+              key: key,
+              namespaces: namespaces
+            };
+          }
+
           var parts = key.split(nsSeparator);
           if (nsSeparator !== keySeparator || nsSeparator === keySeparator && this.options.ns.indexOf(parts[0]) > -1) namespaces = parts.shift();
           key = parts.join(keySeparator);
@@ -693,7 +704,7 @@
       }
     }, {
       key: "translate",
-      value: function translate(keys, options) {
+      value: function translate(keys, options, lastKey) {
         var _this2 = this;
 
         if (_typeof(options) !== 'object' && this.options.overloadTranslationOptionHandler) {
@@ -758,7 +769,7 @@
           }
         } else if (handleAsObjectInI18nFormat && typeof joinArrays === 'string' && resType === '[object Array]') {
           res = res.join(joinArrays);
-          if (res) res = this.extendTranslation(res, keys, options);
+          if (res) res = this.extendTranslation(res, keys, options, lastKey);
         } else {
           var usedDefault = false;
           var usedKey = false;
@@ -831,7 +842,7 @@
             }
           }
 
-          res = this.extendTranslation(res, keys, options, resolved);
+          res = this.extendTranslation(res, keys, options, resolved, lastKey);
           if (usedKey && res === key && this.options.appendNamespaceToMissingKey) res = "".concat(namespace, ":").concat(key);
           if (usedKey && this.options.parseMissingKeyHandler) res = this.options.parseMissingKeyHandler(res);
         }
@@ -840,7 +851,7 @@
       }
     }, {
       key: "extendTranslation",
-      value: function extendTranslation(res, key, options, resolved) {
+      value: function extendTranslation(res, key, options, resolved, lastKey) {
         var _this3 = this;
 
         if (this.i18nFormat && this.i18nFormat.parse) {
@@ -851,11 +862,36 @@
           if (options.interpolation) this.interpolator.init(_objectSpread({}, options, {
             interpolation: _objectSpread({}, this.options.interpolation, options.interpolation)
           }));
+          var skipOnVariables = options.interpolation && options.interpolation.skipOnVariables || this.options.interpolation.skipOnVariables;
+          var nestBef;
+
+          if (skipOnVariables) {
+            var nb = res.match(this.interpolator.nestingRegexp);
+            nestBef = nb && nb.length;
+          }
+
           var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
           if (this.options.interpolation.defaultVariables) data = _objectSpread({}, this.options.interpolation.defaultVariables, data);
           res = this.interpolator.interpolate(res, data, options.lng || this.language, options);
+
+          if (skipOnVariables) {
+            var na = res.match(this.interpolator.nestingRegexp);
+            var nestAft = na && na.length;
+            if (nestBef < nestAft) options.nest = false;
+          }
+
           if (options.nest !== false) res = this.interpolator.nest(res, function () {
-            return _this3.translate.apply(_this3, arguments);
+            for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+              args[_key] = arguments[_key];
+            }
+
+            if (lastKey && lastKey[0] === args[0]) {
+              _this3.logger.warn("It seems you are nesting recursively key: ".concat(args[0], " in key: ").concat(key[0]));
+
+              return null;
+            }
+
+            return _this3.translate.apply(_this3, args.concat([key]));
           }, options);
           if (options.interpolation) this.interpolator.reset();
         }
@@ -1121,7 +1157,7 @@
     nr: [1, 2],
     fc: 2
   }, {
-    lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'],
+    lngs: ['ay', 'bo', 'cgg', 'fa', 'ht', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'],
     nr: [1],
     fc: 3
   }, {
@@ -1201,7 +1237,7 @@
     nr: [5, 1, 2, 3],
     fc: 21
   }, {
-    lngs: ['he'],
+    lngs: ['he', 'iw'],
     nr: [1, 2, 20, 21],
     fc: 22
   }];
@@ -1255,7 +1291,7 @@
       return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n !== 0 ? 1 : 2);
     },
     17: function _(n) {
-      return Number(n == 1 || n % 10 == 1 ? 0 : 1);
+      return Number(n == 1 || n % 10 == 1 && n % 100 != 11 ? 0 : 1);
     },
     18: function _(n) {
       return Number(n == 0 ? 0 : n == 1 ? 1 : 2);
@@ -1456,60 +1492,49 @@
 
         this.resetRegExp();
         var missingInterpolationHandler = options && options.missingInterpolationHandler || this.options.missingInterpolationHandler;
-        replaces = 0;
+        var skipOnVariables = options && options.interpolation && options.interpolation.skipOnVariables || this.options.interpolation.skipOnVariables;
+        var todos = [{
+          regex: this.regexpUnescape,
+          safeValue: function safeValue(val) {
+            return regexSafe(val);
+          }
+        }, {
+          regex: this.regexp,
+          safeValue: function safeValue(val) {
+            return _this.escapeValue ? regexSafe(_this.escape(val)) : regexSafe(val);
+          }
+        }];
+        todos.forEach(function (todo) {
+          replaces = 0;
 
-        while (match = this.regexpUnescape.exec(str)) {
-          value = handleFormat(match[1].trim());
+          while (match = todo.regex.exec(str)) {
+            value = handleFormat(match[1].trim());
 
-          if (value === undefined) {
-            if (typeof missingInterpolationHandler === 'function') {
-              var temp = missingInterpolationHandler(str, match, options);
-              value = typeof temp === 'string' ? temp : '';
-            } else {
-              this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
-              value = '';
+            if (value === undefined) {
+              if (typeof missingInterpolationHandler === 'function') {
+                var temp = missingInterpolationHandler(str, match, options);
+                value = typeof temp === 'string' ? temp : '';
+              } else if (skipOnVariables) {
+                value = match[0];
+                continue;
+              } else {
+                _this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
+
+                value = '';
+              }
+            } else if (typeof value !== 'string' && !_this.useRawValueToEscape) {
+              value = makeString(value);
             }
-          } else if (typeof value !== 'string' && !this.useRawValueToEscape) {
-            value = makeString(value);
-          }
 
-          str = str.replace(match[0], regexSafe(value));
-          this.regexpUnescape.lastIndex = 0;
-          replaces++;
+            str = str.replace(match[0], todo.safeValue(value));
+            todo.regex.lastIndex = 0;
+            replaces++;
 
-          if (replaces >= this.maxReplaces) {
-            break;
-          }
-        }
-
-        replaces = 0;
-
-        while (match = this.regexp.exec(str)) {
-          value = handleFormat(match[1].trim());
-
-          if (value === undefined) {
-            if (typeof missingInterpolationHandler === 'function') {
-              var _temp = missingInterpolationHandler(str, match, options);
-
-              value = typeof _temp === 'string' ? _temp : '';
-            } else {
-              this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
-              value = '';
+            if (replaces >= _this.maxReplaces) {
+              break;
             }
-          } else if (typeof value !== 'string' && !this.useRawValueToEscape) {
-            value = makeString(value);
           }
-
-          value = this.escapeValue ? regexSafe(this.escape(value)) : regexSafe(value);
-          str = str.replace(match[0], value);
-          this.regexp.lastIndex = 0;
-          replaces++;
-
-          if (replaces >= this.maxReplaces) {
-            break;
-          }
-        }
-
+        });
         return str;
       }
     }, {
@@ -1878,7 +1903,8 @@
         nestingPrefix: '$t(',
         nestingSuffix: ')',
         nestingOptionsSeparator: ',',
-        maxReplaces: 1000
+        maxReplaces: 1000,
+        skipOnVariables: false
       }
     };
   }
@@ -2414,7 +2440,7 @@
   var each = arr.forEach;
   var slice = arr.slice;
   function defaults(obj) {
-    each.call(slice.call(arguments, 1), source => {
+    each.call(slice.call(arguments, 1), function (source) {
       if (source) {
         for (var prop in source) {
           if (obj[prop] === undefined) obj[prop] = source[prop];
@@ -2444,6 +2470,21 @@
     __proto__: null
   });
 
+  function _typeof$1(obj) {
+    "@babel/helpers - typeof";
+
+    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+      _typeof$1 = function _typeof(obj) {
+        return typeof obj;
+      };
+    } else {
+      _typeof$1 = function _typeof(obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+    }
+
+    return _typeof$1(obj);
+  }
   var fetchApi$1;
 
   if (typeof fetch === 'function') {
@@ -2474,13 +2515,12 @@
     }
   }
 
-  if (!fetchApi$1 && fetchNode && !XmlHttpRequestApi && !ActiveXObjectApi) fetchApi$1 = undefined || fetchNode; // because of strange export
-
+  if (!fetchApi$1 && fetchNode && !XmlHttpRequestApi && !ActiveXObjectApi) fetchApi$1 = undefined || fetchNode;
   if (typeof fetchApi$1 !== 'function') fetchApi$1 = undefined;
 
-  var addQueryString = (url, params) => {
-    if (params && typeof params === 'object') {
-      var queryString = ''; // Must encode data
+  var addQueryString = function addQueryString(url, params) {
+    if (params && _typeof$1(params) === 'object') {
+      var queryString = '';
 
       for (var paramName in params) {
         queryString += '&' + encodeURIComponent(paramName) + '=' + encodeURIComponent(params[paramName]);
@@ -2491,10 +2531,9 @@
     }
 
     return url;
-  }; // fetch api stuff
+  };
 
-
-  var requestWithFetch = (options, url, payload, callback) => {
+  var requestWithFetch = function requestWithFetch(options, url, payload, callback) {
     if (options.queryStringParams) {
       url = addQueryString(url, options.queryStringParams);
     }
@@ -2504,25 +2543,22 @@
     fetchApi$1(url, defaults({
       method: payload ? 'POST' : 'GET',
       body: payload ? options.stringify(payload) : undefined,
-      headers
-    }, typeof options.requestOptions === 'function' ? options.requestOptions(payload) : options.requestOptions)).then(response => {
+      headers: headers
+    }, typeof options.requestOptions === 'function' ? options.requestOptions(payload) : options.requestOptions)).then(function (response) {
       if (!response.ok) return callback(response.statusText || 'Error', {
         status: response.status
       });
-      response.text().then(data => {
+      response.text().then(function (data) {
         callback(null, {
           status: response.status,
-          data
+          data: data
         });
       }).catch(callback);
     }).catch(callback);
-  }; // xml http request stuff
+  };
 
-
-  var requestWithXmlHttpRequest = (options, url, payload, callback) => {
-    if (payload && typeof payload === 'object') {
-      // if (!cache) payload._t = Date.now()
-      // URL encoded form payload must be in querystring format
+  var requestWithXmlHttpRequest = function requestWithXmlHttpRequest(options, url, payload, callback) {
+    if (payload && _typeof$1(payload) === 'object') {
       payload = addQueryString('', payload).slice(1);
     }
 
@@ -2564,7 +2600,7 @@
         }
       }
 
-      x.onreadystatechange = () => {
+      x.onreadystatechange = function () {
         x.readyState > 3 && callback(x.status >= 400 ? x.statusText : null, {
           status: x.status,
           data: x.responseText
@@ -2577,47 +2613,80 @@
     }
   };
 
-  var request = (options, url, payload, callback) => {
+  var request = function request(options, url, payload, callback) {
     if (typeof payload === 'function') {
       callback = payload;
       payload = undefined;
     }
 
-    callback = callback || (() => {});
+    callback = callback || function () {};
 
     if (fetchApi$1) {
-      // use fetch api
       return requestWithFetch(options, url, payload, callback);
     }
 
     if (typeof XMLHttpRequest === 'function' || typeof ActiveXObject === 'function') {
-      // use xml http request
       return requestWithXmlHttpRequest(options, url, payload, callback);
     }
   };
 
-  var getDefaults = () => {
+  function _classCallCheck$1(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _defineProperties$1(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass$1(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties$1(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties$1(Constructor, staticProps);
+    return Constructor;
+  }
+
+  function _defineProperty$2(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  var getDefaults = function getDefaults() {
     return {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
       addPath: '/locales/add/{{lng}}/{{ns}}',
       allowMultiLoading: false,
-      parse: data => JSON.parse(data),
+      parse: function parse(data) {
+        return JSON.parse(data);
+      },
       stringify: JSON.stringify,
-      parsePayload: (namespace, key, fallbackValue) => ({
-        [key]: fallbackValue || ''
-      }),
-      request,
+      parsePayload: function parsePayload(namespace, key, fallbackValue) {
+        return _defineProperty$2({}, key, fallbackValue || '');
+      },
+      request: request,
       reloadInterval: false,
       customHeaders: {},
       queryStringParams: {},
       crossDomain: false,
-      // used for XmlHttpRequest
       withCredentials: false,
-      // used for XmlHttpRequest
       overrideMimeType: false,
-      // used for XmlHttpRequest
       requestOptions: {
-        // used for fetch
         mode: 'cors',
         credentials: 'same-origin',
         cache: 'default'
@@ -2625,10 +2694,13 @@
     };
   };
 
-  class Backend {
-    constructor(services) {
+  var Backend = function () {
+    function Backend(services) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var allOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      _classCallCheck$1(this, Backend);
+
       this.services = services;
       this.options = options;
       this.allOptions = allOptions;
@@ -2636,115 +2708,134 @@
       this.init(services, options, allOptions);
     }
 
-    init(services) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var allOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-      this.services = services;
-      this.options = defaults(options, this.options || {}, getDefaults());
-      this.allOptions = allOptions;
+    _createClass$1(Backend, [{
+      key: "init",
+      value: function init(services) {
+        var _this = this;
 
-      if (this.options.reloadInterval) {
-        setInterval(() => this.reload(), this.options.reloadInterval);
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var allOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        this.services = services;
+        this.options = defaults(options, this.options || {}, getDefaults());
+        this.allOptions = allOptions;
+
+        if (this.options.reloadInterval) {
+          setInterval(function () {
+            return _this.reload();
+          }, this.options.reloadInterval);
+        }
       }
-    }
+    }, {
+      key: "readMulti",
+      value: function readMulti(languages, namespaces, callback) {
+        var loadPath = this.options.loadPath;
 
-    readMulti(languages, namespaces, callback) {
-      var loadPath = this.options.loadPath;
-
-      if (typeof this.options.loadPath === 'function') {
-        loadPath = this.options.loadPath(languages, namespaces);
-      }
-
-      var url = this.services.interpolator.interpolate(loadPath, {
-        lng: languages.join('+'),
-        ns: namespaces.join('+')
-      });
-      this.loadUrl(url, callback, languages, namespaces);
-    }
-
-    read(language, namespace, callback) {
-      var loadPath = this.options.loadPath;
-
-      if (typeof this.options.loadPath === 'function') {
-        loadPath = this.options.loadPath([language], [namespace]);
-      }
-
-      var url = this.services.interpolator.interpolate(loadPath, {
-        lng: language,
-        ns: namespace
-      });
-      this.loadUrl(url, callback, language, namespace);
-    }
-
-    loadUrl(url, callback, languages, namespaces) {
-      this.options.request(this.options, url, undefined, (err, res) => {
-        if (res && res.status >= 500 && res.status < 600) return callback('failed loading ' + url, true
-        /* retry */
-        );
-        if (res && res.status >= 400 && res.status < 500) return callback('failed loading ' + url, false
-        /* no retry */
-        );
-        if (err) return callback(err, false);
-        var ret, parseErr;
-
-        try {
-          ret = this.options.parse(res.data, languages, namespaces);
-        } catch (e) {
-          parseErr = 'failed parsing ' + url + ' to json';
+        if (typeof this.options.loadPath === 'function') {
+          loadPath = this.options.loadPath(languages, namespaces);
         }
 
-        if (parseErr) return callback(parseErr, false);
-        callback(null, ret);
-      });
-    }
+        var url = this.services.interpolator.interpolate(loadPath, {
+          lng: languages.join('+'),
+          ns: namespaces.join('+')
+        });
+        this.loadUrl(url, callback, languages, namespaces);
+      }
+    }, {
+      key: "read",
+      value: function read(language, namespace, callback) {
+        var loadPath = this.options.loadPath;
 
-    create(languages, namespace, key, fallbackValue) {
-      // If there is a falsey addPath, then abort -- this has been disabled.
-      if (!this.options.addPath) return;
-      if (typeof languages === 'string') languages = [languages];
-      var payload = this.options.parsePayload(namespace, key, fallbackValue);
-      languages.forEach(lng => {
-        var url = this.services.interpolator.interpolate(this.options.addPath, {
-          lng: lng,
+        if (typeof this.options.loadPath === 'function') {
+          loadPath = this.options.loadPath([language], [namespace]);
+        }
+
+        var url = this.services.interpolator.interpolate(loadPath, {
+          lng: language,
           ns: namespace
         });
-        this.options.request(this.options, url, payload, (data, res) => {// TODO: if res.status === 4xx do log
+        this.loadUrl(url, callback, language, namespace);
+      }
+    }, {
+      key: "loadUrl",
+      value: function loadUrl(url, callback, languages, namespaces) {
+        var _this2 = this;
+
+        this.options.request(this.options, url, undefined, function (err, res) {
+          if (res && (res.status >= 500 && res.status < 600 || !res.status)) return callback('failed loading ' + url, true);
+          if (res && res.status >= 400 && res.status < 500) return callback('failed loading ' + url, false);
+          if (!res && err && err.message && err.message.indexOf('Failed to fetch') > -1) return callback('failed loading ' + url, true);
+          if (err) return callback(err, false);
+          var ret, parseErr;
+
+          try {
+            if (typeof res.data === 'string') {
+              ret = _this2.options.parse(res.data, languages, namespaces);
+            } else {
+              ret = res.data;
+            }
+          } catch (e) {
+            parseErr = 'failed parsing ' + url + ' to json';
+          }
+
+          if (parseErr) return callback(parseErr, false);
+          callback(null, ret);
         });
-      });
-    }
+      }
+    }, {
+      key: "create",
+      value: function create(languages, namespace, key, fallbackValue) {
+        var _this3 = this;
 
-    reload() {
-      var {
-        backendConnector,
-        languageUtils,
-        logger
-      } = this.services;
-      var currentLanguage = backendConnector.language;
-      if (currentLanguage && currentLanguage.toLowerCase() === 'cimode') return; // avoid loading resources for cimode
+        if (!this.options.addPath) return;
+        if (typeof languages === 'string') languages = [languages];
+        var payload = this.options.parsePayload(namespace, key, fallbackValue);
+        languages.forEach(function (lng) {
+          var url = _this3.services.interpolator.interpolate(_this3.options.addPath, {
+            lng: lng,
+            ns: namespace
+          });
 
-      var toLoad = [];
-
-      var append = lng => {
-        var lngs = languageUtils.toResolveHierarchy(lng);
-        lngs.forEach(l => {
-          if (toLoad.indexOf(l) < 0) toLoad.push(l);
+          _this3.options.request(_this3.options, url, payload, function (data, res) {});
         });
-      };
+      }
+    }, {
+      key: "reload",
+      value: function reload() {
+        var _this4 = this;
 
-      append(currentLanguage);
-      if (this.allOptions.preload) this.allOptions.preload.forEach(l => append(l));
-      toLoad.forEach(lng => {
-        this.allOptions.ns.forEach(ns => {
-          backendConnector.read(lng, ns, 'read', null, null, (err, data) => {
-            if (err) logger.warn("loading namespace ".concat(ns, " for language ").concat(lng, " failed"), err);
-            if (!err && data) logger.log("loaded namespace ".concat(ns, " for language ").concat(lng), data);
-            backendConnector.loaded("".concat(lng, "|").concat(ns), err, data);
+        var _this$services = this.services,
+            backendConnector = _this$services.backendConnector,
+            languageUtils = _this$services.languageUtils,
+            logger = _this$services.logger;
+        var currentLanguage = backendConnector.language;
+        if (currentLanguage && currentLanguage.toLowerCase() === 'cimode') return;
+        var toLoad = [];
+
+        var append = function append(lng) {
+          var lngs = languageUtils.toResolveHierarchy(lng);
+          lngs.forEach(function (l) {
+            if (toLoad.indexOf(l) < 0) toLoad.push(l);
+          });
+        };
+
+        append(currentLanguage);
+        if (this.allOptions.preload) this.allOptions.preload.forEach(function (l) {
+          return append(l);
+        });
+        toLoad.forEach(function (lng) {
+          _this4.allOptions.ns.forEach(function (ns) {
+            backendConnector.read(lng, ns, 'read', null, null, function (err, data) {
+              if (err) logger.warn("loading namespace ".concat(ns, " for language ").concat(lng, " failed"), err);
+              if (!err && data) logger.log("loaded namespace ".concat(ns, " for language ").concat(lng), data);
+              backendConnector.loaded("".concat(lng, "|").concat(ns), err, data);
+            });
           });
         });
-      });
-    }
+      }
+    }]);
 
-  }
+    return Backend;
+  }();
 
   Backend.type = 'backend';
 
@@ -2761,28 +2852,92 @@
       }
     });
     return obj;
-  }
+  } // eslint-disable-next-line no-control-regex
+
+
+  var fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
+
+  var serializeCookie = function serializeCookie(name, val, options) {
+    var opt = options || {};
+    opt.path = opt.path || '/';
+    var value = encodeURIComponent(val);
+    var str = name + '=' + value;
+
+    if (opt.maxAge > 0) {
+      var maxAge = opt.maxAge - 0;
+      if (isNaN(maxAge)) throw new Error('maxAge should be a Number');
+      str += '; Max-Age=' + Math.floor(maxAge);
+    }
+
+    if (opt.domain) {
+      if (!fieldContentRegExp.test(opt.domain)) {
+        throw new TypeError('option domain is invalid');
+      }
+
+      str += '; Domain=' + opt.domain;
+    }
+
+    if (opt.path) {
+      if (!fieldContentRegExp.test(opt.path)) {
+        throw new TypeError('option path is invalid');
+      }
+
+      str += '; Path=' + opt.path;
+    }
+
+    if (opt.expires) {
+      if (typeof opt.expires.toUTCString !== 'function') {
+        throw new TypeError('option expires is invalid');
+      }
+
+      str += '; Expires=' + opt.expires.toUTCString();
+    }
+
+    if (opt.httpOnly) str += '; HttpOnly';
+    if (opt.secure) str += '; Secure';
+
+    if (opt.sameSite) {
+      var sameSite = typeof opt.sameSite === 'string' ? opt.sameSite.toLowerCase() : opt.sameSite;
+
+      switch (sameSite) {
+        case true:
+          str += '; SameSite=Strict';
+          break;
+
+        case 'lax':
+          str += '; SameSite=Lax';
+          break;
+
+        case 'strict':
+          str += '; SameSite=Strict';
+          break;
+
+        case 'none':
+          str += '; SameSite=None';
+          break;
+
+        default:
+          throw new TypeError('option sameSite is invalid');
+      }
+    }
+
+    return str;
+  };
 
   var cookie = {
     create: function create(name, value, minutes, domain) {
       var cookieOptions = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
-        path: '/'
+        path: '/',
+        sameSite: 'strict'
       };
-      var expires;
 
       if (minutes) {
-        var date = new Date();
-        date.setTime(date.getTime() + minutes * 60 * 1000);
-        expires = '; expires=' + date.toUTCString();
-      } else expires = '';
+        cookieOptions.expires = new Date();
+        cookieOptions.expires.setTime(cookieOptions.expires.getTime() + minutes * 60 * 1000);
+      }
 
-      domain = domain ? 'domain=' + domain + ';' : '';
-      cookieOptions = Object.keys(cookieOptions).reduce(function (acc, key) {
-        return acc + ';' + key.replace(/([A-Z])/g, function ($1) {
-          return '-' + $1.toLowerCase();
-        }) + '=' + cookieOptions[key];
-      }, '');
-      document.cookie = name + '=' + encodeURIComponent(value) + expires + ';' + domain + cookieOptions;
+      if (domain) cookieOptions.domain = domain;
+      document.cookie = serializeCookie(name, encodeURIComponent(value), cookieOptions);
     },
     read: function read(name) {
       var nameEQ = name + '=';
@@ -2892,16 +3047,16 @@
     lookup: function lookup(options) {
       var found;
 
-      if (options.lookupsessionStorage && hasSessionStorageSupport) {
-        var lng = window.sessionStorage.getItem(options.lookupsessionStorage);
+      if (options.lookupSessionStorage && hasSessionStorageSupport) {
+        var lng = window.sessionStorage.getItem(options.lookupSessionStorage);
         if (lng) found = lng;
       }
 
       return found;
     },
     cacheUserLanguage: function cacheUserLanguage(lng, options) {
-      if (options.lookupsessionStorage && hasSessionStorageSupport) {
-        window.sessionStorage.setItem(options.lookupsessionStorage, lng);
+      if (options.lookupSessionStorage && hasSessionStorageSupport) {
+        window.sessionStorage.setItem(options.lookupSessionStorage, lng);
       }
     }
   };
@@ -2994,6 +3149,7 @@
       lookupQuerystring: 'lng',
       lookupCookie: 'i18next',
       lookupLocalStorage: 'i18nextLng',
+      lookupSessionStorage: 'i18nextLng',
       // cache user language
       caches: ['localStorage'],
       excludeCacheFor: ['cimode'] //cookieMinutes: 10,
