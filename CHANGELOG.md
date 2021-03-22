@@ -1,3 +1,7 @@
+### 2.6.0
+
+- update i18next dependencies
+
 ### 2.5.11
 
 - update i18next dependencies
