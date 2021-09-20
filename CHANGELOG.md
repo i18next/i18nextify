@@ -1,3 +1,7 @@
+### 3.0.0
+
+- update to major i18next version
+
 ### 2.6.0
 
 - update i18next dependencies
