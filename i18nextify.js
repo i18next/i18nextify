@@ -90,7 +90,7 @@
       var ownKeys = Object.keys(source);
 
       if (typeof Object.getOwnPropertySymbols === 'function') {
-        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+        ownKeys.push.apply(ownKeys, Object.getOwnPropertySymbols(source).filter(function (sym) {
           return Object.getOwnPropertyDescriptor(source, sym).enumerable;
         }));
       }
@@ -173,6 +173,8 @@
   function _possibleConstructorReturn(self, call) {
     if (call && (_typeof$1(call) === "object" || typeof call === "function")) {
       return call;
+    } else if (call !== void 0) {
+      throw new TypeError("Derived constructors may only return object or undefined");
     }
 
     return _assertThisInitialized(self);
@@ -497,6 +499,20 @@
   }
 
   var isIE10 = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent && window.navigator.userAgent.indexOf('MSIE') > -1;
+  var chars = [' ', ',', '?', '!', ';'];
+
+  function looksLikeObjectPath(key, nsSeparator, keySeparator) {
+    nsSeparator = nsSeparator || '';
+    keySeparator = keySeparator || '';
+    var possibleChars = chars.filter(function (c) {
+      return nsSeparator.indexOf(c) < 0 || keySeparator.indexOf(c) < 0;
+    });
+    if (possibleChars.length === 0) return true;
+    var r = new RegExp("(".concat(possibleChars.map(function (c) {
+      return c === '?' ? '\\?' : c;
+    }).join('|'), ")"));
+    return !r.test(key);
+  }
 
   function deepFind(obj, path) {
     var keySeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '.';
@@ -506,6 +522,8 @@
     var current = obj;
 
     for (var i = 0; i < paths.length; ++i) {
+      if (!current) return undefined;
+
       if (typeof current[paths[i]] === 'string' && i + 1 < paths.length) {
         return undefined;
       }
@@ -693,6 +711,15 @@
         return this.data[lng];
       }
     }, {
+      key: "hasLanguageSomeTranslations",
+      value: function hasLanguageSomeTranslations(lng) {
+        var data = this.getDataByLanguage(lng);
+        var n = data && Object.keys(data) || [];
+        return !!n.find(function (v) {
+          return data[v] && Object.keys(data[v]).length > 0;
+        });
+      }
+    }, {
       key: "toJSON",
       value: function toJSON() {
         return this.data;
@@ -756,6 +783,11 @@
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
           interpolation: {}
         };
+
+        if (key === undefined || key === null) {
+          return false;
+        }
+
         var resolved = this.resolve(key, options);
         return resolved && resolved.res !== undefined;
       }
@@ -766,8 +798,10 @@
         if (nsSeparator === undefined) nsSeparator = ':';
         var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
         var namespaces = options.ns || this.options.defaultNS;
+        var wouldCheckForNsInKey = nsSeparator && key.indexOf(nsSeparator) > -1;
+        var seemsNaturalLanguage = !looksLikeObjectPath(key, nsSeparator, keySeparator);
 
-        if (nsSeparator && key.indexOf(nsSeparator) > -1) {
+        if (wouldCheckForNsInKey && !seemsNaturalLanguage) {
           var m = key.match(this.interpolator.nestingRegexp);
 
           if (m && m.length > 0) {
@@ -831,8 +865,13 @@
 
         if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0 && !(typeof joinArrays === 'string' && resType === '[object Array]')) {
           if (!options.returnObjects && !this.options.returnObjects) {
-            this.logger.warn('accessing an object - but returnObjects options is not enabled!');
-            return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, options) : "key '".concat(key, " (").concat(this.language, ")' returned an object instead of string.");
+            if (!this.options.returnedObjectHandler) {
+              this.logger.warn('accessing an object - but returnObjects options is not enabled!');
+            }
+
+            return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, _objectSpread({}, options, {
+              ns: namespaces
+            })) : "key '".concat(key, " (").concat(this.language, ")' returned an object instead of string.");
           }
 
           if (keySeparator) {
@@ -861,7 +900,7 @@
           var usedKey = false;
           var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
           var hasDefaultValue = Translator.hasDefaultValue(options);
-          var defaultValueSuffix = needsPluralHandling ? this.pluralResolver.getSuffix(lng, options.count) : '';
+          var defaultValueSuffix = needsPluralHandling ? this.pluralResolver.getSuffix(lng, options.count, options) : '';
           var defaultValue = options["defaultValue".concat(defaultValueSuffix)] || options.defaultValue;
 
           if (!this.isValidLookup(res) && hasDefaultValue) {
@@ -874,6 +913,8 @@
             res = key;
           }
 
+          var missingKeyNoValueFallbackToKey = options.missingKeyNoValueFallbackToKey || this.options.missingKeyNoValueFallbackToKey;
+          var resForMissing = missingKeyNoValueFallbackToKey && usedKey ? undefined : res;
           var updateMissing = hasDefaultValue && defaultValue !== res && this.options.updateMissing;
 
           if (usedKey || usedDefault || updateMissing) {
@@ -901,9 +942,9 @@
 
             var send = function send(l, k, fallbackValue) {
               if (_this2.options.missingKeyHandler) {
-                _this2.options.missingKeyHandler(l, namespace, k, updateMissing ? fallbackValue : res, updateMissing, options);
+                _this2.options.missingKeyHandler(l, namespace, k, updateMissing ? fallbackValue : resForMissing, updateMissing, options);
               } else if (_this2.backendConnector && _this2.backendConnector.saveMissing) {
-                _this2.backendConnector.saveMissing(l, namespace, k, updateMissing ? fallbackValue : res, updateMissing, options);
+                _this2.backendConnector.saveMissing(l, namespace, k, updateMissing ? fallbackValue : resForMissing, updateMissing, options);
               }
 
               _this2.emit('missingKey', l, namespace, k, res);
@@ -924,7 +965,7 @@
 
           res = this.extendTranslation(res, keys, options, resolved, lastKey);
           if (usedKey && res === key && this.options.appendNamespaceToMissingKey) res = "".concat(namespace, ":").concat(key);
-          if (usedKey && this.options.parseMissingKeyHandler) res = this.options.parseMissingKeyHandler(res);
+          if ((usedKey || usedDefault) && this.options.parseMissingKeyHandler) res = this.options.parseMissingKeyHandler(res);
         }
 
         return res;
@@ -1009,7 +1050,7 @@
           var namespaces = extracted.namespaces;
           if (_this4.options.fallbackNS) namespaces = namespaces.concat(_this4.options.fallbackNS);
           var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
-          var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
+          var needsContextHandling = options.context !== undefined && (typeof options.context === 'string' || typeof options.context === 'number') && options.context !== '';
           var codes = options.lngs ? options.lngs : _this4.languageUtils.toResolveHierarchy(options.lng || _this4.language, options.fallbackLng);
           namespaces.forEach(function (ns) {
             if (_this4.isValidLookup(found)) return;
@@ -1031,7 +1072,7 @@
                 _this4.i18nFormat.addLookupKeys(finalKeys, key, code, ns, options);
               } else {
                 var pluralSuffix;
-                if (needsPluralHandling) pluralSuffix = _this4.pluralResolver.getSuffix(code, options.count);
+                if (needsPluralHandling) pluralSuffix = _this4.pluralResolver.getSuffix(code, options.count, options);
                 if (needsPluralHandling && needsContextHandling) finalKeys.push(finalKey + pluralSuffix);
                 if (needsContextHandling) finalKeys.push(finalKey += "".concat(_this4.options.contextSeparator).concat(options.context));
                 if (needsPluralHandling) finalKeys.push(finalKey += pluralSuffix);
@@ -1095,7 +1136,6 @@
       _classCallCheck(this, LanguageUtil);
 
       this.options = options;
-      this.whitelist = this.options.supportedLngs || false;
       this.supportedLngs = this.options.supportedLngs || false;
       this.logger = baseLogger.create('languageUtils');
     }
@@ -1144,12 +1184,6 @@
         }
 
         return this.options.cleanCode || this.options.lowerCaseLng ? code.toLowerCase() : code;
-      }
-    }, {
-      key: "isWhitelisted",
-      value: function isWhitelisted(code) {
-        this.logger.deprecate('languageUtils.isWhitelisted', 'function "isWhitelisted" will be renamed to "isSupportedCode" in the next major - please make sure to rename it\'s usage asap.');
-        return this.isSupportedCode(code);
       }
     }, {
       key: "isSupportedCode",
@@ -1247,11 +1281,11 @@
     nr: [1, 2],
     fc: 1
   }, {
-    lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'],
+    lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'hi', 'hu', 'hy', 'ia', 'it', 'kk', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'],
     nr: [1, 2],
     fc: 2
   }, {
-    lngs: ['ay', 'bo', 'cgg', 'fa', 'ht', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'],
+    lngs: ['ay', 'bo', 'cgg', 'fa', 'ht', 'id', 'ja', 'jbo', 'ka', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'],
     nr: [1],
     fc: 3
   }, {
@@ -1403,6 +1437,15 @@
       return Number(n == 1 ? 0 : n == 2 ? 1 : (n < 0 || n > 10) && n % 10 == 0 ? 2 : 3);
     }
   };
+  var deprecatedJsonVersions = ['v1', 'v2', 'v3'];
+  var suffixesOrder = {
+    zero: 0,
+    one: 1,
+    two: 2,
+    few: 3,
+    many: 4,
+    other: 5
+  };
 
   function createRules() {
     var rules = {};
@@ -1437,19 +1480,38 @@
     }, {
       key: "getRule",
       value: function getRule(code) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        if (this.shouldUseIntlApi()) {
+          try {
+            return new Intl.PluralRules(code, {
+              type: options.ordinal ? 'ordinal' : 'cardinal'
+            });
+          } catch (_unused) {
+            return;
+          }
+        }
+
         return this.rules[code] || this.rules[this.languageUtils.getLanguagePartFromCode(code)];
       }
     }, {
       key: "needsPlural",
       value: function needsPlural(code) {
-        var rule = this.getRule(code);
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var rule = this.getRule(code, options);
+
+        if (this.shouldUseIntlApi()) {
+          return rule && rule.resolvedOptions().pluralCategories.length > 1;
+        }
+
         return rule && rule.numbers.length > 1;
       }
     }, {
       key: "getPluralFormsOfKey",
       value: function getPluralFormsOfKey(code, key) {
-        return this.getSuffixes(code).map(function (suffix) {
-          return key + suffix;
+        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        return this.getSuffixes(code, options).map(function (suffix) {
+          return "".concat(key).concat(suffix);
         });
       }
     }, {
@@ -1457,54 +1519,78 @@
       value: function getSuffixes(code) {
         var _this = this;
 
-        var rule = this.getRule(code);
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var rule = this.getRule(code, options);
 
         if (!rule) {
           return [];
         }
 
+        if (this.shouldUseIntlApi()) {
+          return rule.resolvedOptions().pluralCategories.sort(function (pluralCategory1, pluralCategory2) {
+            return suffixesOrder[pluralCategory1] - suffixesOrder[pluralCategory2];
+          }).map(function (pluralCategory) {
+            return "".concat(_this.options.prepend).concat(pluralCategory);
+          });
+        }
+
         return rule.numbers.map(function (number) {
-          return _this.getSuffix(code, number);
+          return _this.getSuffix(code, number, options);
         });
       }
     }, {
       key: "getSuffix",
       value: function getSuffix(code, count) {
-        var _this2 = this;
-
-        var rule = this.getRule(code);
+        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var rule = this.getRule(code, options);
 
         if (rule) {
-          var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
-          var suffix = rule.numbers[idx];
-
-          if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
-            if (suffix === 2) {
-              suffix = 'plural';
-            } else if (suffix === 1) {
-              suffix = '';
-            }
+          if (this.shouldUseIntlApi()) {
+            return "".concat(this.options.prepend).concat(rule.select(count));
           }
 
-          var returnSuffix = function returnSuffix() {
-            return _this2.options.prepend && suffix.toString() ? _this2.options.prepend + suffix.toString() : suffix.toString();
-          };
-
-          if (this.options.compatibilityJSON === 'v1') {
-            if (suffix === 1) return '';
-            if (typeof suffix === 'number') return "_plural_".concat(suffix.toString());
-            return returnSuffix();
-          } else if (this.options.compatibilityJSON === 'v2') {
-            return returnSuffix();
-          } else if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
-            return returnSuffix();
-          }
-
-          return this.options.prepend && idx.toString() ? this.options.prepend + idx.toString() : idx.toString();
+          return this.getSuffixRetroCompatible(rule, count);
         }
 
         this.logger.warn("no plural rule found for: ".concat(code));
         return '';
+      }
+    }, {
+      key: "getSuffixRetroCompatible",
+      value: function getSuffixRetroCompatible(rule, count) {
+        var _this2 = this;
+
+        var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
+        var suffix = rule.numbers[idx];
+
+        if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+          if (suffix === 2) {
+            suffix = 'plural';
+          } else if (suffix === 1) {
+            suffix = '';
+          }
+        }
+
+        var returnSuffix = function returnSuffix() {
+          return _this2.options.prepend && suffix.toString() ? _this2.options.prepend + suffix.toString() : suffix.toString();
+        };
+
+        if (this.options.compatibilityJSON === 'v1') {
+          if (suffix === 1) return '';
+          if (typeof suffix === 'number') return "_plural_".concat(suffix.toString());
+          return returnSuffix();
+        } else if (this.options.compatibilityJSON === 'v2') {
+          return returnSuffix();
+        } else if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+          return returnSuffix();
+        }
+
+        return this.options.prepend && idx.toString() ? this.options.prepend + idx.toString() : idx.toString();
+      }
+    }, {
+      key: "shouldUseIntlApi",
+      value: function shouldUseIntlApi() {
+        return !deprecatedJsonVersions.includes(this.options.compatibilityJSON);
       }
     }]);
 
@@ -1582,13 +1668,17 @@
         var handleFormat = function handleFormat(key) {
           if (key.indexOf(_this.formatSeparator) < 0) {
             var path = getPathWithDefaults(data, defaultData, key);
-            return _this.alwaysFormat ? _this.format(path, undefined, lng) : path;
+            return _this.alwaysFormat ? _this.format(path, undefined, lng, _objectSpread({}, options, data, {
+              interpolationkey: key
+            })) : path;
           }
 
           var p = key.split(_this.formatSeparator);
           var k = p.shift().trim();
           var f = p.join(_this.formatSeparator).trim();
-          return _this.format(getPathWithDefaults(data, defaultData, k), f, lng, options);
+          return _this.format(getPathWithDefaults(data, defaultData, k), f, lng, _objectSpread({}, options, data, {
+            interpolationkey: k
+          }));
         };
 
         this.resetRegExp();
@@ -1627,8 +1717,16 @@
               value = makeString(value);
             }
 
-            str = str.replace(match[0], todo.safeValue(value));
-            todo.regex.lastIndex = 0;
+            var safeValue = todo.safeValue(value);
+            str = str.replace(match[0], safeValue);
+
+            if (skipOnVariables) {
+              todo.regex.lastIndex += safeValue.length;
+              todo.regex.lastIndex -= match[0].length;
+            } else {
+              todo.regex.lastIndex = 0;
+            }
+
             replaces++;
 
             if (replaces >= _this.maxReplaces) {
@@ -1677,7 +1775,7 @@
           var formatters = [];
           var doReduce = false;
 
-          if (match[0].includes(this.formatSeparator) && !/{.*}/.test(match[1])) {
+          if (match[0].indexOf(this.formatSeparator) !== -1 && !/{.*}/.test(match[1])) {
             var r = match[1].split(this.formatSeparator).map(function (elem) {
               return elem.trim();
             });
@@ -1697,7 +1795,9 @@
 
           if (doReduce) {
             value = formatters.reduce(function (v, f) {
-              return _this2.format(v, f, options.lng, options);
+              return _this2.format(v, f, options.lng, _objectSpread({}, options, {
+                interpolationkey: match[1].trim()
+              }));
             }, value.trim());
           }
 
@@ -1949,8 +2049,6 @@
       defaultNS: ['translation'],
       fallbackLng: ['dev'],
       fallbackNS: false,
-      whitelist: false,
-      nonExplicitWhitelist: false,
       supportedLngs: false,
       nonExplicitSupportedLngs: false,
       load: 'all',
@@ -2005,7 +2103,7 @@
         nestingSuffix: ')',
         nestingOptionsSeparator: ',',
         maxReplaces: 1000,
-        skipOnVariables: false
+        skipOnVariables: true
       }
     };
   }
@@ -2014,18 +2112,6 @@
     if (typeof options.ns === 'string') options.ns = [options.ns];
     if (typeof options.fallbackLng === 'string') options.fallbackLng = [options.fallbackLng];
     if (typeof options.fallbackNS === 'string') options.fallbackNS = [options.fallbackNS];
-
-    if (options.whitelist) {
-      if (options.whitelist && options.whitelist.indexOf('cimode') < 0) {
-        options.whitelist = options.whitelist.concat(['cimode']);
-      }
-
-      options.supportedLngs = options.whitelist;
-    }
-
-    if (options.nonExplicitWhitelist) {
-      options.nonExplicitSupportedLngs = options.nonExplicitWhitelist;
-    }
 
     if (options.supportedLngs && options.supportedLngs.indexOf('cimode') < 0) {
       options.supportedLngs = options.supportedLngs.concat(['cimode']);
@@ -2088,12 +2174,12 @@
           options = {};
         }
 
-        if (options.whitelist && !options.supportedLngs) {
-          this.logger.deprecate('whitelist', 'option "whitelist" will be renamed to "supportedLngs" in the next major - please make sure to rename this option asap.');
-        }
-
-        if (options.nonExplicitWhitelist && !options.nonExplicitSupportedLngs) {
-          this.logger.deprecate('whitelist', 'options "nonExplicitWhitelist" will be renamed to "nonExplicitSupportedLngs" in the next major - please make sure to rename this option asap.');
+        if (!options.defaultNS && options.ns) {
+          if (typeof options.ns === 'string') {
+            options.defaultNS = options.ns;
+          } else {
+            options.defaultNS = options.ns[0];
+          }
         }
 
         this.options = _objectSpread({}, get(), this.options, transformOptions(options));
@@ -2191,7 +2277,7 @@
 
         var load = function load() {
           var finish = function finish(err, t) {
-            if (_this2.isInitialized) _this2.logger.warn('init: i18next is already initialized. You should call init just once!');
+            if (_this2.isInitialized && !_this2.initializedStoreOnce) _this2.logger.warn('init: i18next is already initialized. You should call init just once!');
             _this2.isInitialized = true;
             if (!_this2.options.isClone) _this2.logger.log('initialized', _this2.options);
 
@@ -2312,10 +2398,26 @@
         var deferred = defer();
         this.emit('languageChanging', lng);
 
+        var setLngProps = function setLngProps(l) {
+          _this4.language = l;
+          _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l);
+          _this4.resolvedLanguage = undefined;
+          if (['cimode', 'dev'].indexOf(l) > -1) return;
+
+          for (var li = 0; li < _this4.languages.length; li++) {
+            var lngInLngs = _this4.languages[li];
+            if (['cimode', 'dev'].indexOf(lngInLngs) > -1) continue;
+
+            if (_this4.store.hasLanguageSomeTranslations(lngInLngs)) {
+              _this4.resolvedLanguage = lngInLngs;
+              break;
+            }
+          }
+        };
+
         var done = function done(err, l) {
           if (l) {
-            _this4.language = l;
-            _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l);
+            setLngProps(l);
 
             _this4.translator.changeLanguage(l);
 
@@ -2337,12 +2439,12 @@
         };
 
         var setLng = function setLng(lngs) {
+          if (!lng && !lngs && _this4.services.languageDetector) lngs = [];
           var l = typeof lngs === 'string' ? lngs : _this4.services.languageUtils.getBestMatchFromCodes(lngs);
 
           if (l) {
             if (!_this4.language) {
-              _this4.language = l;
-              _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l);
+              setLngProps(l);
             }
 
             if (!_this4.translator.language) _this4.translator.changeLanguage(l);
@@ -2366,7 +2468,7 @@
       }
     }, {
       key: "getFixedT",
-      value: function getFixedT(lng, ns) {
+      value: function getFixedT(lng, ns, keyPrefix) {
         var _this5 = this;
 
         var fixedT = function fixedT(key, opts) {
@@ -2385,7 +2487,9 @@
           options.lng = options.lng || fixedT.lng;
           options.lngs = options.lngs || fixedT.lngs;
           options.ns = options.ns || fixedT.ns;
-          return _this5.t(key, options);
+          var keySeparator = _this5.options.keySeparator || '.';
+          var resultKey = keyPrefix ? "".concat(keyPrefix).concat(keySeparator).concat(key) : key;
+          return _this5.t(resultKey, options);
         };
 
         if (typeof lng === 'string') {
@@ -2395,6 +2499,7 @@
         }
 
         fixedT.ns = ns;
+        fixedT.keyPrefix = keyPrefix;
         return fixedT;
       }
     }, {
@@ -2433,7 +2538,7 @@
           return false;
         }
 
-        var lng = this.languages[0];
+        var lng = this.resolvedLanguage || this.languages[0];
         var fallbackLng = this.options ? this.options.fallbackLng : false;
         var lastLng = this.languages[this.languages.length - 1];
         if (lng.toLowerCase() === 'cimode') return true;
@@ -2501,7 +2606,7 @@
     }, {
       key: "dir",
       value: function dir(lng) {
-        if (!lng) lng = this.languages && this.languages.length > 0 ? this.languages[0] : this.language;
+        if (!lng) lng = this.resolvedLanguage || (this.languages && this.languages.length > 0 ? this.languages[0] : this.language);
         if (!lng) return 'rtl';
         var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ug', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
         return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
@@ -2549,6 +2654,17 @@
         };
         return clone;
       }
+    }, {
+      key: "toJSON",
+      value: function toJSON() {
+        return {
+          options: this.options,
+          store: this.store,
+          language: this.language,
+          languages: this.languages,
+          resolvedLanguage: this.resolvedLanguage
+        };
+      }
     }]);
 
     return I18n;
@@ -2589,6 +2705,18 @@
     return typeof XMLHttpRequest === 'function' || (typeof XMLHttpRequest === "undefined" ? "undefined" : _typeof$2(XMLHttpRequest)) === 'object';
   }
 
+  function isPromise(maybePromise) {
+    return !!maybePromise && typeof maybePromise.then === 'function';
+  }
+
+  function makePromise(maybePromise) {
+    if (isPromise(maybePromise)) {
+      return maybePromise;
+    }
+
+    return Promise.resolve(maybePromise);
+  }
+
   var fetchApi;
   if (typeof fetch === 'function') {
     if (typeof global !== 'undefined' && global.fetch) {
@@ -2599,7 +2727,7 @@
   }
 
   if (typeof require !== 'undefined' && (typeof window === 'undefined' || typeof window.document === 'undefined')) {
-    var f = fetchApi || require('node-fetch');
+    var f = fetchApi || require('cross-fetch');
     if (f.default) f = f.default;
     exports.default = f;
     module.exports = exports.default;
@@ -2867,37 +2995,38 @@
     }, {
       key: "readMulti",
       value: function readMulti(languages, namespaces, callback) {
+        this._readAny(languages, languages, namespaces, namespaces, callback);
+      }
+    }, {
+      key: "read",
+      value: function read(language, namespace, callback) {
+        this._readAny([language], language, [namespace], namespace, callback);
+      }
+    }, {
+      key: "_readAny",
+      value: function _readAny(languages, loadUrlLanguages, namespaces, loadUrlNamespaces, callback) {
+        var _this2 = this;
+
         var loadPath = this.options.loadPath;
 
         if (typeof this.options.loadPath === 'function') {
           loadPath = this.options.loadPath(languages, namespaces);
         }
 
-        var url = this.services.interpolator.interpolate(loadPath, {
-          lng: languages.join('+'),
-          ns: namespaces.join('+')
-        });
-        this.loadUrl(url, callback, languages, namespaces);
-      }
-    }, {
-      key: "read",
-      value: function read(language, namespace, callback) {
-        var loadPath = this.options.loadPath;
+        loadPath = makePromise(loadPath);
+        loadPath.then(function (resolvedLoadPath) {
+          var url = _this2.services.interpolator.interpolate(resolvedLoadPath, {
+            lng: languages.join('+'),
+            ns: namespaces.join('+')
+          });
 
-        if (typeof this.options.loadPath === 'function') {
-          loadPath = this.options.loadPath([language], [namespace]);
-        }
-
-        var url = this.services.interpolator.interpolate(loadPath, {
-          lng: language,
-          ns: namespace
+          _this2.loadUrl(url, callback, loadUrlLanguages, loadUrlNamespaces);
         });
-        this.loadUrl(url, callback, language, namespace);
       }
     }, {
       key: "loadUrl",
       value: function loadUrl(url, callback, languages, namespaces) {
-        var _this2 = this;
+        var _this3 = this;
 
         this.options.request(this.options, url, undefined, function (err, res) {
           if (res && (res.status >= 500 && res.status < 600 || !res.status)) return callback('failed loading ' + url + '; status code: ' + res.status, true);
@@ -2908,7 +3037,7 @@
 
           try {
             if (typeof res.data === 'string') {
-              ret = _this2.options.parse(res.data, languages, namespaces);
+              ret = _this3.options.parse(res.data, languages, namespaces);
             } else {
               ret = res.data;
             }
@@ -2923,7 +3052,7 @@
     }, {
       key: "create",
       value: function create(languages, namespace, key, fallbackValue, callback) {
-        var _this3 = this;
+        var _this4 = this;
 
         if (!this.options.addPath) return;
         if (typeof languages === 'string') languages = [languages];
@@ -2932,18 +3061,18 @@
         var dataArray = [];
         var resArray = [];
         languages.forEach(function (lng) {
-          var addPath = _this3.options.addPath;
+          var addPath = _this4.options.addPath;
 
-          if (typeof _this3.options.addPath === 'function') {
-            addPath = _this3.options.addPath(lng, namespace);
+          if (typeof _this4.options.addPath === 'function') {
+            addPath = _this4.options.addPath(lng, namespace);
           }
 
-          var url = _this3.services.interpolator.interpolate(addPath, {
+          var url = _this4.services.interpolator.interpolate(addPath, {
             lng: lng,
             ns: namespace
           });
 
-          _this3.options.request(_this3.options, url, payload, function (data, res) {
+          _this4.options.request(_this4.options, url, payload, function (data, res) {
             finished += 1;
             dataArray.push(data);
             resArray.push(res);
@@ -2957,7 +3086,7 @@
     }, {
       key: "reload",
       value: function reload() {
-        var _this4 = this;
+        var _this5 = this;
 
         var _this$services = this.services,
             backendConnector = _this$services.backendConnector,
@@ -2979,7 +3108,7 @@
           return append(l);
         });
         toLoad.forEach(function (lng) {
-          _this4.allOptions.ns.forEach(function (ns) {
+          _this5.allOptions.ns.forEach(function (ns) {
             backendConnector.read(lng, ns, 'read', null, null, function (err, data) {
               if (err) logger.warn("loading namespace ".concat(ns, " for language ").concat(lng, " failed"), err);
               if (!err && data) logger.log("loaded namespace ".concat(ns, " for language ").concat(lng), data);
