@@ -505,13 +505,23 @@
     nsSeparator = nsSeparator || '';
     keySeparator = keySeparator || '';
     var possibleChars = chars.filter(function (c) {
-      return nsSeparator.indexOf(c) < 0 || keySeparator.indexOf(c) < 0;
+      return nsSeparator.indexOf(c) < 0 && keySeparator.indexOf(c) < 0;
     });
     if (possibleChars.length === 0) return true;
     var r = new RegExp("(".concat(possibleChars.map(function (c) {
       return c === '?' ? '\\?' : c;
     }).join('|'), ")"));
-    return !r.test(key);
+    var matched = !r.test(key);
+
+    if (!matched) {
+      var ki = key.indexOf(keySeparator);
+
+      if (ki > 0 && !r.test(key.substring(0, ki))) {
+        matched = true;
+      }
+    }
+
+    return matched;
   }
 
   function deepFind(obj, path) {
@@ -799,7 +809,7 @@
         var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
         var namespaces = options.ns || this.options.defaultNS;
         var wouldCheckForNsInKey = nsSeparator && key.indexOf(nsSeparator) > -1;
-        var seemsNaturalLanguage = !looksLikeObjectPath(key, nsSeparator, keySeparator);
+        var seemsNaturalLanguage = !this.options.userDefinedKeySeparator && !options.keySeparator && !looksLikeObjectPath(key, nsSeparator, keySeparator);
 
         if (wouldCheckForNsInKey && !seemsNaturalLanguage) {
           var m = key.match(this.interpolator.nestingRegexp);
@@ -2177,12 +2187,17 @@
         if (!options.defaultNS && options.ns) {
           if (typeof options.ns === 'string') {
             options.defaultNS = options.ns;
-          } else {
+          } else if (options.ns.indexOf('translation') < 0) {
             options.defaultNS = options.ns[0];
           }
         }
 
         this.options = _objectSpread({}, get(), this.options, transformOptions(options));
+
+        if (options.keySeparator !== undefined) {
+          this.options.userDefinedKeySeparator = options.keySeparator;
+        }
+
         this.format = this.options.interpolation.format;
         if (!callback) callback = noop;
 
@@ -2608,7 +2623,7 @@
       value: function dir(lng) {
         if (!lng) lng = this.resolvedLanguage || (this.languages && this.languages.length > 0 ? this.languages[0] : this.language);
         if (!lng) return 'rtl';
-        var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ug', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
+        var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ug', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam', 'ckb'];
         return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
       }
     }, {
