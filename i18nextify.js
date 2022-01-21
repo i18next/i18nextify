@@ -4,6 +4,32 @@
   (global = global || self, global.i18nextify = factory());
 }(this, (function () { 'use strict';
 
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread2(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = null != arguments[i] ? arguments[i] : {};
+      i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+
+    return target;
+  }
+
   function _defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
@@ -19,88 +45,14 @@
     return obj;
   }
 
-  function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-
-    if (Object.getOwnPropertySymbols) {
-      var symbols = Object.getOwnPropertySymbols(object);
-      if (enumerableOnly) symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      });
-      keys.push.apply(keys, symbols);
-    }
-
-    return keys;
-  }
-
-  function _objectSpread2(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i] != null ? arguments[i] : {};
-
-      if (i % 2) {
-        ownKeys(Object(source), true).forEach(function (key) {
-          _defineProperty(target, key, source[key]);
-        });
-      } else if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-      } else {
-        ownKeys(Object(source)).forEach(function (key) {
-          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-      }
-    }
-
-    return target;
-  }
-
   function _typeof(obj) {
     "@babel/helpers - typeof";
 
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function _typeof(obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof = function _typeof(obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
-
-    return _typeof(obj);
-  }
-
-  function _defineProperty$1(obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-
-    return obj;
-  }
-
-  function _objectSpread(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i] != null ? Object(arguments[i]) : {};
-      var ownKeys = Object.keys(source);
-
-      if (typeof Object.getOwnPropertySymbols === 'function') {
-        ownKeys.push.apply(ownKeys, Object.getOwnPropertySymbols(source).filter(function (sym) {
-          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-        }));
-      }
-
-      ownKeys.forEach(function (key) {
-        _defineProperty$1(target, key, source[key]);
-      });
-    }
-
-    return target;
+    return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+      return typeof obj;
+    } : function (obj) {
+      return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    }, _typeof(obj);
   }
 
   function _classCallCheck(instance, Constructor) {
@@ -122,45 +74,11 @@
   function _createClass(Constructor, protoProps, staticProps) {
     if (protoProps) _defineProperties(Constructor.prototype, protoProps);
     if (staticProps) _defineProperties(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
     return Constructor;
   }
-
-  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-  function unwrapExports (x) {
-  	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-  }
-
-  function createCommonjsModule(fn, module) {
-  	return module = { exports: {} }, fn(module, module.exports), module.exports;
-  }
-
-  var _typeof_1 = createCommonjsModule(function (module) {
-  function _typeof(obj) {
-    "@babel/helpers - typeof";
-
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      module.exports = _typeof = function _typeof(obj) {
-        return typeof obj;
-      };
-
-      module.exports["default"] = module.exports, module.exports.__esModule = true;
-    } else {
-      module.exports = _typeof = function _typeof(obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-
-      module.exports["default"] = module.exports, module.exports.__esModule = true;
-    }
-
-    return _typeof(obj);
-  }
-
-  module.exports = _typeof;
-  module.exports["default"] = module.exports, module.exports.__esModule = true;
-  });
-
-  var _typeof$1 = unwrapExports(_typeof_1);
 
   function _assertThisInitialized(self) {
     if (self === void 0) {
@@ -168,23 +86,6 @@
     }
 
     return self;
-  }
-
-  function _possibleConstructorReturn(self, call) {
-    if (call && (_typeof$1(call) === "object" || typeof call === "function")) {
-      return call;
-    } else if (call !== void 0) {
-      throw new TypeError("Derived constructors may only return object or undefined");
-    }
-
-    return _assertThisInitialized(self);
-  }
-
-  function _getPrototypeOf(o) {
-    _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-      return o.__proto__ || Object.getPrototypeOf(o);
-    };
-    return _getPrototypeOf(o);
   }
 
   function _setPrototypeOf(o, p) {
@@ -208,7 +109,115 @@
         configurable: true
       }
     });
+    Object.defineProperty(subClass, "prototype", {
+      writable: false
+    });
     if (superClass) _setPrototypeOf(subClass, superClass);
+  }
+
+  function _possibleConstructorReturn(self, call) {
+    if (call && (_typeof(call) === "object" || typeof call === "function")) {
+      return call;
+    } else if (call !== void 0) {
+      throw new TypeError("Derived constructors may only return object or undefined");
+    }
+
+    return _assertThisInitialized(self);
+  }
+
+  function _getPrototypeOf(o) {
+    _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+      return o.__proto__ || Object.getPrototypeOf(o);
+    };
+    return _getPrototypeOf(o);
+  }
+
+  function _defineProperty$1(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  function _arrayWithHoles(arr) {
+    if (Array.isArray(arr)) return arr;
+  }
+
+  function _iterableToArray(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
+  }
+
+  function _arrayLikeToArray(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+
+    for (var i = 0, arr2 = new Array(len); i < len; i++) {
+      arr2[i] = arr[i];
+    }
+
+    return arr2;
+  }
+
+  function _unsupportedIterableToArray(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(o);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  }
+
+  function _nonIterableRest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  function _toArray(arr) {
+    return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest();
+  }
+
+  function ownKeys$1(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+
+      if (i % 2) {
+        ownKeys$1(Object(source), true).forEach(function (key) {
+          _defineProperty$1(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$1(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
   }
 
   var consoleLogger = {
@@ -296,9 +305,9 @@
     }, {
       key: "create",
       value: function create(moduleName) {
-        return new Logger(this.logger, _objectSpread({}, {
+        return new Logger(this.logger, _objectSpread(_objectSpread({}, {
           prefix: "".concat(this.prefix, ":").concat(moduleName, ":")
-        }, this.options));
+        }), this.options));
       }
     }]);
 
@@ -524,6 +533,76 @@
     return matched;
   }
 
+  function ownKeys$1$1(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread$1(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+
+      if (i % 2) {
+        ownKeys$1$1(Object(source), true).forEach(function (key) {
+          _defineProperty$1(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$1$1(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
+  }
+
+  function _createSuper(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct();
+
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf(Derived),
+          result;
+
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+
+      return _possibleConstructorReturn(this, result);
+    };
+  }
+
+  function _isNativeReflectConstruct() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function deepFind(obj, path) {
     var keySeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '.';
     if (!obj) return undefined;
@@ -550,8 +629,12 @@
         }
 
         if (mix === undefined) return undefined;
-        if (typeof mix === 'string') return mix;
-        if (p && typeof mix[p] === 'string') return mix[p];
+
+        if (path.endsWith(p)) {
+          if (typeof mix === 'string') return mix;
+          if (p && typeof mix[p] === 'string') return mix[p];
+        }
+
         var joinedPath = paths.slice(i + j).join(keySeparator);
         if (joinedPath) return deepFind(mix, joinedPath, keySeparator);
         return undefined;
@@ -566,6 +649,8 @@
   var ResourceStore = function (_EventEmitter) {
     _inherits(ResourceStore, _EventEmitter);
 
+    var _super = _createSuper(ResourceStore);
+
     function ResourceStore(data) {
       var _this;
 
@@ -576,7 +661,7 @@
 
       _classCallCheck(this, ResourceStore);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(ResourceStore).call(this));
+      _this = _super.call(this);
 
       if (isIE10) {
         EventEmitter.call(_assertThisInitialized(_this));
@@ -687,7 +772,7 @@
         if (deep) {
           deepExtend(pack, resources, overwrite);
         } else {
-          pack = _objectSpread({}, pack, resources);
+          pack = _objectSpread$1(_objectSpread$1({}, pack), resources);
         }
 
         setPath(this.data, path, pack);
@@ -712,7 +797,7 @@
       key: "getResourceBundle",
       value: function getResourceBundle(lng, ns) {
         if (!ns) ns = this.options.defaultNS;
-        if (this.options.compatibilityAPI === 'v1') return _objectSpread({}, {}, this.getResource(lng, ns));
+        if (this.options.compatibilityAPI === 'v1') return _objectSpread$1(_objectSpread$1({}, {}), this.getResource(lng, ns));
         return this.getResource(lng, ns);
       }
     }, {
@@ -753,10 +838,83 @@
       return value;
     }
   };
+
+  function ownKeys$2(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread$2(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+
+      if (i % 2) {
+        ownKeys$2(Object(source), true).forEach(function (key) {
+          _defineProperty$1(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$2(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
+  }
+
+  function _createSuper$1(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct$1();
+
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf(Derived),
+          result;
+
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+
+      return _possibleConstructorReturn(this, result);
+    };
+  }
+
+  function _isNativeReflectConstruct$1() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   var checkedLoadedFor = {};
 
   var Translator = function (_EventEmitter) {
     _inherits(Translator, _EventEmitter);
+
+    var _super = _createSuper$1(Translator);
 
     function Translator(services) {
       var _this;
@@ -765,7 +923,7 @@
 
       _classCallCheck(this, Translator);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Translator).call(this));
+      _this = _super.call(this);
 
       if (isIE10) {
         EventEmitter.call(_assertThisInitialized(_this));
@@ -807,9 +965,9 @@
         var nsSeparator = options.nsSeparator !== undefined ? options.nsSeparator : this.options.nsSeparator;
         if (nsSeparator === undefined) nsSeparator = ':';
         var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
-        var namespaces = options.ns || this.options.defaultNS;
+        var namespaces = options.ns || this.options.defaultNS || [];
         var wouldCheckForNsInKey = nsSeparator && key.indexOf(nsSeparator) > -1;
-        var seemsNaturalLanguage = !this.options.userDefinedKeySeparator && !options.keySeparator && !looksLikeObjectPath(key, nsSeparator, keySeparator);
+        var seemsNaturalLanguage = !this.options.userDefinedKeySeparator && !options.keySeparator && !this.options.userDefinedNsSeparator && !options.nsSeparator && !looksLikeObjectPath(key, nsSeparator, keySeparator);
 
         if (wouldCheckForNsInKey && !seemsNaturalLanguage) {
           var m = key.match(this.interpolator.nestingRegexp);
@@ -879,7 +1037,7 @@
               this.logger.warn('accessing an object - but returnObjects options is not enabled!');
             }
 
-            return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, _objectSpread({}, options, {
+            return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, _objectSpread$2(_objectSpread$2({}, options), {}, {
               ns: namespaces
             })) : "key '".concat(key, " (").concat(this.language, ")' returned an object instead of string.");
           }
@@ -892,7 +1050,7 @@
             for (var m in res) {
               if (Object.prototype.hasOwnProperty.call(res, m)) {
                 var deepKey = "".concat(newKeyToUse).concat(keySeparator).concat(m);
-                copy[m] = this.translate(deepKey, _objectSpread({}, options, {
+                copy[m] = this.translate(deepKey, _objectSpread$2(_objectSpread$2({}, options), {
                   joinArrays: false,
                   ns: namespaces
                 }));
@@ -931,7 +1089,7 @@
             this.logger.log(updateMissing ? 'updateKey' : 'missingKey', lng, namespace, key, updateMissing ? defaultValue : res);
 
             if (keySeparator) {
-              var fk = this.resolve(key, _objectSpread({}, options, {
+              var fk = this.resolve(key, _objectSpread$2(_objectSpread$2({}, options), {}, {
                 keySeparator: false
               }));
               if (fk && fk.res) this.logger.warn('Seems the loaded translations were in flat JSON format instead of nested. Either set keySeparator: false on init or make sure your translations are published in nested format.');
@@ -950,11 +1108,13 @@
               lngs.push(options.lng || this.language);
             }
 
-            var send = function send(l, k, fallbackValue) {
+            var send = function send(l, k, specificDefaultValue) {
+              var defaultForMissing = hasDefaultValue && specificDefaultValue !== res ? specificDefaultValue : resForMissing;
+
               if (_this2.options.missingKeyHandler) {
-                _this2.options.missingKeyHandler(l, namespace, k, updateMissing ? fallbackValue : resForMissing, updateMissing, options);
+                _this2.options.missingKeyHandler(l, namespace, k, defaultForMissing, updateMissing, options);
               } else if (_this2.backendConnector && _this2.backendConnector.saveMissing) {
-                _this2.backendConnector.saveMissing(l, namespace, k, updateMissing ? fallbackValue : resForMissing, updateMissing, options);
+                _this2.backendConnector.saveMissing(l, namespace, k, defaultForMissing, updateMissing, options);
               }
 
               _this2.emit('missingKey', l, namespace, k, res);
@@ -990,10 +1150,10 @@
             resolved: resolved
           });
         } else if (!options.skipInterpolation) {
-          if (options.interpolation) this.interpolator.init(_objectSpread({}, options, {
-            interpolation: _objectSpread({}, this.options.interpolation, options.interpolation)
+          if (options.interpolation) this.interpolator.init(_objectSpread$2(_objectSpread$2({}, options), {
+            interpolation: _objectSpread$2(_objectSpread$2({}, this.options.interpolation), options.interpolation)
           }));
-          var skipOnVariables = options.interpolation && options.interpolation.skipOnVariables || this.options.interpolation.skipOnVariables;
+          var skipOnVariables = typeof res === 'string' && (options.interpolation && options.interpolation.skipOnVariables || this.options.interpolation.skipOnVariables);
           var nestBef;
 
           if (skipOnVariables) {
@@ -1002,7 +1162,7 @@
           }
 
           var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
-          if (this.options.interpolation.defaultVariables) data = _objectSpread({}, this.options.interpolation.defaultVariables, data);
+          if (this.options.interpolation.defaultVariables) data = _objectSpread$2(_objectSpread$2({}, this.options.interpolation.defaultVariables), data);
           res = this.interpolator.interpolate(res, data, options.lng || this.language, options);
 
           if (skipOnVariables) {
@@ -1031,7 +1191,7 @@
         var postProcessorNames = typeof postProcess === 'string' ? [postProcess] : postProcess;
 
         if (res !== undefined && res !== null && postProcessorNames && postProcessorNames.length && options.applyPostProcessor !== false) {
-          res = postProcessor.handle(postProcessorNames, res, key, this.options && this.options.postProcessPassResolved ? _objectSpread({
+          res = postProcessor.handle(postProcessorNames, res, key, this.options && this.options.postProcessPassResolved ? _objectSpread$2({
             i18nResolved: resolved
           }, options) : options, this);
         }
@@ -1060,6 +1220,9 @@
           var namespaces = extracted.namespaces;
           if (_this4.options.fallbackNS) namespaces = namespaces.concat(_this4.options.fallbackNS);
           var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+
+          var needsZeroSuffixLookup = needsPluralHandling && !options.ordinal && options.count === 0 && _this4.pluralResolver.shouldUseIntlApi();
+
           var needsContextHandling = options.context !== undefined && (typeof options.context === 'string' || typeof options.context === 'number') && options.context !== '';
           var codes = options.lngs ? options.lngs : _this4.languageUtils.toResolveHierarchy(options.lng || _this4.language, options.fallbackLng);
           namespaces.forEach(function (ns) {
@@ -1075,17 +1238,35 @@
             codes.forEach(function (code) {
               if (_this4.isValidLookup(found)) return;
               usedLng = code;
-              var finalKey = key;
-              var finalKeys = [finalKey];
+              var finalKeys = [key];
 
               if (_this4.i18nFormat && _this4.i18nFormat.addLookupKeys) {
                 _this4.i18nFormat.addLookupKeys(finalKeys, key, code, ns, options);
               } else {
                 var pluralSuffix;
                 if (needsPluralHandling) pluralSuffix = _this4.pluralResolver.getSuffix(code, options.count, options);
-                if (needsPluralHandling && needsContextHandling) finalKeys.push(finalKey + pluralSuffix);
-                if (needsContextHandling) finalKeys.push(finalKey += "".concat(_this4.options.contextSeparator).concat(options.context));
-                if (needsPluralHandling) finalKeys.push(finalKey += pluralSuffix);
+                var zeroSuffix = '_zero';
+
+                if (needsPluralHandling) {
+                  finalKeys.push(key + pluralSuffix);
+
+                  if (needsZeroSuffixLookup) {
+                    finalKeys.push(key + zeroSuffix);
+                  }
+                }
+
+                if (needsContextHandling) {
+                  var contextKey = "".concat(key).concat(_this4.options.contextSeparator).concat(options.context);
+                  finalKeys.push(contextKey);
+
+                  if (needsPluralHandling) {
+                    finalKeys.push(contextKey + pluralSuffix);
+
+                    if (needsZeroSuffixLookup) {
+                      finalKeys.push(contextKey + zeroSuffix);
+                    }
+                  }
+                }
               }
 
               var possibleKey;
@@ -1482,7 +1663,7 @@
 
       if ((!this.options.compatibilityJSON || this.options.compatibilityJSON === 'v4') && (typeof Intl === 'undefined' || !Intl.PluralRules)) {
         this.options.compatibilityJSON = 'v3';
-        this.logger.error('Your environment seems not to be Inlt API compatible, use an Intl.PluralRules polyfill. Will fallback to the compatibilityJSON v3 format handling.');
+        this.logger.error('Your environment seems not to be Intl API compatible, use an Intl.PluralRules polyfill. Will fallback to the compatibilityJSON v3 format handling.');
       }
 
       this.rules = createRules();
@@ -1613,6 +1794,44 @@
     return PluralResolver;
   }();
 
+  function ownKeys$3(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread$3(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+
+      if (i % 2) {
+        ownKeys$3(Object(source), true).forEach(function (key) {
+          _defineProperty$1(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$3(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
+  }
+
   var Interpolator = function () {
     function Interpolator() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1684,7 +1903,7 @@
         var handleFormat = function handleFormat(key) {
           if (key.indexOf(_this.formatSeparator) < 0) {
             var path = getPathWithDefaults(data, defaultData, key);
-            return _this.alwaysFormat ? _this.format(path, undefined, lng, _objectSpread({}, options, data, {
+            return _this.alwaysFormat ? _this.format(path, undefined, lng, _objectSpread$3(_objectSpread$3(_objectSpread$3({}, options), data), {}, {
               interpolationkey: key
             })) : path;
           }
@@ -1692,7 +1911,7 @@
           var p = key.split(_this.formatSeparator);
           var k = p.shift().trim();
           var f = p.join(_this.formatSeparator).trim();
-          return _this.format(getPathWithDefaults(data, defaultData, k), f, lng, _objectSpread({}, options, data, {
+          return _this.format(getPathWithDefaults(data, defaultData, k), f, lng, _objectSpread$3(_objectSpread$3(_objectSpread$3({}, options), data), {}, {
             interpolationkey: k
           }));
         };
@@ -1761,7 +1980,7 @@
         var match;
         var value;
 
-        var clonedOptions = _objectSpread({}, options);
+        var clonedOptions = _objectSpread$3({}, options);
 
         clonedOptions.applyPostProcessor = false;
         delete clonedOptions.defaultValue;
@@ -1777,7 +1996,7 @@
 
           try {
             clonedOptions = JSON.parse(optionsString);
-            if (inheritedOptions) clonedOptions = _objectSpread({}, inheritedOptions, clonedOptions);
+            if (inheritedOptions) clonedOptions = _objectSpread$3(_objectSpread$3({}, inheritedOptions), clonedOptions);
           } catch (e) {
             this.logger.warn("failed parsing options string in nesting for key ".concat(key), e);
             return "".concat(key).concat(sep).concat(optionsString);
@@ -1811,7 +2030,7 @@
 
           if (doReduce) {
             value = formatters.reduce(function (v, f) {
-              return _this2.format(v, f, options.lng, _objectSpread({}, options, {
+              return _this2.format(v, f, options.lng, _objectSpread$3(_objectSpread$3({}, options), {}, {
                 interpolationkey: match[1].trim()
               }));
             }, value.trim());
@@ -1828,6 +2047,233 @@
     return Interpolator;
   }();
 
+  function ownKeys$4(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread$4(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+
+      if (i % 2) {
+        ownKeys$4(Object(source), true).forEach(function (key) {
+          _defineProperty$1(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$4(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
+  }
+
+  function parseFormatStr(formatStr) {
+    var formatName = formatStr.toLowerCase().trim();
+    var formatOptions = {};
+
+    if (formatStr.indexOf('(') > -1) {
+      var p = formatStr.split('(');
+      formatName = p[0].toLowerCase().trim();
+      var optStr = p[1].substring(0, p[1].length - 1);
+
+      if (formatName === 'currency' && optStr.indexOf(':') < 0) {
+        if (!formatOptions.currency) formatOptions.currency = optStr.trim();
+      } else if (formatName === 'relativetime' && optStr.indexOf(':') < 0) {
+        if (!formatOptions.range) formatOptions.range = optStr.trim();
+      } else {
+        var opts = optStr.split(';');
+        opts.forEach(function (opt) {
+          if (!opt) return;
+
+          var _opt$split = opt.split(':'),
+              _opt$split2 = _toArray(_opt$split),
+              key = _opt$split2[0],
+              rest = _opt$split2.slice(1);
+
+          var val = rest.join(':');
+          if (val.trim() === 'false') formatOptions[key.trim()] = false;
+          if (val.trim() === 'true') formatOptions[key.trim()] = true;
+          if (!isNaN(val.trim())) formatOptions[key.trim()] = parseInt(val.trim(), 10);
+          if (!formatOptions[key.trim()]) formatOptions[key.trim()] = val.trim();
+        });
+      }
+    }
+
+    return {
+      formatName: formatName,
+      formatOptions: formatOptions
+    };
+  }
+
+  var Formatter = function () {
+    function Formatter() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, Formatter);
+
+      this.logger = baseLogger.create('formatter');
+      this.options = options;
+      this.formats = {
+        number: function number(val, lng, options) {
+          return new Intl.NumberFormat(lng, options).format(val);
+        },
+        currency: function currency(val, lng, options) {
+          return new Intl.NumberFormat(lng, _objectSpread$4(_objectSpread$4({}, options), {}, {
+            style: 'currency'
+          })).format(val);
+        },
+        datetime: function datetime(val, lng, options) {
+          return new Intl.DateTimeFormat(lng, _objectSpread$4({}, options)).format(val);
+        },
+        relativetime: function relativetime(val, lng, options) {
+          return new Intl.RelativeTimeFormat(lng, _objectSpread$4({}, options)).format(val, options.range || 'day');
+        },
+        list: function list(val, lng, options) {
+          return new Intl.ListFormat(lng, _objectSpread$4({}, options)).format(val);
+        }
+      };
+      this.init(options);
+    }
+
+    _createClass(Formatter, [{
+      key: "init",
+      value: function init(services) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+          interpolation: {}
+        };
+        var iOpts = options.interpolation;
+        this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ',';
+      }
+    }, {
+      key: "add",
+      value: function add(name, fc) {
+        this.formats[name] = fc;
+      }
+    }, {
+      key: "format",
+      value: function format(value, _format, lng, options) {
+        var _this = this;
+
+        var formats = _format.split(this.formatSeparator);
+
+        var result = formats.reduce(function (mem, f) {
+          var _parseFormatStr = parseFormatStr(f),
+              formatName = _parseFormatStr.formatName,
+              formatOptions = _parseFormatStr.formatOptions;
+
+          if (_this.formats[formatName]) {
+            var formatted = mem;
+
+            try {
+              var valOptions = options && options.formatParams && options.formatParams[options.interpolationkey] || {};
+              var l = valOptions.locale || valOptions.lng || options.locale || options.lng || lng;
+              formatted = _this.formats[formatName](mem, l, _objectSpread$4(_objectSpread$4(_objectSpread$4({}, formatOptions), options), valOptions));
+            } catch (error) {
+              _this.logger.warn(error);
+            }
+
+            return formatted;
+          } else {
+            _this.logger.warn("there was no format function for ".concat(formatName));
+          }
+
+          return mem;
+        }, value);
+        return result;
+      }
+    }]);
+
+    return Formatter;
+  }();
+
+  function ownKeys$5(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread$5(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+
+      if (i % 2) {
+        ownKeys$5(Object(source), true).forEach(function (key) {
+          _defineProperty$1(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$5(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
+  }
+
+  function _createSuper$2(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct$2();
+
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf(Derived),
+          result;
+
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+
+      return _possibleConstructorReturn(this, result);
+    };
+  }
+
+  function _isNativeReflectConstruct$2() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function remove(arr, what) {
     var found = arr.indexOf(what);
 
@@ -1840,6 +2286,8 @@
   var Connector = function (_EventEmitter) {
     _inherits(Connector, _EventEmitter);
 
+    var _super = _createSuper$2(Connector);
+
     function Connector(backend, store, services) {
       var _this;
 
@@ -1847,7 +2295,7 @@
 
       _classCallCheck(this, Connector);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Connector).call(this));
+      _this = _super.call(this);
 
       if (isIE10) {
         EventEmitter.call(_assertThisInitialized(_this));
@@ -2044,7 +2492,7 @@
         if (key === undefined || key === null || key === '') return;
 
         if (this.backend && this.backend.create) {
-          this.backend.create(languages, namespace, key, fallbackValue, null, _objectSpread({}, options, {
+          this.backend.create(languages, namespace, key, fallbackValue, null, _objectSpread$5(_objectSpread$5({}, options), {}, {
             isUpdate: isUpdate
           }));
         }
@@ -2136,10 +2584,91 @@
     return options;
   }
 
+  function ownKeys$6(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread$6(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+
+      if (i % 2) {
+        ownKeys$6(Object(source), true).forEach(function (key) {
+          _defineProperty$1(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys$6(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
+  }
+
+  function _createSuper$3(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct$3();
+
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf(Derived),
+          result;
+
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+
+      return _possibleConstructorReturn(this, result);
+    };
+  }
+
+  function _isNativeReflectConstruct$3() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function noop() {}
+
+  function bindMemberFunctions(inst) {
+    var mems = Object.getOwnPropertyNames(Object.getPrototypeOf(inst));
+    mems.forEach(function (mem) {
+      if (typeof inst[mem] === 'function') {
+        inst[mem] = inst[mem].bind(inst);
+      }
+    });
+  }
 
   var I18n = function (_EventEmitter) {
     _inherits(I18n, _EventEmitter);
+
+    var _super = _createSuper$3(I18n);
 
     function I18n() {
       var _this;
@@ -2149,7 +2678,7 @@
 
       _classCallCheck(this, I18n);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(I18n).call(this));
+      _this = _super.call(this);
 
       if (isIE10) {
         EventEmitter.call(_assertThisInitialized(_this));
@@ -2161,6 +2690,7 @@
       _this.modules = {
         external: []
       };
+      bindMemberFunctions(_assertThisInitialized(_this));
 
       if (callback && !_this.isInitialized && !options.isClone) {
         if (!_this.options.initImmediate) {
@@ -2198,14 +2728,20 @@
           }
         }
 
-        this.options = _objectSpread({}, get(), this.options, transformOptions(options));
+        var defOpts = get();
+        this.options = _objectSpread$6(_objectSpread$6(_objectSpread$6({}, defOpts), this.options), transformOptions(options));
+
+        if (this.options.compatibilityAPI !== 'v1') {
+          this.options.interpolation = _objectSpread$6(_objectSpread$6({}, defOpts.interpolation), this.options.interpolation);
+        }
 
         if (options.keySeparator !== undefined) {
           this.options.userDefinedKeySeparator = options.keySeparator;
         }
 
-        this.format = this.options.interpolation.format;
-        if (!callback) callback = noop;
+        if (options.nsSeparator !== undefined) {
+          this.options.userDefinedNsSeparator = options.nsSeparator;
+        }
 
         function createClassOnDemand(ClassOrObject) {
           if (!ClassOrObject) return null;
@@ -2220,6 +2756,14 @@
             baseLogger.init(null, this.options);
           }
 
+          var formatter;
+
+          if (this.modules.formatter) {
+            formatter = this.modules.formatter;
+          } else if (typeof Intl !== 'undefined') {
+            formatter = Formatter;
+          }
+
           var lu = new LanguageUtil(this.options);
           this.store = new ResourceStore(this.options.resources, this.options);
           var s = this.services;
@@ -2231,6 +2775,13 @@
             compatibilityJSON: this.options.compatibilityJSON,
             simplifyPluralSuffix: this.options.simplifyPluralSuffix
           });
+
+          if (formatter && (!this.options.interpolation.format || this.options.interpolation.format === defOpts.interpolation.format)) {
+            s.formatter = createClassOnDemand(formatter);
+            s.formatter.init(s, this.options);
+            this.options.interpolation.format = s.formatter.format.bind(s.formatter);
+          }
+
           s.interpolator = new Interpolator(this.options);
           s.utils = {
             hasLoadedNamespace: this.hasLoadedNamespace.bind(this)
@@ -2266,6 +2817,9 @@
             if (m.init) m.init(_this2);
           });
         }
+
+        this.format = this.options.interpolation.format;
+        if (!callback) callback = noop;
 
         if (this.options.fallbackLng && !this.services.languageDetector && !this.options.lng) {
           var codes = this.services.languageUtils.getFallbackCodes(this.options.fallbackLng);
@@ -2404,6 +2958,10 @@
           postProcessor.addPostProcessor(module);
         }
 
+        if (module.type === 'formatter') {
+          this.modules.formatter = module;
+        }
+
         if (module.type === '3rdParty') {
           this.modules.external.push(module);
         }
@@ -2502,7 +3060,7 @@
 
             options = _this5.options.overloadTranslationOptionHandler([key, opts].concat(rest));
           } else {
-            options = _objectSpread({}, opts);
+            options = _objectSpread$6({}, opts);
           }
 
           options.lng = options.lng || fixedT.lng;
@@ -2630,14 +3188,7 @@
         if (!lng) lng = this.resolvedLanguage || (this.languages && this.languages.length > 0 ? this.languages[0] : this.language);
         if (!lng) return 'rtl';
         var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ug', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam', 'ckb'];
-        return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
-      }
-    }, {
-      key: "createInstance",
-      value: function createInstance() {
-        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var callback = arguments.length > 1 ? arguments[1] : undefined;
-        return new I18n(options, callback);
+        return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) > -1 || lng.toLowerCase().indexOf('-arab') > 1 ? 'rtl' : 'ltr';
       }
     }, {
       key: "cloneInstance",
@@ -2647,7 +3198,7 @@
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
 
-        var mergedOptions = _objectSpread({}, this.options, options, {
+        var mergedOptions = _objectSpread$6(_objectSpread$6(_objectSpread$6({}, this.options), options), {
           isClone: true
         });
 
@@ -2656,7 +3207,7 @@
         membersToCopy.forEach(function (m) {
           clone[m] = _this8[m];
         });
-        clone.services = _objectSpread({}, this.services);
+        clone.services = _objectSpread$6({}, this.services);
         clone.services.utils = {
           hasLoadedNamespace: clone.hasLoadedNamespace.bind(clone)
         };
@@ -2691,22 +3242,36 @@
     return I18n;
   }(EventEmitter);
 
-  var i18next = new I18n();
+  _defineProperty$1(I18n, "createInstance", function () {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments.length > 1 ? arguments[1] : undefined;
+    return new I18n(options, callback);
+  });
 
-  function _typeof$2(obj) {
+  var instance = I18n.createInstance();
+  instance.createInstance = I18n.createInstance;
+  var createInstance = instance.createInstance;
+  var init = instance.init;
+  var loadResources = instance.loadResources;
+  var reloadResources = instance.reloadResources;
+  var use = instance.use;
+  var changeLanguage = instance.changeLanguage;
+  var getFixedT = instance.getFixedT;
+  var t = instance.t;
+  var exists = instance.exists;
+  var setDefaultNamespace = instance.setDefaultNamespace;
+  var hasLoadedNamespace = instance.hasLoadedNamespace;
+  var loadNamespaces = instance.loadNamespaces;
+  var loadLanguages = instance.loadLanguages;
+
+  function _typeof$1(obj) {
     "@babel/helpers - typeof";
 
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof$2 = function _typeof(obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof$2 = function _typeof(obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
-
-    return _typeof$2(obj);
+    return _typeof$1 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+      return typeof obj;
+    } : function (obj) {
+      return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    }, _typeof$1(obj);
   }
 
   var arr = [];
@@ -2723,7 +3288,7 @@
     return obj;
   }
   function hasXMLHttpRequest() {
-    return typeof XMLHttpRequest === 'function' || (typeof XMLHttpRequest === "undefined" ? "undefined" : _typeof$2(XMLHttpRequest)) === 'object';
+    return typeof XMLHttpRequest === 'function' || (typeof XMLHttpRequest === "undefined" ? "undefined" : _typeof$1(XMLHttpRequest)) === 'object';
   }
 
   function isPromise(maybePromise) {
@@ -2739,6 +3304,7 @@
   }
 
   var fetchApi;
+
   if (typeof fetch === 'function') {
     if (typeof global !== 'undefined' && global.fetch) {
       fetchApi = global.fetch;
@@ -2749,6 +3315,7 @@
 
   if (typeof require !== 'undefined' && (typeof window === 'undefined' || typeof window.document === 'undefined')) {
     var f = fetchApi || require('cross-fetch');
+
     if (f.default) f = f.default;
     exports.default = f;
     module.exports = exports.default;
@@ -2758,20 +3325,14 @@
     __proto__: null
   });
 
-  function _typeof$3(obj) {
+  function _typeof$2(obj) {
     "@babel/helpers - typeof";
 
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof$3 = function _typeof(obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof$3 = function _typeof(obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
-
-    return _typeof$3(obj);
+    return _typeof$2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+      return typeof obj;
+    } : function (obj) {
+      return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    }, _typeof$2(obj);
   }
   var fetchApi$1;
 
@@ -2807,7 +3368,7 @@
   if (typeof fetchApi$1 !== 'function') fetchApi$1 = undefined;
 
   var addQueryString = function addQueryString(url, params) {
-    if (params && _typeof$3(params) === 'object') {
+    if (params && _typeof$2(params) === 'object') {
       var queryString = '';
 
       for (var paramName in params) {
@@ -2846,7 +3407,7 @@
   };
 
   var requestWithXmlHttpRequest = function requestWithXmlHttpRequest(options, url, payload, callback) {
-    if (payload && _typeof$3(payload) === 'object') {
+    if (payload && _typeof$2(payload) === 'object') {
       payload = addQueryString('', payload).slice(1);
     }
 
@@ -2937,6 +3498,9 @@
   function _createClass$1(Constructor, protoProps, staticProps) {
     if (protoProps) _defineProperties$1(Constructor.prototype, protoProps);
     if (staticProps) _defineProperties$1(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
     return Constructor;
   }
 
@@ -3144,28 +3708,6 @@
   }();
 
   Backend.type = 'backend';
-
-  function _classCallCheck$2(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  function _defineProperties$2(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  function _createClass$2(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties$2(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties$2(Constructor, staticProps);
-    return Constructor;
-  }
 
   var arr$1 = [];
   var each$1 = arr$1.forEach;
@@ -3502,14 +4044,14 @@
     function Browser(services) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      _classCallCheck$2(this, Browser);
+      _classCallCheck(this, Browser);
 
       this.type = 'languageDetector';
       this.detectors = {};
       this.init(services, options);
     }
 
-    _createClass$2(Browser, [{
+    _createClass(Browser, [{
       key: "init",
       value: function init(services) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -3748,6 +4290,12 @@
   } // })("docReady", window);
   // modify this previous line to pass in your own method name
   // and object for the method to be attached to
+
+  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+  function createCommonjsModule(fn, module) {
+  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
 
   var version = "2";
 
@@ -4102,7 +4650,7 @@
   }
 
   var isObject = function isObject(x) {
-    return typeof x === "object" && x !== null;
+    return typeof x === 'object' && x !== null;
   };
 
   var diffProps_1 = diffProps;
@@ -4468,8 +5016,8 @@
                 });
               } // items are matching, so skip ahead
               else {
-                  simulateIndex++;
-                }
+                simulateIndex++;
+              }
             } else {
               inserts.push({
                 key: wantedItem.key,
@@ -4486,8 +5034,8 @@
           k++;
         } // a key in simulate has no matching wanted key, remove it
         else if (simulateItem && simulateItem.key) {
-            removes.push(remove$1(simulate, simulateIndex, simulateItem.key));
-          }
+          removes.push(remove$1(simulate, simulateIndex, simulateItem.key));
+        }
       } else {
         simulateIndex++;
         k++;
@@ -7158,20 +7706,20 @@
   function isNotExcluded(node) {
     var ret = !node.properties || !node.properties.attributes || node.properties.attributes.translated !== '';
 
-    if (ret && node.tagName && i18next.options.ignoreTags.indexOf(node.tagName) > -1) {
+    if (ret && node.tagName && instance.options.ignoreTags.indexOf(node.tagName) > -1) {
       ret = false;
     }
 
-    if (ret && i18next.options.ignoreClasses && node.properties && node.properties.className) {
+    if (ret && instance.options.ignoreClasses && node.properties && node.properties.className) {
       var p = node.properties.className.split(' ');
       p.forEach(cls => {
         if (!ret) return;
-        if (i18next.options.ignoreClasses.indexOf(cls) > -1) ret = false;
+        if (instance.options.ignoreClasses.indexOf(cls) > -1) ret = false;
       });
     }
 
-    if (ret && i18next.options.ignoreIds) {
-      if (i18next.options.ignoreIds.indexOf(node.properties && node.properties.id) > -1) {
+    if (ret && instance.options.ignoreIds) {
+      if (instance.options.ignoreIds.indexOf(node.properties && node.properties.id) > -1) {
         ret = false;
       }
     }
@@ -7186,8 +7734,8 @@
     var key = overrideKey || str.trim();
     if (!options.defaultValue) options.defaultValue = str;
 
-    if (hasContent && !i18next.options.ignoreWithoutKey || hasContent && i18next.options.ignoreWithoutKey && overrideKey) {
-      return i18next.t(key, options);
+    if (hasContent && !instance.options.ignoreWithoutKey || hasContent && instance.options.ignoreWithoutKey && overrideKey) {
+      return instance.t(key, options);
     }
 
     return str;
@@ -7202,7 +7750,7 @@
     var realNodeIsUnTranslated = arguments.length > 4 ? arguments[4] : undefined;
     var opts = arguments.length > 5 ? arguments[5] : undefined;
     if (!props) return props;
-    i18next.options.translateAttributes.forEach(item => {
+    instance.options.translateAttributes.forEach(item => {
       if (item.ele && node.tagName !== item.ele) return;
 
       if (item.cond && item.cond.length === 2) {
@@ -7278,18 +7826,18 @@
   }
 
   function removeIndent(str, substitution) {
-    if (!i18next.options.cleanIndent) return str;
+    if (!instance.options.cleanIndent) return str;
     var ret = str.replace(/\n +/g, substitution);
     return ret;
   }
 
   function canInline(node, tOptions) {
-    if (!node.children || !node.children.length || i18next.options.ignoreInlineOn.indexOf(node.tagName) > -1) {
+    if (!node.children || !node.children.length || instance.options.ignoreInlineOn.indexOf(node.tagName) > -1) {
       return false;
     }
 
-    if (i18next.options.mergeTags.indexOf(node.tagName) > -1) return true;
-    var baseTags = tOptions.inlineTags || i18next.options.inlineTags;
+    if (instance.options.mergeTags.indexOf(node.tagName) > -1) return true;
+    var baseTags = tOptions.inlineTags || instance.options.inlineTags;
     var inlineTags = tOptions.additionalInlineTags ? baseTags.concat(tOptions.additionalInlineTags) : baseTags;
     var inlineable = true;
     var hadNonTextNode = false;
@@ -7313,11 +7861,11 @@
     tOptions = getTOptions(tOptions, node);
     var parentKey = currentDepth === 0 ? parentOverrideKey : '';
 
-    if (currentDepth > 0 && parentOverrideKey && !i18next.options.ignoreWithoutKey) {
+    if (currentDepth > 0 && parentOverrideKey && !instance.options.ignoreWithoutKey) {
       parentKey = "".concat(parentOverrideKey, ".").concat(currentDepth);
     }
 
-    var overrideKey = getAttribute(node, i18next.options.keyAttr) || parentKey; // normally we use content as key, but optionally we allow to override it
+    var overrideKey = getAttribute(node, instance.options.keyAttr) || parentKey; // normally we use content as key, but optionally we allow to override it
     // translate node as one block
 
     var mergeFlag = getAttribute(node, 'merge');
@@ -7390,18 +7938,18 @@
         } // exclude whitespace replacement eg on PRE, CODE
 
 
-        var ignore = i18next.options.ignoreCleanIndentFor.indexOf(parent.tagName) > -1;
+        var ignore = instance.options.ignoreCleanIndentFor.indexOf(parent.tagName) > -1;
 
         if (!ignore) {
           txt = removeIndent(txt, '\n');
 
-          if (i18next.options.cleanWhitespace) {
+          if (instance.options.cleanWhitespace) {
             var regex = /^\s*(.*[^\s])\s*$/g;
             match = regex.exec(txt);
           }
         }
 
-        if (!ignore && match && match.length > 1 && i18next.options.cleanWhitespace) {
+        if (!ignore && match && match.length > 1 && instance.options.cleanWhitespace) {
           var _translation = translate(match[1], tOptions, overrideKey || '');
 
           node.text = txt.replace(match[1], _translation);
@@ -7441,7 +7989,7 @@
     var localized = walk$1(node, null, null, null, null, {
       retranslate
     });
-    i18next.services.logger.log("localization took: ".concat(recurseTime.end(), "ms"));
+    instance.services.logger.log("localization took: ".concat(recurseTime.end(), "ms"));
     return localized;
   }
 
@@ -7449,7 +7997,7 @@
     var virtualizeTime = new Instrument();
     virtualizeTime.start();
     var vNode = vdomVirtualize(node);
-    i18next.services.logger.log("virtualization took: ".concat(virtualizeTime.end(), "ms"));
+    instance.services.logger.log("virtualization took: ".concat(virtualizeTime.end(), "ms"));
     return vNode;
   }
 
@@ -7472,7 +8020,7 @@
   var missings = {};
 
   function log() {
-    i18next.services.logger.log('missing resources: \n' + JSON.stringify(missings, null, 2));
+    instance.services.logger.log('missing resources: \n' + JSON.stringify(missings, null, 2));
   }
 
   var debouncedLog = debounce(log, 2000);
@@ -7484,8 +8032,8 @@
       debouncedLog();
     });
 
-    if (i18next.services.backendConnector && i18next.services.backendConnector.saveMissing) {
-      i18next.services.backendConnector.saveMissing(lngs, namespace, key, res);
+    if (instance.services.backendConnector && instance.services.backendConnector.saveMissing) {
+      instance.services.backendConnector.saveMissing(lngs, namespace, key, res);
     }
   }
 
@@ -7522,11 +8070,11 @@
   var initialized = false;
   docReady(() => {
     domReady = true;
-    if (!initialized) init();
+    if (!initialized) init$1();
   }); // extend i18next with default extensions
 
-  i18next.use(Backend);
-  i18next.use(Browser); // log out missings
+  instance.use(Backend);
+  instance.use(Browser); // log out missings
   // i18next.on('missingKey', missingHandler);
   // store last init options - for case init is called before dom ready
 
@@ -7536,14 +8084,14 @@
     if (!ns && lastOptions.namespaceFromPath) ns = getPathname();
     lastOptions.ns.push(ns);
     lastOptions.defaultNS = ns;
-    i18next.loadNamespaces(lastOptions.ns, () => {
-      i18next.setDefaultNamespace(ns);
+    instance.loadNamespaces(lastOptions.ns, () => {
+      instance.setDefaultNamespace(ns);
     });
   }
 
   var renderers = [];
 
-  function init() {
+  function init$1() {
     var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     options = _objectSpread2(_objectSpread2(_objectSpread2({}, getDefaults$2()), lastOptions), options);
     options = parseOptions(options); // delay init from domReady
@@ -7611,7 +8159,7 @@
       }
     }
 
-    i18next.init(options, done);
+    instance.init(options, done);
 
     if (!domReady) {
       docReady(done);
@@ -7629,8 +8177,8 @@
   }
 
   var index = {
-    init,
-    i18next,
+    init: init$1,
+    i18next: instance,
     changeNamespace,
     forceRerender
   };
