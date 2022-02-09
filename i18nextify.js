@@ -1135,7 +1135,14 @@
 
           res = this.extendTranslation(res, keys, options, resolved, lastKey);
           if (usedKey && res === key && this.options.appendNamespaceToMissingKey) res = "".concat(namespace, ":").concat(key);
-          if ((usedKey || usedDefault) && this.options.parseMissingKeyHandler) res = this.options.parseMissingKeyHandler(res);
+
+          if ((usedKey || usedDefault) && this.options.parseMissingKeyHandler) {
+            if (this.options.compatibilityAPI !== 'v1') {
+              res = this.options.parseMissingKeyHandler(key, usedDefault ? res : undefined);
+            } else {
+              res = this.options.parseMissingKeyHandler(res);
+            }
+          }
         }
 
         return res;
@@ -1153,7 +1160,7 @@
           if (options.interpolation) this.interpolator.init(_objectSpread$2(_objectSpread$2({}, options), {
             interpolation: _objectSpread$2(_objectSpread$2({}, this.options.interpolation), options.interpolation)
           }));
-          var skipOnVariables = typeof res === 'string' && (options.interpolation && options.interpolation.skipOnVariables || this.options.interpolation.skipOnVariables);
+          var skipOnVariables = typeof res === 'string' && (options && options.interpolation && options.interpolation.skipOnVariables !== undefined ? options.interpolation.skipOnVariables : this.options.interpolation.skipOnVariables);
           var nestBef;
 
           if (skipOnVariables) {
@@ -1918,7 +1925,7 @@
 
         this.resetRegExp();
         var missingInterpolationHandler = options && options.missingInterpolationHandler || this.options.missingInterpolationHandler;
-        var skipOnVariables = options && options.interpolation && options.interpolation.skipOnVariables || this.options.interpolation.skipOnVariables;
+        var skipOnVariables = options && options.interpolation && options.interpolation.skipOnVariables !== undefined ? options.interpolation.skipOnVariables : this.options.interpolation.skipOnVariables;
         var todos = [{
           regex: this.regexpUnescape,
           safeValue: function safeValue(val) {
@@ -1934,17 +1941,20 @@
           replaces = 0;
 
           while (match = todo.regex.exec(str)) {
-            value = handleFormat(match[1].trim());
+            var matchedVar = match[1].trim();
+            value = handleFormat(matchedVar);
 
             if (value === undefined) {
               if (typeof missingInterpolationHandler === 'function') {
                 var temp = missingInterpolationHandler(str, match, options);
                 value = typeof temp === 'string' ? temp : '';
+              } else if (options && options.hasOwnProperty(matchedVar)) {
+                value = '';
               } else if (skipOnVariables) {
                 value = match[0];
                 continue;
               } else {
-                _this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
+                _this.logger.warn("missed to pass in variable ".concat(matchedVar, " for interpolating ").concat(str));
 
                 value = '';
               }
@@ -2165,7 +2175,7 @@
     }, {
       key: "add",
       value: function add(name, fc) {
-        this.formats[name] = fc;
+        this.formats[name.toLowerCase().trim()] = fc;
       }
     }, {
       key: "format",
