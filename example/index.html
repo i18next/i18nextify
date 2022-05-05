@@ -24,6 +24,14 @@
       setTimeout(() => {
         window.i18nextify.forceRerender();
       }, 5000);
+
+      // window.i18nextify.i18next.on("languageChanged", function (c) {
+      //   console.log(c, "..changed");
+      //   window.i18nextify.forceRerender();
+      // });
+      // function chngLng (lng) {
+      //   window.i18nextify.i18next.changeLanguage(lng);
+      // }
     </script>
   </head>
 
@@ -36,6 +44,13 @@
       <span> | </span>
       <a i18next-key="languageSelect.en" href="/?lng=en">english</a>
     </div>
+    <!--
+    <div i18next-key="languageSelectTwo">  
+      <button i18next-key="languageSelect.de" onclick="chngLng('de')">deutsch</button>
+      <span> | </span>
+      <button i18next-key="languageSelect.en" onclick="chngLng('en')">english</button>
+    </div>
+    -->
     <div>
       <p merge i18next-key="provides">i18next provides:</p>
     </div>
