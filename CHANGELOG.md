@@ -1,3 +1,8 @@
+### 3.1.0
+
+- update i18next dependencies
+- fix image sources and links placeholders
+
 ### 3.0.5
 
 - update i18next dependencies

@@ -133,11 +133,17 @@ function translateProps(
         if (!index || index % 2 === 0) {
           mem.push(match);
         } else {
-          mem.push(translate(
+          const tr = translate(
             match,
             { ...tOptions },
             overrideKey ? `${overrideKey}.${attr}` : ''
-          ));
+          )
+          if (tr && tr.indexOf('http') == 0) { // image sources and links seems to be prefixed with the origin hosts
+            if (mem[index - 1] && mem[index - 1].indexOf('http') === 0) {
+              mem.splice(index -1 , 1);
+            }
+          }
+          mem.push(tr);
         }
         return mem;
       }, arr);

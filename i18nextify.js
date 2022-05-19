@@ -507,7 +507,7 @@
     return data;
   }
 
-  var isIE10 = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent && window.navigator.userAgent.indexOf('MSIE') > -1;
+  var isIE10 = typeof window !== 'undefined' && window.navigator && typeof window.navigator.userAgentData === 'undefined' && window.navigator.userAgent && window.navigator.userAgent.indexOf('MSIE') > -1;
   var chars = [' ', ',', '?', '!', ';'];
 
   function looksLikeObjectPath(key, nsSeparator, keySeparator) {
@@ -1002,6 +1002,7 @@
         if (!options) options = {};
         if (keys === undefined || keys === null) return '';
         if (!Array.isArray(keys)) keys = [String(keys)];
+        var returnDetails = options.returnDetails !== undefined ? options.returnDetails : this.options.returnDetails;
         var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
 
         var _this$extractFromKey = this.extractFromKey(keys[keys.length - 1], options),
@@ -1015,7 +1016,18 @@
         if (lng && lng.toLowerCase() === 'cimode') {
           if (appendNamespaceToCIMode) {
             var nsSeparator = options.nsSeparator || this.options.nsSeparator;
-            return namespace + nsSeparator + key;
+
+            if (returnDetails) {
+              resolved.res = "".concat(namespace).concat(nsSeparator).concat(key);
+              return resolved;
+            }
+
+            return "".concat(namespace).concat(nsSeparator).concat(key);
+          }
+
+          if (returnDetails) {
+            resolved.res = key;
+            return resolved;
           }
 
           return key;
@@ -1037,9 +1049,16 @@
               this.logger.warn('accessing an object - but returnObjects options is not enabled!');
             }
 
-            return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, _objectSpread$2(_objectSpread$2({}, options), {}, {
+            var r = this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, _objectSpread$2(_objectSpread$2({}, options), {}, {
               ns: namespaces
             })) : "key '".concat(key, " (").concat(this.language, ")' returned an object instead of string.");
+
+            if (returnDetails) {
+              resolved.res = r;
+              return resolved;
+            }
+
+            return r;
           }
 
           if (keySeparator) {
@@ -1145,6 +1164,11 @@
           }
         }
 
+        if (returnDetails) {
+          resolved.res = res;
+          return resolved;
+        }
+
         return res;
       }
     }, {
@@ -1153,7 +1177,7 @@
         var _this3 = this;
 
         if (this.i18nFormat && this.i18nFormat.parse) {
-          res = this.i18nFormat.parse(res, options, resolved.usedLng, resolved.usedNS, resolved.usedKey, {
+          res = this.i18nFormat.parse(res, _objectSpread$2(_objectSpread$2({}, this.options.interpolation.defaultVariables), options), resolved.usedLng, resolved.usedNS, resolved.usedKey, {
             resolved: resolved
           });
         } else if (!options.skipInterpolation) {
@@ -2119,10 +2143,10 @@
               rest = _opt$split2.slice(1);
 
           var val = rest.join(':');
+          if (!formatOptions[key.trim()]) formatOptions[key.trim()] = val.trim();
           if (val.trim() === 'false') formatOptions[key.trim()] = false;
           if (val.trim() === 'true') formatOptions[key.trim()] = true;
           if (!isNaN(val.trim())) formatOptions[key.trim()] = parseInt(val.trim(), 10);
-          if (!formatOptions[key.trim()]) formatOptions[key.trim()] = val.trim();
         });
       }
     }
@@ -2284,13 +2308,9 @@
     }
   }
 
-  function remove(arr, what) {
-    var found = arr.indexOf(what);
-
-    while (found !== -1) {
-      arr.splice(found, 1);
-      found = arr.indexOf(what);
-    }
+  function removePending(q, name) {
+    delete q.pending[name];
+    q.pendingCount--;
   }
 
   var Connector = function (_EventEmitter) {
@@ -2317,6 +2337,9 @@
       _this.languageUtils = services.languageUtils;
       _this.options = options;
       _this.logger = baseLogger.create('backendConnector');
+      _this.waitingReads = [];
+      _this.maxParallelReads = options.maxParallelReads || 10;
+      _this.readingCalls = 0;
       _this.state = {};
       _this.queue = [];
 
@@ -2332,10 +2355,10 @@
       value: function queueLoad(languages, namespaces, options, callback) {
         var _this2 = this;
 
-        var toLoad = [];
-        var pending = [];
-        var toLoadLanguages = [];
-        var toLoadNamespaces = [];
+        var toLoad = {};
+        var pending = {};
+        var toLoadLanguages = {};
+        var toLoadNamespaces = {};
         languages.forEach(function (lng) {
           var hasAllNamespaces = true;
           namespaces.forEach(function (ns) {
@@ -2344,21 +2367,22 @@
             if (!options.reload && _this2.store.hasResourceBundle(lng, ns)) {
               _this2.state[name] = 2;
             } else if (_this2.state[name] < 0) ;else if (_this2.state[name] === 1) {
-              if (pending.indexOf(name) < 0) pending.push(name);
+              if (pending[name] === undefined) pending[name] = true;
             } else {
               _this2.state[name] = 1;
               hasAllNamespaces = false;
-              if (pending.indexOf(name) < 0) pending.push(name);
-              if (toLoad.indexOf(name) < 0) toLoad.push(name);
-              if (toLoadNamespaces.indexOf(ns) < 0) toLoadNamespaces.push(ns);
+              if (pending[name] === undefined) pending[name] = true;
+              if (toLoad[name] === undefined) toLoad[name] = true;
+              if (toLoadNamespaces[ns] === undefined) toLoadNamespaces[ns] = true;
             }
           });
-          if (!hasAllNamespaces) toLoadLanguages.push(lng);
+          if (!hasAllNamespaces) toLoadLanguages[lng] = true;
         });
 
-        if (toLoad.length || pending.length) {
+        if (Object.keys(toLoad).length || Object.keys(pending).length) {
           this.queue.push({
             pending: pending,
+            pendingCount: Object.keys(pending).length,
             loaded: {},
             errors: [],
             callback: callback
@@ -2366,10 +2390,10 @@
         }
 
         return {
-          toLoad: toLoad,
-          pending: pending,
-          toLoadLanguages: toLoadLanguages,
-          toLoadNamespaces: toLoadNamespaces
+          toLoad: Object.keys(toLoad),
+          pending: Object.keys(pending),
+          toLoadLanguages: Object.keys(toLoadLanguages),
+          toLoadNamespaces: Object.keys(toLoadNamespaces)
         };
       }
     }, {
@@ -2388,16 +2412,17 @@
         var loaded = {};
         this.queue.forEach(function (q) {
           pushPath(q.loaded, [lng], ns);
-          remove(q.pending, name);
+          removePending(q, name);
           if (err) q.errors.push(err);
 
-          if (q.pending.length === 0 && !q.done) {
+          if (q.pendingCount === 0 && !q.done) {
             Object.keys(q.loaded).forEach(function (l) {
-              if (!loaded[l]) loaded[l] = [];
+              if (!loaded[l]) loaded[l] = {};
+              var loadedKeys = Object.keys(loaded[l]);
 
-              if (q.loaded[l].length) {
-                q.loaded[l].forEach(function (ns) {
-                  if (loaded[l].indexOf(ns) < 0) loaded[l].push(ns);
+              if (loadedKeys.length) {
+                loadedKeys.forEach(function (ns) {
+                  if (loadedKeys[ns] !== undefined) loaded[l][ns] = true;
                 });
               }
             });
@@ -2424,12 +2449,34 @@
         var wait = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 350;
         var callback = arguments.length > 5 ? arguments[5] : undefined;
         if (!lng.length) return callback(null, {});
+
+        if (this.readingCalls >= this.maxParallelReads) {
+          this.waitingReads.push({
+            lng: lng,
+            ns: ns,
+            fcName: fcName,
+            tried: tried,
+            wait: wait,
+            callback: callback
+          });
+          return;
+        }
+
+        this.readingCalls++;
         return this.backend[fcName](lng, ns, function (err, data) {
           if (err && data && tried < 5) {
             setTimeout(function () {
               _this3.read.call(_this3, lng, ns, fcName, tried + 1, wait * 2, callback);
             }, wait);
             return;
+          }
+
+          _this3.readingCalls--;
+
+          if (_this3.waitingReads.length > 0) {
+            var next = _this3.waitingReads.shift();
+
+            _this3.read(next.lng, next.ns, next.fcName, next.tried, next.wait, next.callback);
           }
 
           callback(err, data);
@@ -3154,7 +3201,7 @@
         }
 
         if (this.hasResourceBundle(lng, ns)) return true;
-        if (!this.services.backendConnector.backend) return true;
+        if (!this.services.backendConnector.backend || this.options.resources && !this.options.partialBundledLanguages) return true;
         if (loadNotPending(lng, ns) && (!fallbackLng || loadNotPending(lastLng, ns))) return true;
         return false;
       }
@@ -3620,6 +3667,8 @@
 
         loadPath = makePromise(loadPath);
         loadPath.then(function (resolvedLoadPath) {
+          if (!resolvedLoadPath) return callback(null, {});
+
           var url = _this2.services.interpolator.interpolate(resolvedLoadPath, {
             lng: languages.join('+'),
             ns: namespaces.join('+')
@@ -3873,7 +3922,13 @@
       var found;
 
       if (typeof window !== 'undefined') {
-        var query = window.location.search.substring(1);
+        var search = window.location.search;
+
+        if (!window.location.search && window.location.hash && window.location.hash.indexOf('?') > -1) {
+          search = window.location.hash.substring(window.location.hash.indexOf('?'));
+        }
+
+        var query = search.substring(1);
         var params = query.split('&');
 
         for (var i = 0; i < params.length; i++) {
@@ -5016,7 +5071,7 @@
       simulateItem = simulate[simulateIndex]; // remove items
 
       while (simulateItem === null && simulate.length) {
-        removes.push(remove$1(simulate, simulateIndex, null));
+        removes.push(remove(simulate, simulateIndex, null));
         simulateItem = simulate[simulateIndex];
       }
 
@@ -5026,7 +5081,7 @@
           if (simulateItem && simulateItem.key) {
             // if an insert doesn't put this key in place, it needs to move
             if (bKeys[simulateItem.key] !== k + 1) {
-              removes.push(remove$1(simulate, simulateIndex, simulateItem.key));
+              removes.push(remove(simulate, simulateIndex, simulateItem.key));
               simulateItem = simulate[simulateIndex]; // if the remove didn't put the wanted item in place, we need to insert it
 
               if (!simulateItem || simulateItem.key !== wantedItem.key) {
@@ -5054,7 +5109,7 @@
           k++;
         } // a key in simulate has no matching wanted key, remove it
         else if (simulateItem && simulateItem.key) {
-          removes.push(remove$1(simulate, simulateIndex, simulateItem.key));
+          removes.push(remove(simulate, simulateIndex, simulateItem.key));
         }
       } else {
         simulateIndex++;
@@ -5065,7 +5120,7 @@
 
     while (simulateIndex < simulate.length) {
       simulateItem = simulate[simulateIndex];
-      removes.push(remove$1(simulate, simulateIndex, simulateItem && simulateItem.key));
+      removes.push(remove(simulate, simulateIndex, simulateItem && simulateItem.key));
     } // If the only moves we have are deletes then we can just
     // let the delete patch remove these items.
 
@@ -5086,7 +5141,7 @@
     };
   }
 
-  function remove$1(arr, index, key) {
+  function remove(arr, index, key) {
     arr.splice(index, 1);
     return {
       from: index,
@@ -7816,7 +7871,16 @@
           if (!index || index % 2 === 0) {
             mem.push(match);
           } else {
-            mem.push(translate(match, _objectSpread2({}, tOptions), overrideKey ? "".concat(overrideKey, ".").concat(attr) : ''));
+            var tr = translate(match, _objectSpread2({}, tOptions), overrideKey ? "".concat(overrideKey, ".").concat(attr) : '');
+
+            if (tr && tr.indexOf('http') == 0) {
+              // image sources and links seems to be prefixed with the origin hosts
+              if (mem[index - 1] && mem[index - 1].indexOf('http') === 0) {
+                mem.splice(index - 1, 1);
+              }
+            }
+
+            mem.push(tr);
           }
 
           return mem;
