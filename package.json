@@ -18,9 +18,9 @@
   "bugs": "https://github.com/i18next/i18nextify/issues",
   "dependencies": {
     "@babel/runtime": "^7.17.9",
-    "i18next": "21.8.3",
+    "i18next": "21.8.4",
     "i18next-browser-languagedetector": "6.1.4",
-    "i18next-http-backend": "1.4.0",
+    "i18next-http-backend": "1.4.1",
     "udc": "1.0.1",
     "vdom-parser": "1.4.1",
     "vdom-to-html": "2.3.1",
