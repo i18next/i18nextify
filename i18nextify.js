@@ -1157,7 +1157,7 @@
 
           if ((usedKey || usedDefault) && this.options.parseMissingKeyHandler) {
             if (this.options.compatibilityAPI !== 'v1') {
-              res = this.options.parseMissingKeyHandler(key, usedDefault ? res : undefined);
+              res = this.options.parseMissingKeyHandler(this.options.appendNamespaceToMissingKey ? "".concat(namespace, ":").concat(key) : key, usedDefault ? res : undefined);
             } else {
               res = this.options.parseMissingKeyHandler(res);
             }
@@ -1990,7 +1990,7 @@
             str = str.replace(match[0], safeValue);
 
             if (skipOnVariables) {
-              todo.regex.lastIndex += safeValue.length;
+              todo.regex.lastIndex += value.length;
               todo.regex.lastIndex -= match[0].length;
             } else {
               todo.regex.lastIndex = 0;
@@ -2142,11 +2142,11 @@
               key = _opt$split2[0],
               rest = _opt$split2.slice(1);
 
-          var val = rest.join(':');
-          if (!formatOptions[key.trim()]) formatOptions[key.trim()] = val.trim();
-          if (val.trim() === 'false') formatOptions[key.trim()] = false;
-          if (val.trim() === 'true') formatOptions[key.trim()] = true;
-          if (!isNaN(val.trim())) formatOptions[key.trim()] = parseInt(val.trim(), 10);
+          var val = rest.join(':').trim().replace(/^'+|'+$/g, '');
+          if (!formatOptions[key.trim()]) formatOptions[key.trim()] = val;
+          if (val === 'false') formatOptions[key.trim()] = false;
+          if (val === 'true') formatOptions[key.trim()] = true;
+          if (!isNaN(val)) formatOptions[key.trim()] = parseInt(val, 10);
         });
       }
     }
@@ -2309,8 +2309,10 @@
   }
 
   function removePending(q, name) {
-    delete q.pending[name];
-    q.pendingCount--;
+    if (q.pending[name] !== undefined) {
+      delete q.pending[name];
+      q.pendingCount--;
+    }
   }
 
   var Connector = function (_EventEmitter) {
@@ -2418,11 +2420,11 @@
           if (q.pendingCount === 0 && !q.done) {
             Object.keys(q.loaded).forEach(function (l) {
               if (!loaded[l]) loaded[l] = {};
-              var loadedKeys = Object.keys(loaded[l]);
+              var loadedKeys = q.loaded[l];
 
               if (loadedKeys.length) {
                 loadedKeys.forEach(function (ns) {
-                  if (loadedKeys[ns] !== undefined) loaded[l][ns] = true;
+                  if (loaded[l][ns] === undefined) loaded[l][ns] = true;
                 });
               }
             });
