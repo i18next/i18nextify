@@ -157,12 +157,12 @@ function init(options = {}) {
         }
 
         if (window.document.title) {
-          const keyTitle = window.document.getElementsByTagName('title').length > 0 && window.document.getElementsByTagName('title')[0].getAttribute('i18next-key');
+          const keyTitle = window.document.getElementsByTagName('title').length > 0 && window.document.getElementsByTagName('title')[0].getAttribute(i18next.options.keyAttr);
           window.document.title = i18next.t(keyTitle || window.document.title);
         }
-        if (document.querySelector('meta[name="description"]') && document.querySelector('meta[name="description"]').content) {
-          const keyDescr = document.querySelector('meta[name="description"]').getAttribute(i18next.options.keyAttr) || document.querySelector('meta[name="description"]').content;
-          document.querySelector('meta[name="description"]').setAttribute("content", i18next.t(keyDescr));
+        if (window.document.querySelector('meta[name="description"]') && window.document.querySelector('meta[name="description"]').content) {
+          const keyDescr = window.document.querySelector('meta[name="description"]').getAttribute(i18next.options.keyAttr) || window.document.querySelector('meta[name="description"]').content;
+          window.document.querySelector('meta[name="description"]').setAttribute("content", i18next.t(keyDescr));
         }
 
         options.onInitialTranslate();

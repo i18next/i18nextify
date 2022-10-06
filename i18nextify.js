@@ -8324,13 +8324,13 @@
           }
 
           if (window.document.title) {
-            var keyTitle = window.document.getElementsByTagName('title').length > 0 && window.document.getElementsByTagName('title')[0].getAttribute('i18next-key');
+            var keyTitle = window.document.getElementsByTagName('title').length > 0 && window.document.getElementsByTagName('title')[0].getAttribute(instance.options.keyAttr);
             window.document.title = instance.t(keyTitle || window.document.title);
           }
 
-          if (document.querySelector('meta[name="description"]') && document.querySelector('meta[name="description"]').content) {
-            var keyDescr = document.querySelector('meta[name="description"]').getAttribute(instance.options.keyAttr) || document.querySelector('meta[name="description"]').content;
-            document.querySelector('meta[name="description"]').setAttribute("content", instance.t(keyDescr));
+          if (window.document.querySelector('meta[name="description"]') && window.document.querySelector('meta[name="description"]').content) {
+            var keyDescr = window.document.querySelector('meta[name="description"]').getAttribute(instance.options.keyAttr) || window.document.querySelector('meta[name="description"]').content;
+            window.document.querySelector('meta[name="description"]').setAttribute("content", instance.t(keyDescr));
           }
 
           options.onInitialTranslate();

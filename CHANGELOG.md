@@ -1,3 +1,7 @@
+### 3.2.1
+
+- use correct keyAttr for title tag
+
 ### 3.2.0
 
 - update i18next dependencies
