@@ -10,6 +10,7 @@ import { missingHandler } from './missingHandler';
 import { parseOptions, getPathname } from './utils';
 
 function getDefaults() {
+  const scriptEle = document.getElementById('i18nextify');
   return {
     autorun: true,
     ele: document.body,
@@ -43,7 +44,8 @@ function getDefaults() {
     namespaceFromPath: false,
     missingKeyHandler: missingHandler,
     ns: [],
-    onInitialTranslate: () => {}
+    onInitialTranslate: () => {},
+    fallbackLng: (scriptEle && (scriptEle.getAttribute('fallbacklng') || scriptEle.getAttribute('fallbackLng'))) || undefined
   };
 }
 
@@ -153,10 +155,24 @@ function init(options = {}) {
         if (options.ele.style && options.ele.style.display === 'none') {
           options.ele.style.display = 'block';
         }
+
+        if (window.document.title) {
+          const keyTitle = window.document.getElementsByTagName('title').length > 0 && window.document.getElementsByTagName('title')[0].getAttribute('i18next-key');
+          window.document.title = i18next.t(keyTitle || window.document.title);
+        }
+        if (document.querySelector('meta[name="description"]') && document.querySelector('meta[name="description"]').content) {
+          const keyDescr = document.querySelector('meta[name="description"]').getAttribute(i18next.options.keyAttr) || document.querySelector('meta[name="description"]').content;
+          document.querySelector('meta[name="description"]').setAttribute("content", i18next.t(keyDescr));
+        }
+
         options.onInitialTranslate();
       });
     }
   }
+
+  i18next.on('languageChanged', (lng) => {
+    window.document.documentElement.lang = lng;
+  });
 
   i18next.init(options, done);
 

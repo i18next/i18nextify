@@ -1,3 +1,10 @@
+### 3.2.0
+
+- update i18next dependencies
+- ability to define fallbacklng in script
+- translatable title and description
+- set html lng attribute
+
 ### 3.1.2
 
 - update i18next dependencies

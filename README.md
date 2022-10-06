@@ -1,3 +1,5 @@
+[![npm version](https://img.shields.io/npm/v/i18nextify.svg?style=flat-square)](https://www.npmjs.com/package/i18nextify)
+
 # i18nextify
 
 Just drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.min.js) on your page and you're ready to deliver your pages in any language.
@@ -6,7 +8,7 @@ See the [sample](https://i18next.github.io/i18nextify) ([code](https://github.co
 
 _i18nextify_ uses Virtual DOM to update your page with translations based on the current content. `MutationObserver` is used to trigger translations on newly added content.
 
-_i18nextify_ comes bundled with [i18next](https://i18next.com).
+_i18nextify_ comes bundled with [i18next](https://www.i18next.com).
 
 Should play well with any static or dynamic page not using its own Virtual DOM.
 
@@ -23,6 +25,19 @@ Drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.
 <html>
   <head>
     <script src="/i18nextify.min.js"></script>
+    <!-- or: <script src="https://unpkg.com/i18nextify@^3.2.0"></script> -->
+  </head>
+  ...
+</html>
+```
+
+Optionally you can also define your fallback language directly in the script tag:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/i18nextify.min.js" fallbacklng="en"></script>
   </head>
   ...
 </html>
@@ -30,7 +45,7 @@ Drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.
 
 Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see _i18nextify_ in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
 
-See the [example](https://github.com/i18next/i18nextify/tree/master/example) for details.
+See the [example](https://github.com/i18next/i18nextify/tree/master/example/simple) for details.
 
 ## Initialize with options
 
@@ -77,6 +92,18 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example) for
   </head>
   ...
 </html>
+```
+
+## Delay initial translation
+
+```js
+const translation = i18nextify.init({
+  autorun: false,
+});
+
+setTimeout(function () {
+  translation.start();
+}, 1000);
 ```
 
 ## Merge content / using html in translations
