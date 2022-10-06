@@ -37,7 +37,8 @@ Optionally you can also define your fallback language directly in the script tag
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="/i18nextify.min.js" fallbacklng="en"></script>
+    <script src="/i18nextify.min.js" id="i18nextify" fallbacklng="en"></script>
+    <!-- or: <script src="https://unpkg.com/i18nextify@^3.2.1" id="i18nextify" fallbacklng="en"></script> -->
   </head>
   ...
 </html>
