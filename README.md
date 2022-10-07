@@ -6,6 +6,8 @@ Just drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nex
 
 See the [sample](https://i18next.github.io/i18nextify) ([code](https://github.com/i18next/i18nextify/tree/gh-pages))!
 
+Checkout this [video](https://youtu.be/f0ukRI0LMfo) to see i18nextify in action.
+
 _i18nextify_ uses Virtual DOM to update your page with translations based on the current content. `MutationObserver` is used to trigger translations on newly added content.
 
 _i18nextify_ comes bundled with [i18next](https://www.i18next.com).
