@@ -24,14 +24,14 @@ export function getAttribute(node, attr) {
 
 function getLastOfPath(object, path, Empty) {
   function cleanKey(key) {
-    return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
+    return key && key.indexOf("###") > -1 ? key.replace(/###/g, ".") : key;
   }
 
   function canNotTraverseDeeper() {
-    return !object || typeof object === 'string';
+    return !object || typeof object === "string";
   }
 
-  const stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
+  const stack = typeof path !== "string" ? [].concat(path) : path.split(".");
   while (stack.length > 1) {
     if (canNotTraverseDeeper()) return {};
 
@@ -43,7 +43,7 @@ function getLastOfPath(object, path, Empty) {
   if (canNotTraverseDeeper()) return {};
   return {
     obj: object,
-    k: cleanKey(stack.shift())
+    k: cleanKey(stack.shift()),
   };
 }
 
@@ -70,10 +70,10 @@ export function getPath(object, path) {
 
 export function getPathname() {
   const path = location.pathname;
-  if (path === '/') return 'root';
+  if (path === "/") return "root";
 
-  const parts = path.split('/');
-  let ret = 'root';
+  const parts = path.split("/");
+  let ret = "root";
 
   parts.forEach((p) => {
     if (p) ret += `_${p}`;
@@ -82,6 +82,7 @@ export function getPathname() {
   return ret;
 }
 
+const lowerCaseTags = ["SVG", "RECT", "PATH"];
 export const parseOptions = (options) => {
   if (options.namespace) {
     options.ns.push(options.namespace);
@@ -92,36 +93,40 @@ export const parseOptions = (options) => {
     options.defaultNS = ns;
   }
 
-  if (!options.ns.length) options.ns = ['translation'];
+  if (!options.ns.length) options.ns = ["translation"];
 
   if (options.ignoreTags) {
-    options.ignoreTags = options.ignoreTags.map(s => s.toUpperCase());
+    options.ignoreTags = options.ignoreTags.map((s) => {
+      if (lowerCaseTags.indexOf(s)) return s.toLowerCase();
+      return s.toUpperCase();
+    });
   }
   if (options.ignoreCleanIndentFor) {
-    options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map(s =>
-      s.toUpperCase());
+    options.ignoreCleanIndentFor = options.ignoreCleanIndentFor.map((s) =>
+      s.toUpperCase()
+    );
   }
   if (options.inlineTags) {
-    options.inlineTags = options.inlineTags.map(s => s.toUpperCase());
+    options.inlineTags = options.inlineTags.map((s) => s.toUpperCase());
   }
   if (options.ignoreInlineOn) {
-    options.ignoreInlineOn = options.ignoreInlineOn.map(s => s.toUpperCase());
+    options.ignoreInlineOn = options.ignoreInlineOn.map((s) => s.toUpperCase());
   }
   if (options.mergeTags) {
-    options.mergeTags = options.mergeTags.map(s => s.toUpperCase());
+    options.mergeTags = options.mergeTags.map((s) => s.toUpperCase());
   }
   options.translateAttributes = options.translateAttributes.reduce(
     (mem, attr) => {
       const res = { attr };
-      if (attr.indexOf('#') > -1) {
-        const [a, c] = attr.split('#');
+      if (attr.indexOf("#") > -1) {
+        const [a, c] = attr.split("#");
         res.attr = a;
-        if (c.indexOf('.') > -1) {
-          const [e, b] = c.split('.');
+        if (c.indexOf(".") > -1) {
+          const [e, b] = c.split(".");
           res.ele = e.toUpperCase();
-          res.cond = b.toLowerCase().split('=');
-        } else if (c.indexOf('=') > -1) {
-          res.cond = c.toLowerCase().split('=');
+          res.cond = b.toLowerCase().split("=");
+        } else if (c.indexOf("=") > -1) {
+          res.cond = c.toLowerCase().split("=");
         } else {
           res.ele = c.toUpperCase();
         }

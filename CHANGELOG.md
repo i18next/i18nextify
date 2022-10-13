@@ -1,3 +1,7 @@
+### 3.2.2
+
+- support SVG in ignoreTags
+
 ### 3.2.1
 
 - use correct keyAttr for title tag
