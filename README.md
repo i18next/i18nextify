@@ -46,7 +46,7 @@ Optionally you can also define your fallback language directly in the script tag
 </html>
 ```
 
-Request your page with querystring params `?debug=true&saveMissing` and open the browser console to see _i18nextify_ in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
+Request your page with querystring params `?debug=true&saveMissing=true` and open the browser console to see _i18nextify_ in action. It will output all missing translations - start serving them from `/locales/{{lng}}/translation.json`.
 
 See the [example](https://github.com/i18next/i18nextify/tree/master/example/simple) for details.
 
