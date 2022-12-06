@@ -6764,7 +6764,7 @@
     if (!options.ns.length) options.ns = ["translation"];
     if (options.ignoreTags) {
       options.ignoreTags = options.ignoreTags.map(s => {
-        if (lowerCaseTags.indexOf(s)) return s.toLowerCase();
+        if (lowerCaseTags.indexOf(s) > -1) return s.toLowerCase();
         return s.toUpperCase();
       });
     }
