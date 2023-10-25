@@ -1,3 +1,7 @@
+### 3.3.0
+
+- update deps
+
 ### 3.2.3
 
 - support SVG in ignoreTags
