@@ -2839,8 +2839,8 @@
 
     var headers = defaults({}, typeof options.customHeaders === 'function' ? options.customHeaders() : options.customHeaders);
 
-    if (typeof window === 'undefined' && typeof process !== 'undefined' && process.versions && process.versions.node) {
-      headers['User-Agent'] = "i18next-http-backend (node/".concat(process.version, "; ").concat(process.platform, " ").concat(process.arch, ")");
+    if (typeof window === 'undefined' && typeof global !== 'undefined' && typeof global.process !== 'undefined' && global.process.versions && global.process.versions.node) {
+      headers['User-Agent'] = "i18next-http-backend (node/".concat(global.process.version, "; ").concat(global.process.platform, " ").concat(global.process.arch, ")");
     }
 
     if (payload) headers['Content-Type'] = 'application/json';
