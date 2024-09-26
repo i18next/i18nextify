@@ -49,7 +49,7 @@
     "jest-cli": "^24.9.0",
     "mkdirp": "0.5.1",
     "rimraf": "3.0.2",
-    "rollup": "1.27.8",
+    "rollup": "2.79.2",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^10.0.2",
     "rollup-plugin-node-resolve": "5.2.0",
