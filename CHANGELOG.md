@@ -1,3 +1,7 @@
+### 3.3.2
+
+- last update of i18next deps before next major
+
 ### 3.3.1
 
 - update deps
