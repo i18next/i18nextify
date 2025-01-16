@@ -11,7 +11,9 @@ import { parseOptions, getPathname } from './utils';
 
 function getDefaults() {
   const scriptEle = document.getElementById('i18nextify');
-  return {
+  let supportedLngs = (scriptEle && (scriptEle.getAttribute('supportedlngs') || scriptEle.getAttribute('supportedLngs'))) || undefined;
+  if (typeof supportedLngs === 'string') supportedLngs = supportedLngs.split(',').map(lng => lng.trim());
+  const opt = {
     autorun: true,
     ele: document.body,
     keyAttr: 'i18next-key',
@@ -40,13 +42,23 @@ function getDefaults() {
     saveMissing:
       window.location.search &&
       window.location.search.indexOf('saveMissing=true') > -1,
-    namespace: false,
-    namespaceFromPath: false,
+    namespace: (scriptEle && scriptEle.getAttribute('namespace')) || false,
+    namespaceFromPath: (scriptEle && (scriptEle.getAttribute('namespacefrompath') || scriptEle.getAttribute('namespaceFromPath'))) || false,
     missingKeyHandler: missingHandler,
     ns: [],
-    onInitialTranslate: () => {},
-    fallbackLng: (scriptEle && (scriptEle.getAttribute('fallbacklng') || scriptEle.getAttribute('fallbackLng'))) || undefined
+    supportedLngs,
+    load: (scriptEle && scriptEle.getAttribute('load')) || undefined,
+    fallbackLng: (scriptEle && (scriptEle.getAttribute('fallbacklng') || scriptEle.getAttribute('fallbackLng'))) || undefined,
+    onInitialTranslate: () => {}
   };
+  const loadPath = (scriptEle && (scriptEle.getAttribute('loadpath') || scriptEle.getAttribute('loadPath'))) || undefined;
+  const addPath = (scriptEle && (scriptEle.getAttribute('addpath') || scriptEle.getAttribute('addPath'))) || undefined;
+  if (loadPath || addPath) {
+    opt.backend = {};
+    if (loadPath) opt.backend.loadPath = loadPath;
+    if (addPath) opt.backend.addPath = addPath;
+  }
+  return opt
 }
 
 // auto initialize on dom ready

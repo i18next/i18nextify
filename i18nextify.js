@@ -7825,7 +7825,9 @@
 
   function getDefaults$2() {
     var scriptEle = document.getElementById('i18nextify');
-    return {
+    var supportedLngs = scriptEle && (scriptEle.getAttribute('supportedlngs') || scriptEle.getAttribute('supportedLngs')) || undefined;
+    if (typeof supportedLngs === 'string') supportedLngs = supportedLngs.split(',').map(lng => lng.trim());
+    var opt = {
       autorun: true,
       ele: document.body,
       keyAttr: 'i18next-key',
@@ -7844,13 +7846,25 @@
       keySeparator: '#|#',
       debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
       saveMissing: window.location.search && window.location.search.indexOf('saveMissing=true') > -1,
-      namespace: false,
-      namespaceFromPath: false,
+      namespace: scriptEle && scriptEle.getAttribute('namespace') || false,
+      namespaceFromPath: scriptEle && (scriptEle.getAttribute('namespacefrompath') || scriptEle.getAttribute('namespaceFromPath')) || false,
       missingKeyHandler: missingHandler,
       ns: [],
-      onInitialTranslate: () => {},
-      fallbackLng: scriptEle && (scriptEle.getAttribute('fallbacklng') || scriptEle.getAttribute('fallbackLng')) || undefined
+      supportedLngs,
+      load: scriptEle && scriptEle.getAttribute('load') || undefined,
+      fallbackLng: scriptEle && (scriptEle.getAttribute('fallbacklng') || scriptEle.getAttribute('fallbackLng')) || undefined,
+      onInitialTranslate: () => {}
     };
+    var loadPath = scriptEle && (scriptEle.getAttribute('loadpath') || scriptEle.getAttribute('loadPath')) || undefined;
+    var addPath = scriptEle && (scriptEle.getAttribute('addpath') || scriptEle.getAttribute('addPath')) || undefined;
+
+    if (loadPath || addPath) {
+      opt.backend = {};
+      if (loadPath) opt.backend.loadPath = loadPath;
+      if (addPath) opt.backend.addPath = addPath;
+    }
+
+    return opt;
   } // auto initialize on dom ready
 
 

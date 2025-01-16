@@ -1,3 +1,7 @@
+### 3.3.3
+
+- added ability to pass supportedLngs, namespace, load and loadPath via script tag
+
 ### 3.3.2
 
 - last update of i18next deps before next major
