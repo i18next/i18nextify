@@ -1,3 +1,7 @@
+### 3.3.4
+
+- update i18next-http-backend dep (before next major)
+
 ### 3.3.3
 
 - added ability to pass supportedLngs, namespace, load and loadPath via script tag

@@ -2830,16 +2830,12 @@
     return Promise.resolve(maybePromise);
   }
 
-  var fetchApi;
+  var fetchApi = typeof fetch === 'function' ? fetch : undefined;
 
-  if (typeof fetch === 'function') {
-    if (typeof global !== 'undefined' && global.fetch) {
-      fetchApi = global.fetch;
-    } else if (typeof window !== 'undefined' && window.fetch) {
-      fetchApi = window.fetch;
-    } else {
-      fetchApi = fetch;
-    }
+  if (typeof global !== 'undefined' && global.fetch) {
+    fetchApi = global.fetch;
+  } else if (typeof window !== 'undefined' && window.fetch) {
+    fetchApi = window.fetch;
   }
 
   if (typeof require !== 'undefined' && typeof window === 'undefined') {
@@ -2917,16 +2913,12 @@
       return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
     }, _typeof$1(o);
   }
-  var fetchApi$1;
+  var fetchApi$1 = typeof fetch === 'function' ? fetch : undefined;
 
-  if (typeof fetch === 'function') {
-    if (typeof global !== 'undefined' && global.fetch) {
-      fetchApi$1 = global.fetch;
-    } else if (typeof window !== 'undefined' && window.fetch) {
-      fetchApi$1 = window.fetch;
-    } else {
-      fetchApi$1 = fetch;
-    }
+  if (typeof global !== 'undefined' && global.fetch) {
+    fetchApi$1 = global.fetch;
+  } else if (typeof window !== 'undefined' && window.fetch) {
+    fetchApi$1 = window.fetch;
   }
 
   var XmlHttpRequestApi;

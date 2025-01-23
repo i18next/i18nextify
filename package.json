@@ -21,7 +21,7 @@
     "@babel/runtime": "^7.23.2",
     "i18next": "23.16.8",
     "i18next-browser-languagedetector": "7.2.2",
-    "i18next-http-backend": "2.7.1",
+    "i18next-http-backend": "2.7.3",
     "udc": "1.0.1",
     "vdom-parser": "1.4.1",
     "vdom-to-html": "2.3.1",
