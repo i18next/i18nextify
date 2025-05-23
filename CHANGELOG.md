@@ -1,3 +1,7 @@
+### 4.0.0
+
+- update i18next dependencies to the current major versions
+
 ### 3.3.4
 
 - update i18next-http-backend dep (before next major)

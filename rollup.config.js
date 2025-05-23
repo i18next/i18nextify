@@ -39,8 +39,8 @@ export default {
     nodeResolve({ jsnext: true, main: true }),
     commonjs({})
   ].concat(compress ? terser() : []),
-  // external: ['react', 'react-dom'],
-  // moduleId: 'react-i18next',
+  external: ['cross-fetch'],
+  // moduleId: 'i18nextify',
   output: {
     name: 'i18nextify',
     format,
