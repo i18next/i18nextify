@@ -1,6 +1,10 @@
 ### 4.0.0
 
 - update i18next dependencies to the current major versions
+  - for more information read:
+    - https://github.com/i18next/i18next/blob/master/CHANGELOG.md#2400
+    - https://github.com/i18next/i18next-http-backend/blob/master/CHANGELOG.md#300
+    - https://github.com/i18next/i18next-browser-languageDetector/blob/master/CHANGELOG.md#800
 
 ### 3.3.4
 
