@@ -1795,6 +1795,9 @@
       if (typeof this.options.overloadTranslationOptionHandler !== 'function') {
         this.options.overloadTranslationOptionHandler = defOpts.overloadTranslationOptionHandler;
       }
+      if (this.options.debug === true) {
+        if (typeof console !== 'undefined') console.warn('i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com');
+      }
       var createClassOnDemand = ClassOrObject => {
         if (!ClassOrObject) return null;
         if (typeof ClassOrObject === 'function') return new ClassOrObject();
@@ -4405,8 +4408,12 @@
     return value;
   };
   DOMElement.prototype.removeAttributeNS = function _Element_removeAttributeNS(namespace, name) {
+    // Prevent prototype pollution by checking if namespace is a direct property
+    if (!Object.prototype.hasOwnProperty.call(this._attributes, namespace)) {
+      return;
+    }
     var attributes = this._attributes[namespace];
-    if (attributes) {
+    if (attributes && Object.prototype.hasOwnProperty.call(attributes, name)) {
       delete attributes[name];
     }
   };
