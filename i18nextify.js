@@ -1745,6 +1745,18 @@
       }
     });
   };
+  var usesLocize = inst => {
+    var _inst$modules, _inst$modules2, _inst$options;
+    if ((inst === null || inst === void 0 || (_inst$modules = inst.modules) === null || _inst$modules === void 0 || (_inst$modules = _inst$modules.backend) === null || _inst$modules === void 0 || (_inst$modules = _inst$modules.name) === null || _inst$modules === void 0 ? void 0 : _inst$modules.indexOf('Locize')) > 0) return true;
+    if ((inst === null || inst === void 0 || (_inst$modules2 = inst.modules) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.backend) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.constructor) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.name) === null || _inst$modules2 === void 0 ? void 0 : _inst$modules2.indexOf('Locize')) > 0) return true;
+    if (inst !== null && inst !== void 0 && (_inst$options = inst.options) !== null && _inst$options !== void 0 && (_inst$options = _inst$options.backend) !== null && _inst$options !== void 0 && _inst$options.backends) {
+      if (inst.options.backend.backends.some(b => {
+        var _b$constructor;
+        return (b === null || b === void 0 ? void 0 : b.name.indexOf('Locize')) > 0 || (b === null || b === void 0 || (_b$constructor = b.constructor) === null || _b$constructor === void 0 ? void 0 : _b$constructor.name.indexOf('Locize')) > 0;
+      })) return true;
+    }
+    return false;
+  };
   class I18n extends EventEmitter {
     constructor() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1795,8 +1807,8 @@
       if (typeof this.options.overloadTranslationOptionHandler !== 'function') {
         this.options.overloadTranslationOptionHandler = defOpts.overloadTranslationOptionHandler;
       }
-      if (this.options.debug === true) {
-        if (typeof console !== 'undefined') console.warn('i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com');
+      if (this.options.showSupportNotice !== false && !usesLocize(this)) {
+        if (typeof console !== 'undefined' && typeof console.info !== 'undefined') console.info('🌐 i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com 💙');
       }
       var createClassOnDemand = ClassOrObject => {
         if (!ClassOrObject) return null;
