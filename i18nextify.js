@@ -1751,8 +1751,8 @@
     if ((inst === null || inst === void 0 || (_inst$modules2 = inst.modules) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.backend) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.constructor) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.name) === null || _inst$modules2 === void 0 ? void 0 : _inst$modules2.indexOf('Locize')) > 0) return true;
     if (inst !== null && inst !== void 0 && (_inst$options = inst.options) !== null && _inst$options !== void 0 && (_inst$options = _inst$options.backend) !== null && _inst$options !== void 0 && _inst$options.backends) {
       if (inst.options.backend.backends.some(b => {
-        var _b$constructor;
-        return (b === null || b === void 0 ? void 0 : b.name.indexOf('Locize')) > 0 || (b === null || b === void 0 || (_b$constructor = b.constructor) === null || _b$constructor === void 0 ? void 0 : _b$constructor.name.indexOf('Locize')) > 0;
+        var _b$name, _b$constructor;
+        return (b === null || b === void 0 || (_b$name = b.name) === null || _b$name === void 0 ? void 0 : _b$name.indexOf('Locize')) > 0 || (b === null || b === void 0 || (_b$constructor = b.constructor) === null || _b$constructor === void 0 || (_b$constructor = _b$constructor.name) === null || _b$constructor === void 0 ? void 0 : _b$constructor.indexOf('Locize')) > 0;
       })) return true;
     }
     return false;
