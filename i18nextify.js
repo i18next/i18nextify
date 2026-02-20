@@ -1751,7 +1751,7 @@
     if (typeof globalThis !== 'undefined') globalThis[SUPPORT_NOTICE_KEY] = true;
   };
   var usesLocize = inst => {
-    var _inst$modules, _inst$modules2, _inst$options;
+    var _inst$modules, _inst$modules2, _inst$options, _inst$options2, _inst$options3;
     if ((inst === null || inst === void 0 || (_inst$modules = inst.modules) === null || _inst$modules === void 0 || (_inst$modules = _inst$modules.backend) === null || _inst$modules === void 0 || (_inst$modules = _inst$modules.name) === null || _inst$modules === void 0 ? void 0 : _inst$modules.indexOf('Locize')) > 0) return true;
     if ((inst === null || inst === void 0 || (_inst$modules2 = inst.modules) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.backend) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.constructor) === null || _inst$modules2 === void 0 || (_inst$modules2 = _inst$modules2.name) === null || _inst$modules2 === void 0 ? void 0 : _inst$modules2.indexOf('Locize')) > 0) return true;
     if (inst !== null && inst !== void 0 && (_inst$options = inst.options) !== null && _inst$options !== void 0 && (_inst$options = _inst$options.backend) !== null && _inst$options !== void 0 && _inst$options.backends) {
@@ -1759,6 +1759,10 @@
         var _b$name, _b$constructor;
         return (b === null || b === void 0 || (_b$name = b.name) === null || _b$name === void 0 ? void 0 : _b$name.indexOf('Locize')) > 0 || (b === null || b === void 0 || (_b$constructor = b.constructor) === null || _b$constructor === void 0 || (_b$constructor = _b$constructor.name) === null || _b$constructor === void 0 ? void 0 : _b$constructor.indexOf('Locize')) > 0;
       })) return true;
+    }
+    if (inst !== null && inst !== void 0 && (_inst$options2 = inst.options) !== null && _inst$options2 !== void 0 && (_inst$options2 = _inst$options2.backend) !== null && _inst$options2 !== void 0 && _inst$options2.projectId) return true;
+    if (inst !== null && inst !== void 0 && (_inst$options3 = inst.options) !== null && _inst$options3 !== void 0 && (_inst$options3 = _inst$options3.backend) !== null && _inst$options3 !== void 0 && _inst$options3.backendOptions) {
+      if (inst.options.backend.backendOptions.some(b => b === null || b === void 0 ? void 0 : b.projectId)) return true;
     }
     return false;
   };

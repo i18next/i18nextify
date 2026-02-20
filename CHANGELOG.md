@@ -1,3 +1,7 @@
+### 4.0.6
+
+- update i18next dependency
+
 ### 4.0.5
 
 - update i18next dependencies
