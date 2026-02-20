@@ -1077,7 +1077,7 @@
           type
         });
       } catch (err) {
-        if (!Intl) {
+        if (typeof Intl === 'undefined') {
           this.logger.error('No Intl support, please use an Intl polyfill!');
           return dummyRule;
         }
@@ -1263,16 +1263,16 @@
       var value;
       var clonedOptions;
       var handleHasOptions = (key, inheritedOptions) => {
-        var _matchedSingleQuotes$;
+        var _matchedSingleQuotes$, _matchedDoubleQuotes$;
         var sep = this.nestingOptionsSeparator;
         if (key.indexOf(sep) < 0) return key;
-        var c = key.split(new RegExp("".concat(sep, "[ ]*{")));
+        var c = key.split(new RegExp("".concat(regexEscape(sep), "[ ]*{")));
         var optionsString = "{".concat(c[1]);
         key = c[0];
         optionsString = this.interpolate(optionsString, clonedOptions);
         var matchedSingleQuotes = optionsString.match(/'/g);
         var matchedDoubleQuotes = optionsString.match(/"/g);
-        if (((_matchedSingleQuotes$ = matchedSingleQuotes === null || matchedSingleQuotes === void 0 ? void 0 : matchedSingleQuotes.length) !== null && _matchedSingleQuotes$ !== void 0 ? _matchedSingleQuotes$ : 0) % 2 === 0 && !matchedDoubleQuotes || matchedDoubleQuotes.length % 2 !== 0) {
+        if (((_matchedSingleQuotes$ = matchedSingleQuotes === null || matchedSingleQuotes === void 0 ? void 0 : matchedSingleQuotes.length) !== null && _matchedSingleQuotes$ !== void 0 ? _matchedSingleQuotes$ : 0) % 2 === 0 && !matchedDoubleQuotes || ((_matchedDoubleQuotes$ = matchedDoubleQuotes === null || matchedDoubleQuotes === void 0 ? void 0 : matchedDoubleQuotes.length) !== null && _matchedDoubleQuotes$ !== void 0 ? _matchedDoubleQuotes$ : 0) % 2 !== 0) {
           optionsString = optionsString.replace(/'/g, '"');
         }
         try {
@@ -1745,6 +1745,11 @@
       }
     });
   };
+  var SUPPORT_NOTICE_KEY = '__i18next_supportNoticeShown';
+  var getSupportNoticeShown = () => typeof globalThis !== 'undefined' && !!globalThis[SUPPORT_NOTICE_KEY];
+  var setSupportNoticeShown = () => {
+    if (typeof globalThis !== 'undefined') globalThis[SUPPORT_NOTICE_KEY] = true;
+  };
   var usesLocize = inst => {
     var _inst$modules, _inst$modules2, _inst$options;
     if ((inst === null || inst === void 0 || (_inst$modules = inst.modules) === null || _inst$modules === void 0 || (_inst$modules = _inst$modules.backend) === null || _inst$modules === void 0 || (_inst$modules = _inst$modules.name) === null || _inst$modules === void 0 ? void 0 : _inst$modules.indexOf('Locize')) > 0) return true;
@@ -1807,8 +1812,9 @@
       if (typeof this.options.overloadTranslationOptionHandler !== 'function') {
         this.options.overloadTranslationOptionHandler = defOpts.overloadTranslationOptionHandler;
       }
-      if (this.options.showSupportNotice !== false && !usesLocize(this)) {
-        if (typeof console !== 'undefined' && typeof console.info !== 'undefined') console.info('🌐 i18next is maintained with support from locize.com — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com 💙');
+      if (this.options.showSupportNotice !== false && !usesLocize(this) && !getSupportNoticeShown()) {
+        if (typeof console !== 'undefined' && typeof console.info !== 'undefined') console.info('🌐 i18next is maintained with support from Locize — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com 💙');
+        setSupportNoticeShown();
       }
       var createClassOnDemand = ClassOrObject => {
         if (!ClassOrObject) return null;
