@@ -1,3 +1,13 @@
+### 4.0.8
+
+Security release — all issues found via an internal audit. GHSA advisory filed after release.
+
+- security: drop dangerous URL schemes (`javascript:`, `data:`, `vbscript:`, `file:`) when substituted into translated `href` / `src` attribute values. No legitimate translation use case needs these schemes; the previous substitution logic applied them unchanged to the live DOM. Scheme matching is case-insensitive and ignores leading whitespace (GHSA-TBD)
+- security: new `sanitize(html, ctx)` option — if configured, it is invoked with each translated HTML body before it is parsed into the virtual DOM. Defaults to pass-through because rendering HTML from translations is i18nextify's core purpose; applications whose translation sources are not fully trusted (user-contributed locales, third-party translation CDN, etc.) can wire it to DOMPurify or a similar sanitizer.
+- security: fix `debug` / `saveMissing` URL-parameter detection. The previous substring match (`window.location.search.indexOf('debug=true') > -1`) activated these modes for any URL containing the substring — for example `?nosaveMissing=true` silently enabled `saveMissing`, and `?track_debug=true` enabled verbose debug logging. Now uses `URLSearchParams` for an exact parameter match.
+- chore: bump pinned `i18next` to 26.0.6 and `i18next-http-backend` to 3.0.5 — both security releases. See their respective CHANGELOG entries and GHSA advisories.
+- chore: ignore `.env*` and `*.pem`/`*.key` files in `.gitignore`.
+
 ### 4.0.7
 
 - update i18next dependencies

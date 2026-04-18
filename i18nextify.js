@@ -295,6 +295,7 @@
     }
     forward(args, lvl, prefix, debugOnly) {
       if (debugOnly && !this.debug) return null;
+      args = args.map(a => isString(a) ? a.replace(/[\r\n\x00-\x1F\x7F]/g, ' ') : a);
       if (isString(args[0])) args[0] = "".concat(prefix).concat(this.prefix, " ").concat(args[0]);
       return this.logger[lvl](args);
     }
@@ -1187,8 +1188,8 @@
       this.prefix = prefix ? regexEscape(prefix) : prefixEscaped || '{{';
       this.suffix = suffix ? regexEscape(suffix) : suffixEscaped || '}}';
       this.formatSeparator = formatSeparator || ',';
-      this.unescapePrefix = unescapeSuffix ? '' : unescapePrefix || '-';
-      this.unescapeSuffix = this.unescapePrefix ? '' : unescapeSuffix || '';
+      this.unescapePrefix = unescapeSuffix ? '' : unescapePrefix ? regexEscape(unescapePrefix) : '-';
+      this.unescapeSuffix = this.unescapePrefix ? '' : unescapeSuffix ? regexEscape(unescapeSuffix) : '';
       this.nestingPrefix = nestingPrefix ? regexEscape(nestingPrefix) : nestingPrefixEscaped || regexEscape('$t(');
       this.nestingSuffix = nestingSuffix ? regexEscape(nestingSuffix) : nestingSuffixEscaped || regexEscape(')');
       this.nestingOptionsSeparator = nestingOptionsSeparator || ',';
@@ -1232,6 +1233,9 @@
         }));
       };
       this.resetRegExp();
+      if (!this.escapeValue && typeof str === 'string' && /\$t\([^)]*\{[^}]*\{\{/.test(str)) {
+        this.logger.warn('nesting options string contains interpolated variables with escapeValue: false — ' + 'if any of those values are attacker-controlled they can inject additional ' + 'nesting options (e.g. redirect lng/ns). Sanitise untrusted input before passing ' + 'it to t(), or keep escapeValue: true.');
+      }
       var missingInterpolationHandler = (options === null || options === void 0 ? void 0 : options.missingInterpolationHandler) || this.options.missingInterpolationHandler;
       var skipOnVariables = (options === null || options === void 0 || (_options$interpolatio2 = options.interpolation) === null || _options$interpolatio2 === void 0 ? void 0 : _options$interpolatio2.skipOnVariables) !== undefined ? options.interpolation.skipOnVariables : this.options.interpolation.skipOnVariables;
       var todos = [{
@@ -1908,7 +1912,7 @@
           deferred.resolve(t);
           callback(err, t);
         };
-        if (this.languages && !this.isInitialized) return finish(null, this.t.bind(this));
+        if ((this.languages || this.isLanguageChangingTo) && !this.isInitialized) return finish(null, this.t.bind(this));
         this.changeLanguage(this.options.lng, finish);
       };
       if (this.options.resources || !this.options.initAsync) {
@@ -2290,6 +2294,66 @@
   var loadNamespaces = instance.loadNamespaces;
   var loadLanguages = instance.loadLanguages;
 
+  function _createForOfIteratorHelper(r, e) {
+    var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+    if (!t) {
+      if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) {
+        t && (r = t);
+        var _n = 0,
+          F = function F() {};
+        return {
+          s: F,
+          n: function n() {
+            return _n >= r.length ? {
+              done: !0
+            } : {
+              done: !1,
+              value: r[_n++]
+            };
+          },
+          e: function e(r) {
+            throw r;
+          },
+          f: F
+        };
+      }
+      throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+    }
+    var o,
+      a = !0,
+      u = !1;
+    return {
+      s: function s() {
+        t = t.call(r);
+      },
+      n: function n() {
+        var r = t.next();
+        return a = r.done, r;
+      },
+      e: function e(r) {
+        u = !0, o = r;
+      },
+      f: function f() {
+        try {
+          a || null == t.return || t.return();
+        } finally {
+          if (u) throw o;
+        }
+      }
+    };
+  }
+  function _unsupportedIterableToArray(r, a) {
+    if (r) {
+      if ("string" == typeof r) return _arrayLikeToArray(r, a);
+      var t = {}.toString.call(r).slice(8, -1);
+      return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+    }
+  }
+  function _arrayLikeToArray(r, a) {
+    (null == a || a > r.length) && (a = r.length);
+    for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+    return n;
+  }
   function _typeof(o) {
     "@babel/helpers - typeof";
 
@@ -2298,6 +2362,35 @@
     } : function (o) {
       return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
     }, _typeof(o);
+  }
+  var UNSAFE_KEYS = ['__proto__', 'constructor', 'prototype'];
+  function isSafeUrlSegment(v) {
+    if (typeof v !== 'string') return false;
+    if (v.length === 0 || v.length > 128) return false;
+    if (UNSAFE_KEYS.indexOf(v) > -1) return false;
+    if (v.indexOf('..') > -1) return false;
+    if (v.indexOf('/') > -1 || v.indexOf('\\') > -1) return false;
+    if (/[?#%\s@]/.test(v)) return false;
+    if (/[\x00-\x1F\x7F]/.test(v)) return false;
+    return true;
+  }
+  function sanitizeLogValue(v) {
+    if (typeof v !== 'string') return v;
+    return v.replace(/[\r\n\x00-\x1F\x7F]/g, ' ');
+  }
+  function redactUrlCredentials(u) {
+    if (typeof u !== 'string' || u.length === 0) return u;
+    try {
+      var parsed = new URL(u);
+      if (parsed.username || parsed.password) {
+        parsed.username = '';
+        parsed.password = '';
+        return parsed.toString();
+      }
+      return u;
+    } catch (e) {
+      return u.replace(/(\/\/)[^/@\s]+@/g, '$1');
+    }
   }
   function hasXMLHttpRequest() {
     return typeof XMLHttpRequest === 'function' || (typeof XMLHttpRequest === "undefined" ? "undefined" : _typeof(XMLHttpRequest)) === 'object';
@@ -2312,11 +2405,32 @@
     return Promise.resolve(maybePromise);
   }
   var interpolationRegexp = /\{\{(.+?)\}\}/g;
-  function interpolate(str, data) {
-    return str.replace(interpolationRegexp, function (match, key) {
-      var value = data[key.trim()];
-      return value != null ? value : match;
+  function interpolateUrl(str, data) {
+    var unsafe = false;
+    var result = str.replace(interpolationRegexp, function (match, key) {
+      var k = key.trim();
+      if (UNSAFE_KEYS.indexOf(k) > -1) return match;
+      var value = data[k];
+      if (value == null) return match;
+      var segments = String(value).split('+');
+      var _iterator = _createForOfIteratorHelper(segments),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var seg = _step.value;
+          if (!isSafeUrlSegment(seg)) {
+            unsafe = true;
+            return match;
+          }
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+      return segments.join('+');
     });
+    return unsafe ? null : result;
   }
 
   function ownKeys$1(e, r) {
@@ -2401,10 +2515,13 @@
       }).catch(function () {});
     } catch (e) {}
   }
+  var UNSAFE_KEYS$1 = ['__proto__', 'constructor', 'prototype'];
   var addQueryString = function addQueryString(url, params) {
     if (params && _typeof$1(params) === 'object') {
       var queryString = '';
-      for (var paramName in params) {
+      for (var _i = 0, _Object$keys = Object.keys(params); _i < _Object$keys.length; _i++) {
+        var paramName = _Object$keys[_i];
+        if (UNSAFE_KEYS$1.indexOf(paramName) > -1) continue;
         queryString += '&' + encodeURIComponent(paramName) + '=' + encodeURIComponent(params[paramName]);
       }
       if (!queryString) return url;
@@ -2437,7 +2554,6 @@
       fetchApi(url, fetchOptions).then(resolver).catch(callback);
     }
   };
-  var omitFetchOptions = false;
   var requestWithFetch = function requestWithFetch(options, url, payload, callback) {
     if (options.queryStringParams) {
       url = addQueryString(url, options.queryStringParams);
@@ -2452,7 +2568,7 @@
       method: payload ? 'POST' : 'GET',
       body: payload ? options.stringify(payload) : undefined,
       headers: headers
-    }, omitFetchOptions ? {} : reqOptions);
+    }, options._omitFetchOptions ? {} : reqOptions);
     var altFetch = typeof options.alternateFetch === 'function' && options.alternateFetch.length >= 1 ? options.alternateFetch : undefined;
     try {
       fetchIt(url, fetchOptions, callback, altFetch);
@@ -2465,7 +2581,7 @@
           delete fetchOptions[opt];
         });
         fetchIt(url, fetchOptions, callback, altFetch);
-        omitFetchOptions = true;
+        options._omitFetchOptions = true;
       } catch (err) {
         callback(err);
       }
@@ -2494,7 +2610,9 @@
       var h = options.customHeaders;
       h = typeof h === 'function' ? h() : h;
       if (h) {
-        for (var i in h) {
+        for (var _i2 = 0, _Object$keys2 = Object.keys(h); _i2 < _Object$keys2.length; _i2++) {
+          var i = _Object$keys2[_i2];
+          if (UNSAFE_KEYS$1.indexOf(i) > -1) continue;
           x.setRequestHeader(i, h[i]);
         }
       }
@@ -2666,10 +2784,15 @@
         loadPath = makePromise(loadPath);
         loadPath.then(function (resolvedLoadPath) {
           if (!resolvedLoadPath) return callback(null, {});
-          var url = interpolate(resolvedLoadPath, {
+          var url = interpolateUrl(resolvedLoadPath, {
             lng: languages.join('+'),
             ns: namespaces.join('+')
           });
+          if (url == null) {
+            var safeLngs = languages.map(sanitizeLogValue).join(', ');
+            var safeNss = namespaces.map(sanitizeLogValue).join(', ');
+            return callback(new Error('i18next-http-backend: unsafe lng/ns value — refusing to build request URL for languages=[' + safeLngs + '] namespaces=[' + safeNss + ']'), false);
+          }
           _this2.loadUrl(url, callback, loadUrlLanguages, loadUrlNamespaces);
         });
       }
@@ -2680,16 +2803,17 @@
         var lng = typeof languages === 'string' ? [languages] : languages;
         var ns = typeof namespaces === 'string' ? [namespaces] : namespaces;
         var payload = this.options.parseLoadPayload(lng, ns);
+        var safeUrl = sanitizeLogValue(redactUrlCredentials(url));
         this.options.request(this.options, url, payload, function (err, res) {
-          if (res && (res.status >= 500 && res.status < 600 || !res.status)) return callback('failed loading ' + url + '; status code: ' + res.status, true);
-          if (res && res.status >= 400 && res.status < 500) return callback('failed loading ' + url + '; status code: ' + res.status, false);
+          if (res && (res.status >= 500 && res.status < 600 || !res.status)) return callback('failed loading ' + safeUrl + '; status code: ' + res.status, true);
+          if (res && res.status >= 400 && res.status < 500) return callback('failed loading ' + safeUrl + '; status code: ' + res.status, false);
           if (!res && err && err.message) {
             var errorMessage = err.message.toLowerCase();
             var isNetworkError = ['failed', 'fetch', 'network', 'load'].find(function (term) {
               return errorMessage.indexOf(term) > -1;
             });
             if (isNetworkError) {
-              return callback('failed loading ' + url + ': ' + err.message, true);
+              return callback('failed loading ' + safeUrl + ': ' + sanitizeLogValue(err.message), true);
             }
           }
           if (err) return callback(err, false);
@@ -2701,7 +2825,7 @@
               ret = res.data;
             }
           } catch (e) {
-            parseErr = 'failed parsing ' + url + ' to json';
+            parseErr = 'failed parsing ' + safeUrl + ' to json';
           }
           if (parseErr) return callback(parseErr, false);
           callback(null, ret);
@@ -2722,10 +2846,15 @@
           if (typeof _this4.options.addPath === 'function') {
             addPath = _this4.options.addPath(lng, namespace);
           }
-          var url = interpolate(addPath, {
+          var url = interpolateUrl(addPath, {
             lng: lng,
             ns: namespace
           });
+          if (url == null) {
+            finished += 1;
+            if (callback && finished === languages.length) callback(dataArray, resArray);
+            return;
+          }
           _this4.options.request(_this4.options, url, payload, function (data, res) {
             finished += 1;
             dataArray.push(data);
@@ -6434,6 +6563,16 @@
   }
   var replaceInside = ['src', 'href'];
   var REGEXP = new RegExp('%7B%7B(.+?)%7D%7D', 'g'); // urlEncoded {{}}
+
+  // Reject URL schemes that execute script when used in href/src — regardless
+  // of whether the attacker-controlled value reaches the attribute via a
+  // compromised translation backend, a compromised translation file, or a
+  // local override. The list covers the concrete known-exploitable schemes;
+  // legitimate translation use cases never need them.
+  var DANGEROUS_URL_SCHEMES = /^\s*(javascript|data|vbscript|file)\s*:/i;
+  function isDangerousUrl(value) {
+    return typeof value === 'string' && DANGEROUS_URL_SCHEMES.test(value);
+  }
   function translateProps(node, props) {
     var tOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     var overrideKey = arguments.length > 3 ? arguments[3] : undefined;
@@ -6483,7 +6622,13 @@
                 mem.splice(index - 1, 1);
               }
             }
-            mem.push(tr);
+            // Drop dangerous URL schemes (javascript:/data:/vbscript:/file:) —
+            // no legitimate translation needs them in src/href.
+            if (isDangerousUrl(tr)) {
+              mem.push('');
+            } else {
+              mem.push(tr);
+            }
           }
           return mem;
         }, arr);
@@ -6560,7 +6705,20 @@
         }
 
         // translate that's children and surround it again with a dummy node to parse to vdom
-        var translation = "<i18nextifydummy>".concat(translate(key, tOptions, overrideKey), "</i18nextifydummy>");
+        var translated = translate(key, tOptions, overrideKey);
+        // Optional sanitize hook — if the application has configured
+        // `i18next.options.sanitize` (e.g. wired to DOMPurify), run the raw
+        // translation through it before parsing into the virtual DOM.
+        // Default is pass-through because i18nextify's whole purpose is to
+        // render HTML from translations; sanitisation is only safe for apps
+        // where translation content may not be fully trusted.
+        if (typeof instance.options.sanitize === 'function') {
+          translated = instance.options.sanitize(translated, {
+            key,
+            attribute: null
+          });
+        }
+        var translation = "<i18nextifydummy>".concat(translated, "</i18nextifydummy>");
         var newNode = vdomParser((translation || '').trim());
 
         // replace children on passed in node
@@ -6715,8 +6873,24 @@
       cleanWhitespace: true,
       nsSeparator: '#||#',
       keySeparator: '#|#',
-      debug: window.location.search && window.location.search.indexOf('debug=true') > -1,
-      saveMissing: window.location.search && window.location.search.indexOf('saveMissing=true') > -1,
+      // Use URLSearchParams for exact parameter lookup — a previous substring
+      // match (`indexOf('debug=true')`) activated these modes for any URL that
+      // happened to contain the substring (`?nosaveMissing=true` enabled
+      // saveMissing; `?track_debug=true` enabled debug).
+      debug: (() => {
+        try {
+          return new URLSearchParams(window.location.search).get('debug') === 'true';
+        } catch (e) {
+          return false;
+        }
+      })(),
+      saveMissing: (() => {
+        try {
+          return new URLSearchParams(window.location.search).get('saveMissing') === 'true';
+        } catch (e) {
+          return false;
+        }
+      })(),
       namespace: scriptEle && scriptEle.getAttribute('namespace') || false,
       namespaceFromPath: scriptEle && (scriptEle.getAttribute('namespacefrompath') || scriptEle.getAttribute('namespaceFromPath')) || false,
       missingKeyHandler: missingHandler,

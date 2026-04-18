@@ -89,6 +89,11 @@ See the [example](https://github.com/i18next/i18nextify/tree/master/example/simp
         namespaceFromPath: false // set true will use namepace based on window.location.pathname
         ns: ['common'] // -> only set if accessing more then one namepace
 
+        // optional: sanitize hook invoked on every translated HTML body before
+        // it is rendered into the DOM. Default is pass-through. See "Security
+        // considerations" below for when to wire this up (e.g. DOMPurify).
+        sanitize: (html, ctx) => html,
+
         // + all options available in i18next
       });
     </script>
@@ -287,6 +292,63 @@ window.i18nextify.changeNamespace('newNamespace');
 window.i18nextify.forceRerender();
 ```
 
+## Security considerations
+
+i18nextify's core job is to localise a live HTML page by replacing text and
+certain attribute values with translations. Because formatting tags inside
+translations (`<b>`, `<em>`, `<a href="…">`, …) are a supported feature,
+translation strings are **rendered as HTML** rather than as plain text.
+That power comes with a trust assumption:
+
+> **The translation source must be fully controlled by the developer.**
+> Treat every translation value as if it were code shipped in your bundle.
+
+Concretely that means:
+
+- Serve the translation backend over **HTTPS** (MITM on plain HTTP could
+  swap translations for attacker HTML).
+- Do **not** accept user-contributed translations into the live backend
+  without an explicit sanitisation step.
+- If translations are authored by multiple people, treat the authoring
+  workflow like code review — the same way you'd review any other source
+  that ends up executed in the browser.
+
+### The `sanitize` hook
+
+Since v4.0.8, you can pass a `sanitize(html, ctx)` function via init options
+(or via `i18next.init({ ... })`). It is invoked on every translated HTML
+body before it is parsed into the virtual DOM. This is the right place to
+wire [DOMPurify](https://github.com/cure53/DOMPurify) or a similar sanitizer
+if your translation sources are **partially** trusted (third-party CDN,
+user-contributed locales, content owned by a different team):
+
+```js
+import DOMPurify from 'dompurify';
+
+window.i18nextify.init({
+  sanitize: (html, ctx) => DOMPurify.sanitize(html, { ADD_ATTR: ['target'] }),
+  // …other options
+});
+```
+
+`ctx` currently contains `{ key, attribute }` so you can apply stricter
+rules for specific keys if needed. The hook defaults to pass-through — do
+not enable sanitisation blindly, as it will strip the very HTML markup
+this library is designed to render.
+
+### Blocked URL schemes in `href` / `src`
+
+Since v4.0.8, values substituted into translated `href` / `src` attributes
+are dropped if they begin with `javascript:`, `data:`, `vbscript:`, or
+`file:` (case-insensitive, leading whitespace ignored). Legitimate
+translation use cases never need these schemes, so the protection is on by
+default and cannot be disabled.
+
+### Reporting a vulnerability
+
+Please **do not** open a public GitHub issue for security problems. Send
+reports privately via the [GitHub Security Advisories](https://github.com/i18next/i18nextify/security/advisories/new)
+flow on the repository.
 
 ---
 

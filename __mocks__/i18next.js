@@ -32,6 +32,7 @@ const options = {
 };
 
 let tCalls = [];
+let translations = null;
 const resetCalls = () => {
   tCalls = [];
 };
@@ -40,8 +41,16 @@ module.exports = {
   resetOptions(opts) {
     this.options = parseOptions({ ...options, ...opts });
   },
+  // Test-only: override the stubbed translation return values. `map` is
+  // `{ key: returnValue, ... }`. Call with null to clear.
+  setTranslations(map) {
+    translations = map;
+  },
   t(k, opts = {}) {
     tCalls.push({ k, opts });
+    if (translations && Object.prototype.hasOwnProperty.call(translations, k)) {
+      return translations[k];
+    }
     return `#${opts.defaultValue || k}#`;
   },
   getCalls(reset = true) {

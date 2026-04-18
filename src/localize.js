@@ -68,6 +68,16 @@ function translate(str, options = {}, overrideKey) {
 
 const replaceInside = ['src', 'href'];
 const REGEXP = new RegExp('%7B%7B(.+?)%7D%7D', 'g'); // urlEncoded {{}}
+
+// Reject URL schemes that execute script when used in href/src — regardless
+// of whether the attacker-controlled value reaches the attribute via a
+// compromised translation backend, a compromised translation file, or a
+// local override. The list covers the concrete known-exploitable schemes;
+// legitimate translation use cases never need them.
+const DANGEROUS_URL_SCHEMES = /^\s*(javascript|data|vbscript|file)\s*:/i;
+function isDangerousUrl(value) {
+  return typeof value === 'string' && DANGEROUS_URL_SCHEMES.test(value);
+}
 function translateProps(
   node,
   props,
@@ -143,7 +153,13 @@ function translateProps(
               mem.splice(index -1 , 1);
             }
           }
-          mem.push(tr);
+          // Drop dangerous URL schemes (javascript:/data:/vbscript:/file:) —
+          // no legitimate translation needs them in src/href.
+          if (isDangerousUrl(tr)) {
+            mem.push('');
+          } else {
+            mem.push(tr);
+          }
         }
         return mem;
       }, arr);
@@ -262,11 +278,17 @@ function walk(
       }
 
       // translate that's children and surround it again with a dummy node to parse to vdom
-      const translation = `<i18nextifydummy>${translate(
-        key,
-        tOptions,
-        overrideKey
-      )}</i18nextifydummy>`;
+      let translated = translate(key, tOptions, overrideKey);
+      // Optional sanitize hook — if the application has configured
+      // `i18next.options.sanitize` (e.g. wired to DOMPurify), run the raw
+      // translation through it before parsing into the virtual DOM.
+      // Default is pass-through because i18nextify's whole purpose is to
+      // render HTML from translations; sanitisation is only safe for apps
+      // where translation content may not be fully trusted.
+      if (typeof i18next.options.sanitize === 'function') {
+        translated = i18next.options.sanitize(translated, { key, attribute: null });
+      }
+      const translation = `<i18nextifydummy>${translated}</i18nextifydummy>`;
       const newNode = parser((translation || '').trim());
 
       // replace children on passed in node

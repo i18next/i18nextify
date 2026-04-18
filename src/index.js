@@ -36,12 +36,24 @@ function getDefaults() {
     cleanWhitespace: true,
     nsSeparator: '#||#',
     keySeparator: '#|#',
-    debug:
-      window.location.search &&
-      window.location.search.indexOf('debug=true') > -1,
-    saveMissing:
-      window.location.search &&
-      window.location.search.indexOf('saveMissing=true') > -1,
+    // Use URLSearchParams for exact parameter lookup — a previous substring
+    // match (`indexOf('debug=true')`) activated these modes for any URL that
+    // happened to contain the substring (`?nosaveMissing=true` enabled
+    // saveMissing; `?track_debug=true` enabled debug).
+    debug: (() => {
+      try {
+        return new URLSearchParams(window.location.search).get('debug') === 'true';
+      } catch (e) {
+        return false;
+      }
+    })(),
+    saveMissing: (() => {
+      try {
+        return new URLSearchParams(window.location.search).get('saveMissing') === 'true';
+      } catch (e) {
+        return false;
+      }
+    })(),
     namespace: (scriptEle && scriptEle.getAttribute('namespace')) || false,
     namespaceFromPath: (scriptEle && (scriptEle.getAttribute('namespacefrompath') || scriptEle.getAttribute('namespaceFromPath'))) || false,
     missingKeyHandler: missingHandler,
