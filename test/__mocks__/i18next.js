@@ -1,4 +1,4 @@
-import { parseOptions } from '../src/utils';
+import { parseOptions } from '../../src/utils.js'
 
 const options = {
   autorun: true,
@@ -29,34 +29,34 @@ const options = {
   missingKeyHandler: () => {},
   ns: [],
   onInitialTranslate: () => {}
-};
+}
 
-let tCalls = [];
-let translations = null;
+let tCalls = []
+let translations = null
 const resetCalls = () => {
-  tCalls = [];
-};
-module.exports = {
+  tCalls = []
+}
+export default {
   options: parseOptions({ ...options }),
   resetOptions(opts) {
-    this.options = parseOptions({ ...options, ...opts });
+    this.options = parseOptions({ ...options, ...opts })
   },
   // Test-only: override the stubbed translation return values. `map` is
   // `{ key: returnValue, ... }`. Call with null to clear.
   setTranslations(map) {
-    translations = map;
+    translations = map
   },
   t(k, opts = {}) {
-    tCalls.push({ k, opts });
+    tCalls.push({ k, opts })
     if (translations && Object.prototype.hasOwnProperty.call(translations, k)) {
-      return translations[k];
+      return translations[k]
     }
-    return `#${opts.defaultValue || k}#`;
+    return `#${opts.defaultValue || k}#`
   },
   getCalls(reset = true) {
-    const calls = tCalls;
-    if (reset) resetCalls();
-    return calls;
+    const calls = tCalls
+    if (reset) resetCalls()
+    return calls
   },
   resetCalls,
   services: {
@@ -64,4 +64,4 @@ module.exports = {
       log: () => {}
     }
   }
-};
+}

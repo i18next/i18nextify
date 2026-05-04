@@ -1,18 +1,17 @@
-import i18next from 'i18next';
-import HttpApi from 'i18next-http-backend';
-import LngDet from 'i18next-browser-languagedetector';
+import i18next from 'i18next'
+import HttpApi from 'i18next-http-backend'
+import LngDet from 'i18next-browser-languagedetector'
 
-import Observer from './Observer';
-
-import docReady from './docReady';
-import renderer from './renderer';
-import { missingHandler } from './missingHandler';
-import { parseOptions, getPathname } from './utils';
+import Observer from './Observer.js'
+import docReady from './docReady.js'
+import renderer from './renderer.js'
+import { missingHandler } from './missingHandler.js'
+import { parseOptions, getPathname } from './utils.js'
 
 function getDefaults() {
-  const scriptEle = document.getElementById('i18nextify');
-  let supportedLngs = (scriptEle && (scriptEle.getAttribute('supportedlngs') || scriptEle.getAttribute('supportedLngs'))) || undefined;
-  if (typeof supportedLngs === 'string') supportedLngs = supportedLngs.split(',').map(lng => lng.trim());
+  const scriptEle = document.getElementById('i18nextify')
+  let supportedLngs = (scriptEle && (scriptEle.getAttribute('supportedlngs') || scriptEle.getAttribute('supportedLngs'))) || undefined
+  if (typeof supportedLngs === 'string') supportedLngs = supportedLngs.split(',').map(lng => lng.trim())
   const opt = {
     autorun: true,
     ele: document.body,
@@ -42,16 +41,16 @@ function getDefaults() {
     // saveMissing; `?track_debug=true` enabled debug).
     debug: (() => {
       try {
-        return new URLSearchParams(window.location.search).get('debug') === 'true';
+        return new URLSearchParams(window.location.search).get('debug') === 'true'
       } catch (e) {
-        return false;
+        return false
       }
     })(),
     saveMissing: (() => {
       try {
-        return new URLSearchParams(window.location.search).get('saveMissing') === 'true';
+        return new URLSearchParams(window.location.search).get('saveMissing') === 'true'
       } catch (e) {
-        return false;
+        return false
       }
     })(),
     namespace: (scriptEle && scriptEle.getAttribute('namespace')) || false,
@@ -62,65 +61,65 @@ function getDefaults() {
     load: (scriptEle && scriptEle.getAttribute('load')) || undefined,
     fallbackLng: (scriptEle && (scriptEle.getAttribute('fallbacklng') || scriptEle.getAttribute('fallbackLng'))) || undefined,
     onInitialTranslate: () => {}
-  };
-  const loadPath = (scriptEle && (scriptEle.getAttribute('loadpath') || scriptEle.getAttribute('loadPath'))) || undefined;
-  const addPath = (scriptEle && (scriptEle.getAttribute('addpath') || scriptEle.getAttribute('addPath'))) || undefined;
+  }
+  const loadPath = (scriptEle && (scriptEle.getAttribute('loadpath') || scriptEle.getAttribute('loadPath'))) || undefined
+  const addPath = (scriptEle && (scriptEle.getAttribute('addpath') || scriptEle.getAttribute('addPath'))) || undefined
   if (loadPath || addPath) {
-    opt.backend = {};
-    if (loadPath) opt.backend.loadPath = loadPath;
-    if (addPath) opt.backend.addPath = addPath;
+    opt.backend = {}
+    if (loadPath) opt.backend.loadPath = loadPath
+    if (addPath) opt.backend.addPath = addPath
   }
   return opt
 }
 
 // auto initialize on dom ready
-let domReady = false;
-let initialized = false;
+let domReady = false
+let initialized = false
 docReady(() => {
-  domReady = true;
-  if (!initialized) init();
-});
+  domReady = true
+  if (!initialized) init()
+})
 
 // extend i18next with default extensions
-i18next.use(HttpApi);
-i18next.use(LngDet);
+i18next.use(HttpApi)
+i18next.use(LngDet)
 
 // log out missings
 // i18next.on('missingKey', missingHandler);
 
 // store last init options - for case init is called before dom ready
-let lastOptions = {};
+let lastOptions = {}
 
 function changeNamespace(ns) {
-  if (!ns && lastOptions.namespaceFromPath) ns = getPathname();
-  lastOptions.ns.push(ns);
-  lastOptions.defaultNS = ns;
+  if (!ns && lastOptions.namespaceFromPath) ns = getPathname()
+  lastOptions.ns.push(ns)
+  lastOptions.defaultNS = ns
 
   i18next.loadNamespaces(lastOptions.ns, () => {
-    i18next.setDefaultNamespace(ns);
-  });
+    i18next.setDefaultNamespace(ns)
+  })
 }
 
-const renderers = [];
+const renderers = []
 
 function init(options = {}) {
-  options = { ...getDefaults(), ...lastOptions, ...options };
+  options = { ...getDefaults(), ...lastOptions, ...options }
 
-  options = parseOptions(options);
+  options = parseOptions(options)
 
   // delay init from domReady
   if (!options.ele) {
-    delete options.ele;
-    lastOptions = options;
+    delete options.ele
+    lastOptions = options
   }
 
-  initialized = true;
+  initialized = true
 
-  let observer;
+  let observer
 
   function addRenderers(children) {
     for (let i = 0; i < children.length; i++) {
-      const c = children[i];
+      const c = children[i]
       if (
         options.ignoreTags.indexOf(c.tagName) < 0 &&
         options.ignoreIds.indexOf(c.id) < 0 &&
@@ -128,18 +127,18 @@ function init(options = {}) {
         !c.attributes.localized &&
         !c.attributes.translated
       ) {
-        const r = renderer(c, observer);
-        renderers.push(r);
-        r.render();
+        const r = renderer(c, observer)
+        renderers.push(r)
+        r.render()
       }
     }
   }
 
   function waitForInitialRender(children, timeout, callback) {
-    let allRendered = true;
+    let allRendered = true
     setTimeout(() => {
       for (let i = 0; i < children.length; i++) {
-        const c = children[i];
+        const c = children[i]
         if (
           options.ignoreTags.indexOf(c.tagName) < 0 &&
           options.ignoreIds.indexOf(c.id) < 0 &&
@@ -147,69 +146,69 @@ function init(options = {}) {
           !c.attributes.localized &&
           !c.attributes.translated
         ) {
-          if (allRendered) waitForInitialRender(children, 100, callback);
-          allRendered = false;
-          break;
+          if (allRendered) waitForInitialRender(children, 100, callback)
+          allRendered = false
+          break
         }
       }
 
-      if (allRendered) callback();
-    }, timeout);
+      if (allRendered) callback()
+    }, timeout)
   }
 
-  let todo = 1;
-  if (!domReady) todo++;
-  if (options.autorun === false) todo++;
+  let todo = 1
+  if (!domReady) todo++
+  if (options.autorun === false) todo++
 
   function done() {
-    todo -= 1;
+    todo -= 1
     if (!todo) {
-      if (!options.ele) options.ele = document.body;
-      const children = options.ele.children;
+      if (!options.ele) options.ele = document.body
+      const children = options.ele.children
 
-      observer = new Observer(options.ele);
-      addRenderers(children);
+      observer = new Observer(options.ele)
+      addRenderers(children)
 
       observer.on('changed', (mutations) => {
-        renderers.forEach(r => r.debouncedRender());
-        addRenderers(children);
-      });
+        renderers.forEach(r => r.debouncedRender())
+        addRenderers(children)
+      })
 
       waitForInitialRender(children, 0, () => {
         if (options.ele.style && options.ele.style.display === 'none') {
-          options.ele.style.display = 'block';
+          options.ele.style.display = 'block'
         }
 
         if (window.document.title) {
-          const keyTitle = window.document.getElementsByTagName('title').length > 0 && window.document.getElementsByTagName('title')[0].getAttribute(i18next.options.keyAttr);
-          window.document.title = i18next.t(keyTitle || window.document.title);
+          const keyTitle = window.document.getElementsByTagName('title').length > 0 && window.document.getElementsByTagName('title')[0].getAttribute(i18next.options.keyAttr)
+          window.document.title = i18next.t(keyTitle || window.document.title)
         }
         if (window.document.querySelector('meta[name="description"]') && window.document.querySelector('meta[name="description"]').content) {
-          const keyDescr = window.document.querySelector('meta[name="description"]').getAttribute(i18next.options.keyAttr) || window.document.querySelector('meta[name="description"]').content;
-          window.document.querySelector('meta[name="description"]').setAttribute("content", i18next.t(keyDescr));
+          const keyDescr = window.document.querySelector('meta[name="description"]').getAttribute(i18next.options.keyAttr) || window.document.querySelector('meta[name="description"]').content
+          window.document.querySelector('meta[name="description"]').setAttribute('content', i18next.t(keyDescr))
         }
 
-        options.onInitialTranslate();
-      });
+        options.onInitialTranslate()
+      })
     }
   }
 
   i18next.on('languageChanged', (lng) => {
-    window.document.documentElement.lang = lng;
-  });
+    window.document.documentElement.lang = lng
+  })
 
-  i18next.init(options, done);
+  i18next.init(options, done)
 
   if (!domReady) {
-    docReady(done);
+    docReady(done)
   }
-  if (options.autorun === false) return { start: done };
+  if (options.autorun === false) return { start: done }
 }
 
 function forceRerender() {
   renderers.forEach((r) => {
-    r.render(true); // enforce a rerender
-  });
+    r.render(true) // enforce a rerender
+  })
 }
 
 export default {
@@ -217,4 +216,4 @@ export default {
   i18next,
   changeNamespace,
   forceRerender
-};
+}

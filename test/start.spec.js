@@ -1,19 +1,19 @@
-import { createRunner } from './helpers';
+import { createRunner } from './helpers.js'
 
 describe('locize - basic node', () => {
-  const runner = createRunner();
+  const runner = createRunner()
 
   it('should correctly extract content', () => {
     runner.run(
       '<div>test</div>',
       '<div i18next-orgval-0="test" localized="">#test#</div>',
       ['test']
-    );
-  });
-});
+    )
+  })
+})
 
 describe('locize - basic node (multi)', () => {
-  const runner = createRunner();
+  const runner = createRunner()
 
   const tests = [
     [
@@ -21,11 +21,11 @@ describe('locize - basic node (multi)', () => {
       '<div i18next-orgval-0="test" localized="">#test#</div>',
       ['test']
     ]
-  ];
+  ]
 
   tests.forEach((test) => {
     it(`correctly handles ${test[0]}`, () => {
-      expect(runner.run(...test));
-    });
-  });
-});
+      expect(runner.run(...test))
+    })
+  })
+})

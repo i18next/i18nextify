@@ -1,7 +1,7 @@
-import { createRunner } from '../helpers';
+import { createRunner } from '../helpers.js'
 
 describe('i18n-key', () => {
-  const runner = createRunner();
+  const runner = createRunner()
 
   const tests = [
     [
@@ -14,11 +14,11 @@ describe('i18n-key', () => {
       '<h1 i18next-key="key.2" i18next-orgval-0="Test on text node 2" localized="">#Test on text node 2#</h1>',
       [{ k: 'key.2', v: 'Test on text node 2' }]
     ]
-  ];
+  ]
 
   tests.forEach((test) => {
     it(`correctly handles ${test[0]}`, () => {
-      expect(runner.run(...test));
-    });
-  });
-});
+      expect(runner.run(...test))
+    })
+  })
+})

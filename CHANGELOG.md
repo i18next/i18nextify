@@ -1,3 +1,20 @@
+### 5.0.0
+
+- BREAKING: bumped `i18next-http-backend` to v4. v4 dropped its `cross-fetch` dependency, so i18nextify no longer ships the `cross-fetch` / `node-fetch` fallback in its bundle. Native `fetch` is now required (Node ≥ 18, modern browsers, Deno, Bun — all of which ship it). For runtimes without native `fetch`, supply a ponyfill via `i18next-http-backend`'s new `alternateFetch` option, or stay on i18nextify v4.
+- BREAKING: minimum Node version is now 18 (`engines.node = ">=18"`), inherited from the v4 transitive bump.
+- BREAKING: dropped the AMD output format (`dist/amd/`). No README references it and no known consumers; the IIFE / UMD-equivalent `i18nextify.js` and `i18nextify.min.js` cover `<script>`-tag use, and `dist/cjs/` and `dist/esm/` cover module consumers via the new `exports` map.
+- BREAKING: dropped the runtime `@babel/runtime` dependency (no babel transpilation in v5).
+- build: replaced babel + rollup 1 + terser with [`tsdown`](https://tsdown.dev) (rolldown + oxc). One config produces ESM, CJS, and IIFE bundles.
+- build: simplified output layout — `dist/{commonjs,es,umd,amd}/` collapsed to `dist/{cjs,esm}/`. The root `i18nextify.js` / `i18nextify.min.js` are emitted directly by tsdown, no `cp` step needed. `package.json#exports` map added.
+- build: minified browser bundle: 132 KB → 120 KB (−9%); unminified 273 KB → 226 KB (−17%).
+- lint: replaced ESLint 8 + babel-eslint + import / react / jsx-a11y plugins with ESLint 9 + [`neostandard`](https://github.com/neostandard/neostandard) flat config (`eslint.config.mjs`). The React lint stack was unused — the source has no JSX or React.
+- test: replaced Jest 24 with [Vitest](https://vitest.dev) (jsdom environment). Manual mocks moved from project-root `__mocks__/` to `test/__mocks__/` (kept adjacent to the tests that use them) and registered explicitly via `test/setup.js` since Vitest does not auto-resolve manual mocks the way Jest does for node_modules. Six spec files migrated; `require()`-based loads converted to top-level imports so `vi.mock` interception applies (Vitest's CJS shim does not).
+- chore: declared `"type": "module"` and `"sideEffects": false` for native ESM and bundler tree-shaking.
+- chore: relative ESM imports now carry explicit `.js` extensions (Node ESM strict resolution).
+- chore: source style — neostandard's no-semi default applied via `eslint --fix`. No functional change.
+- chore: dropped 24 dev/runtime dependencies (~all babel + rollup + jest packages, plus `@babel/polyfill`, `mkdirp`, `rimraf`, `yargs`). Net devDeps: ~24 → 7. Vulnerabilities: 47 → 0.
+- chore: added `.github/workflows/node.yml` — first CI workflow for this repo. Runs lint + build + test on Node 20 / 22 / 24.
+
 ### 4.0.8
 
 Security release — all issues found via an internal audit. See published advisory [GHSA-6457-mxpq-4fqq](https://github.com/i18next/i18nextify/security/advisories/GHSA-6457-mxpq-4fqq).

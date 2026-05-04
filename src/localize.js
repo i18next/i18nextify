@@ -1,31 +1,31 @@
-import toHTML from 'vdom-to-html';
-import parser from 'vdom-parser';
-import VNode from 'virtual-dom/vnode/vnode';
-import i18next from 'i18next';
-import { getAttribute, getPath, setPath } from './utils';
-import Instrument from './Instrument';
+import toHTML from 'vdom-to-html'
+import parser from 'vdom-parser'
+import VNode from 'virtual-dom/vnode/vnode.js'
+import i18next from 'i18next'
+import { getAttribute, getPath, setPath } from './utils.js'
+import Instrument from './Instrument.js'
 
 function isUnTranslated(node, opts = { retranslate: false }) {
-  if (opts && opts.retranslate) return true;
+  if (opts && opts.retranslate) return true
   return (
     !node.properties ||
     !node.properties.attributes ||
     node.properties.attributes.localized !== ''
-  );
+  )
 }
 
 function isNotExcluded(node) {
   let ret =
     !node.properties ||
     !node.properties.attributes ||
-    node.properties.attributes.translated !== '';
+    node.properties.attributes.translated !== ''
 
   if (
     ret &&
     node.tagName &&
     i18next.options.ignoreTags.indexOf(node.tagName) > -1
   ) {
-    ret = false;
+    ret = false
   }
 
   if (
@@ -34,11 +34,11 @@ function isNotExcluded(node) {
     node.properties &&
     node.properties.className
   ) {
-    const p = node.properties.className.split(' ');
+    const p = node.properties.className.split(' ')
     p.forEach((cls) => {
-      if (!ret) return;
-      if (i18next.options.ignoreClasses.indexOf(cls) > -1) ret = false;
-    });
+      if (!ret) return
+      if (i18next.options.ignoreClasses.indexOf(cls) > -1) ret = false
+    })
   }
 
   if (ret && i18next.options.ignoreIds) {
@@ -46,37 +46,37 @@ function isNotExcluded(node) {
       i18next.options.ignoreIds.indexOf(node.properties && node.properties.id) >
       -1
     ) {
-      ret = false;
+      ret = false
     }
   }
 
-  return ret;
+  return ret
 }
 
 function translate(str, options = {}, overrideKey) {
-  const hasContent = str.trim();
-  const key = overrideKey || str.trim();
-  if (!options.defaultValue) options.defaultValue = str;
+  const hasContent = str.trim()
+  const key = overrideKey || str.trim()
+  if (!options.defaultValue) options.defaultValue = str
   if (
     (hasContent && !i18next.options.ignoreWithoutKey) ||
     (hasContent && i18next.options.ignoreWithoutKey && overrideKey)
   ) {
-    return i18next.t(key, options);
+    return i18next.t(key, options)
   }
-  return str;
+  return str
 }
 
-const replaceInside = ['src', 'href'];
-const REGEXP = new RegExp('%7B%7B(.+?)%7D%7D', 'g'); // urlEncoded {{}}
+const replaceInside = ['src', 'href']
+const REGEXP = /%7B%7B(.+?)%7D%7D/g // urlEncoded {{}}
 
 // Reject URL schemes that execute script when used in href/src — regardless
 // of whether the attacker-controlled value reaches the attribute via a
 // compromised translation backend, a compromised translation file, or a
 // local override. The list covers the concrete known-exploitable schemes;
 // legitimate translation use cases never need them.
-const DANGEROUS_URL_SCHEMES = /^\s*(javascript|data|vbscript|file)\s*:/i;
+const DANGEROUS_URL_SCHEMES = /^\s*(javascript|data|vbscript|file)\s*:/i
 function isDangerousUrl(value) {
-  return typeof value === 'string' && DANGEROUS_URL_SCHEMES.test(value);
+  return typeof value === 'string' && DANGEROUS_URL_SCHEMES.test(value)
 }
 function translateProps(
   node,
@@ -86,35 +86,35 @@ function translateProps(
   realNodeIsUnTranslated,
   opts
 ) {
-  if (!props) return props;
+  if (!props) return props
 
   i18next.options.translateAttributes.forEach((item) => {
-    if (item.ele && node.tagName !== item.ele) return;
+    if (item.ele && node.tagName !== item.ele) return
     if (item.cond && item.cond.length === 2) {
       const condValue =
-        getPath(props, item.cond[0]) || getPath(props.attributes, item.cond[0]);
-      if (!condValue || condValue !== item.cond[1]) return;
+        getPath(props, item.cond[0]) || getPath(props.attributes, item.cond[0])
+      if (!condValue || condValue !== item.cond[1]) return
     }
 
-    let wasOnAttr = false;
-    let value = getPath(props, item.attr);
+    let wasOnAttr = false
+    let value = getPath(props, item.attr)
     if (!value) {
-      value = getPath(props.attributes, item.attr);
-      if (value) wasOnAttr = true;
+      value = getPath(props.attributes, item.attr)
+      if (value) wasOnAttr = true
     }
 
     if (opts.retranslate) {
       let usedValue =
         node.properties &&
         node.properties &&
-        node.properties.attributes[`${item.attr}-i18next-orgval`];
-      if (!usedValue) usedValue = value;
-      value = usedValue;
+        node.properties.attributes[`${item.attr}-i18next-orgval`]
+      if (!usedValue) usedValue = value
+      value = usedValue
     }
 
     if (value) {
       if (realNodeIsUnTranslated) {
-        node.properties.attributes[`${item.attr}-i18next-orgval`] = value;
+        node.properties.attributes[`${item.attr}-i18next-orgval`] = value
       }
 
       setPath(
@@ -125,72 +125,72 @@ function translateProps(
           { ...tOptions },
           overrideKey ? `${overrideKey}.${item.attr}` : ''
         )
-      );
+      )
     }
-  });
+  })
 
   replaceInside.forEach((attr) => {
-    let value = getPath(props, attr);
+    let value = getPath(props, attr)
     if (value) {
-      value = value.replace(/\{\{/g, '%7B%7B').replace(/\}\}/g, '%7D%7D');
+      value = value.replace(/\{\{/g, '%7B%7B').replace(/\}\}/g, '%7D%7D')
     } // fix for safari
     if (value && value.indexOf('%7B') > -1) {
-      const arr = [];
+      const arr = []
 
       value.split(REGEXP).reduce((mem, match, index) => {
-        if (match.length === 0) return mem;
+        if (match.length === 0) return mem
 
         if (!index || index % 2 === 0) {
-          mem.push(match);
+          mem.push(match)
         } else {
           const tr = translate(
             match,
             { ...tOptions },
             overrideKey ? `${overrideKey}.${attr}` : ''
           )
-          if (tr && tr.indexOf('http') == 0) { // image sources and links seems to be prefixed with the origin hosts
+          if (tr && tr.indexOf('http') === 0) { // image sources and links seems to be prefixed with the origin hosts
             if (mem[index - 1] && mem[index - 1].indexOf('http') === 0) {
-              mem.splice(index -1 , 1);
+              mem.splice(index - 1, 1)
             }
           }
           // Drop dangerous URL schemes (javascript:/data:/vbscript:/file:) —
           // no legitimate translation needs them in src/href.
           if (isDangerousUrl(tr)) {
-            mem.push('');
+            mem.push('')
           } else {
-            mem.push(tr);
+            mem.push(tr)
           }
         }
-        return mem;
-      }, arr);
-      if (arr.length) setPath(props, attr, arr.join(''));
+        return mem
+      }, arr)
+      if (arr.length) setPath(props, attr, arr.join(''))
     }
-  });
+  })
 
-  return props;
+  return props
 }
 
 function getTOptions(opts, node) {
-  let optsOnNode = getAttribute(node, 'i18next-options');
+  let optsOnNode = getAttribute(node, 'i18next-options')
   if (optsOnNode) {
     try {
-      optsOnNode = JSON.parse(optsOnNode);
+      optsOnNode = JSON.parse(optsOnNode)
     } catch (e) {
-      console.warn('failed parsing options on node', node);
+      console.warn('failed parsing options on node', node)
     }
   }
   if (optsOnNode && optsOnNode.inlineTags) {
-    optsOnNode.inlineTags = optsOnNode.inlineTags.map(s => s.toUpperCase());
+    optsOnNode.inlineTags = optsOnNode.inlineTags.map(s => s.toUpperCase())
   }
 
-  return { ...(opts || {}), ...(optsOnNode || {}) };
+  return { ...(opts || {}), ...(optsOnNode || {}) }
 }
 
 function removeIndent(str, substitution) {
-  if (!i18next.options.cleanIndent) return str;
+  if (!i18next.options.cleanIndent) return str
 
-  const ret = str.replace(/\n +/g, substitution);
-  return ret;
+  const ret = str.replace(/\n +/g, substitution)
+  return ret
 }
 
 function canInline(node, tOptions) {
@@ -199,29 +199,29 @@ function canInline(node, tOptions) {
     !node.children.length ||
     i18next.options.ignoreInlineOn.indexOf(node.tagName) > -1
   ) {
-    return false;
+    return false
   }
-  if (i18next.options.mergeTags.indexOf(node.tagName) > -1) return true;
+  if (i18next.options.mergeTags.indexOf(node.tagName) > -1) return true
 
-  const baseTags = tOptions.inlineTags || i18next.options.inlineTags;
+  const baseTags = tOptions.inlineTags || i18next.options.inlineTags
   const inlineTags = tOptions.additionalInlineTags
     ? baseTags.concat(tOptions.additionalInlineTags)
-    : baseTags;
+    : baseTags
 
-  let inlineable = true;
-  let hadNonTextNode = false;
+  let inlineable = true
+  let hadNonTextNode = false
   node.children.forEach((child) => {
     if (
       !child.text &&
       child.tagName &&
       inlineTags.indexOf(child.tagName.toUpperCase()) < 0
     ) {
-      inlineable = false;
+      inlineable = false
     }
-    if (child.tagName) hadNonTextNode = true;
-  });
+    if (child.tagName) hadNonTextNode = true
+  })
 
-  return inlineable && hadNonTextNode;
+  return inlineable && hadNonTextNode
 }
 
 function walk(
@@ -232,53 +232,53 @@ function walk(
   currentDepth = 0,
   opts
 ) {
-  const nodeIsNotExcluded = isNotExcluded(node);
-  const nodeIsUnTranslated = isUnTranslated(node, opts);
-  const realNodeIsUnTranslated = isUnTranslated(node); // ignoring forced threatment
-  tOptions = getTOptions(tOptions, node);
-  let parentKey = currentDepth === 0 ? parentOverrideKey : '';
+  const nodeIsNotExcluded = isNotExcluded(node)
+  const nodeIsUnTranslated = isUnTranslated(node, opts)
+  const realNodeIsUnTranslated = isUnTranslated(node) // ignoring forced threatment
+  tOptions = getTOptions(tOptions, node)
+  let parentKey = currentDepth === 0 ? parentOverrideKey : ''
   if (
     currentDepth > 0 &&
     parentOverrideKey &&
     !i18next.options.ignoreWithoutKey
   ) {
-    parentKey = `${parentOverrideKey}.${currentDepth}`;
+    parentKey = `${parentOverrideKey}.${currentDepth}`
   }
-  const overrideKey = getAttribute(node, i18next.options.keyAttr) || parentKey; // normally we use content as key, but optionally we allow to override it
+  const overrideKey = getAttribute(node, i18next.options.keyAttr) || parentKey // normally we use content as key, but optionally we allow to override it
 
   // translate node as one block
-  const mergeFlag = getAttribute(node, 'merge');
+  const mergeFlag = getAttribute(node, 'merge')
   if (
     mergeFlag !== 'false' &&
     (mergeFlag === '' || canInline(node, tOptions))
   ) {
     if (nodeIsNotExcluded && nodeIsUnTranslated) {
       // wrap children into dummy node and remove that outer from translation
-      const dummyNode = new VNode('I18NEXTIFYDUMMY', null, node.children);
+      const dummyNode = new VNode('I18NEXTIFYDUMMY', null, node.children)
       let key = removeIndent(toHTML(dummyNode), '')
         .replace('<i18nextifydummy>', '')
-        .replace('</i18nextifydummy>', '');
+        .replace('</i18nextifydummy>', '')
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
         let usedKey =
           node.properties &&
           node.properties.attributes &&
-          node.properties.attributes['i18next-orgval'];
+          node.properties.attributes['i18next-orgval']
         if (!usedKey) {
           usedKey =
             parent &&
             parent.properties &&
             parent.properties.attributes &&
-            parent.properties.attributes[`i18next-orgval-${currentDepth}`];
+            parent.properties.attributes[`i18next-orgval-${currentDepth}`]
         }
-        if (!usedKey) usedKey = key;
+        if (!usedKey) usedKey = key
 
-        key = usedKey;
+        key = usedKey
       }
 
       // translate that's children and surround it again with a dummy node to parse to vdom
-      let translated = translate(key, tOptions, overrideKey);
+      let translated = translate(key, tOptions, overrideKey)
       // Optional sanitize hook — if the application has configured
       // `i18next.options.sanitize` (e.g. wired to DOMPurify), run the raw
       // translation through it before parsing into the virtual DOM.
@@ -286,13 +286,13 @@ function walk(
       // render HTML from translations; sanitisation is only safe for apps
       // where translation content may not be fully trusted.
       if (typeof i18next.options.sanitize === 'function') {
-        translated = i18next.options.sanitize(translated, { key, attribute: null });
+        translated = i18next.options.sanitize(translated, { key, attribute: null })
       }
-      const translation = `<i18nextifydummy>${translated}</i18nextifydummy>`;
-      const newNode = parser((translation || '').trim());
+      const translation = `<i18nextifydummy>${translated}</i18nextifydummy>`
+      const newNode = parser((translation || '').trim())
 
       // replace children on passed in node
-      node.children = newNode.children;
+      node.children = newNode.children
 
       // persist original key for future retranslate
       if (
@@ -300,22 +300,22 @@ function walk(
         node.properties &&
         node.properties.attributes
       ) {
-        node.properties.attributes['i18next-orgval'] = key;
+        node.properties.attributes['i18next-orgval'] = key
       } else if (
         realNodeIsUnTranslated &&
         parent &&
         parent.properties &&
         parent.properties.attributes
       ) {
-        parent.properties.attributes[`i18next-orgval-${currentDepth}`] = key;
+        parent.properties.attributes[`i18next-orgval-${currentDepth}`] = key
       }
 
       if (node.properties && node.properties.attributes) {
-        node.properties.attributes.localized = '';
+        node.properties.attributes.localized = ''
       }
     }
 
-    return node;
+    return node
   }
 
   if (node.children) {
@@ -331,48 +331,48 @@ function walk(
           overrideKey,
           node.children.length > 1 ? i + 1 : i, // if only a inner text node - keep it index 0, else add a index number + 1
           opts
-        );
+        )
       }
-    });
+    })
   }
 
   // ignore comments
-  if (node.text && !node.properties && node.type === 'Widget') return node;
+  if (node.text && !node.properties && node.type === 'Widget') return node
 
   if (nodeIsNotExcluded && nodeIsUnTranslated) {
     if (node.text) {
-      let match;
-      let txt = node.text;
-      let originalText = node.text;
+      let match
+      let txt = node.text
+      let originalText = node.text
 
       // grab orginial text if we enforce a retranslate
       if (opts.retranslate) {
         let usedText =
           node.properties &&
           node.properties.attributes &&
-          node.properties.attributes['i18next-orgval'];
+          node.properties.attributes['i18next-orgval']
         if (!usedText) {
           usedText =
             parent &&
             parent.properties &&
             parent.properties.attributes &&
-            parent.properties.attributes[`i18next-orgval-${currentDepth}`];
+            parent.properties.attributes[`i18next-orgval-${currentDepth}`]
         }
-        if (!usedText) usedText = node.text;
+        if (!usedText) usedText = node.text
 
-        txt = usedText;
-        originalText = usedText;
+        txt = usedText
+        originalText = usedText
       }
 
       // exclude whitespace replacement eg on PRE, CODE
       const ignore =
-        i18next.options.ignoreCleanIndentFor.indexOf(parent.tagName) > -1;
+        i18next.options.ignoreCleanIndentFor.indexOf(parent.tagName) > -1
 
       if (!ignore) {
-        txt = removeIndent(txt, '\n');
+        txt = removeIndent(txt, '\n')
         if (i18next.options.cleanWhitespace) {
-          const regex = /^\s*(.*[^\s])\s*$/g;
-          match = regex.exec(txt);
+          const regex = /^\s*(.*[^\s])\s*$/g
+          match = regex.exec(txt)
         }
       }
 
@@ -382,10 +382,10 @@ function walk(
         match.length > 1 &&
         i18next.options.cleanWhitespace
       ) {
-        const translation = translate(match[1], tOptions, overrideKey || '');
-        node.text = txt.replace(match[1], translation);
+        const translation = translate(match[1], tOptions, overrideKey || '')
+        node.text = txt.replace(match[1], translation)
       } else {
-        node.text = translate(txt, tOptions, overrideKey || '');
+        node.text = translate(txt, tOptions, overrideKey || '')
       }
 
       // persist original text (key) for future retranslate
@@ -395,7 +395,7 @@ function walk(
         node.properties.attributes
       ) {
         if (originalText) {
-          node.properties.attributes['i18next-orgval'] = originalText;
+          node.properties.attributes['i18next-orgval'] = originalText
         }
       } else if (
         realNodeIsUnTranslated &&
@@ -406,7 +406,7 @@ function walk(
         if (originalText) {
           parent.properties.attributes[
             `i18next-orgval-${currentDepth}`
-          ] = originalText;
+          ] = originalText
         }
       }
     }
@@ -420,25 +420,25 @@ function walk(
         overrideKey,
         realNodeIsUnTranslated,
         opts
-      );
+      )
     }
 
     // set translated
     if (node.properties && node.properties.attributes) {
-      node.properties.attributes.localized = '';
+      node.properties.attributes.localized = ''
     }
   }
 
-  return node;
+  return node
 }
 
 export default function localize(node, retranslate) {
-  const recurseTime = new Instrument();
-  recurseTime.start();
+  const recurseTime = new Instrument()
+  recurseTime.start()
 
-  const localized = walk(node, null, null, null, null, { retranslate });
+  const localized = walk(node, null, null, null, null, { retranslate })
 
-  i18next.services.logger.log(`localization took: ${recurseTime.end()}ms`);
+  i18next.services.logger.log(`localization took: ${recurseTime.end()}ms`)
 
-  return localized;
+  return localized
 }

@@ -27,7 +27,7 @@ Drop this [script](https://github.com/i18next/i18nextify/blob/master/i18nextify.
 <html>
   <head>
     <script src="/i18nextify.min.js"></script>
-    <!-- or: <script src="https://unpkg.com/i18nextify@^3.2.1"></script> -->
+    <!-- or: <script src="https://unpkg.com/i18nextify@^5"></script> -->
   </head>
   ...
 </html>
@@ -40,7 +40,7 @@ Optionally you can also define your fallback language directly in the script tag
 <html>
   <head>
     <script src="/i18nextify.min.js" id="i18nextify" fallbacklng="en"></script>
-    <!-- or: <script src="https://unpkg.com/i18nextify@^3.2.1" id="i18nextify" fallbacklng="en"></script> -->
+    <!-- or: <script src="https://unpkg.com/i18nextify@^5" id="i18nextify" fallbacklng="en"></script> -->
   </head>
   ...
 </html>

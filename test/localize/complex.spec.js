@@ -1,7 +1,7 @@
-import { createRunner } from '../helpers';
+import { createRunner } from '../helpers.js'
 
 describe('complex nodes', () => {
-  const runner = createRunner();
+  const runner = createRunner()
 
   const tests = [
     [
@@ -41,11 +41,11 @@ describe('complex nodes', () => {
         'translated placeholder'
       ]
     ]
-  ];
+  ]
 
   tests.forEach((test) => {
     it(`correctly handles ${test[0]}`, () => {
-      expect(runner.run(...test));
-    });
-  });
-});
+      expect(runner.run(...test))
+    })
+  })
+})
