@@ -16,7 +16,7 @@ Should play well with any static or dynamic page not using its own Virtual DOM.
 
 # Getting started
 
-The easiest way for guaranteed success is using [locizify](https://www.npmjs.com/package/locizify) on [locize.com](https://locize.com).
+The easiest way for guaranteed success is using [locizify](https://www.npmjs.com/package/locizify) on [locize.com](https://www.locize.com?utm_source=i18nextify_readme&utm_medium=github&utm_campaign=readme).
 
 Alternatively:
 
@@ -355,7 +355,7 @@ flow on the repository.
 <h3 align="center">Gold Sponsors</h3>
 
 <p align="center">
-  <a href="https://locize.com/" target="_blank">
+  <a href="https://www.locize.com/?utm_source=i18nextify_readme&utm_medium=github&utm_campaign=readme" target="_blank">
     <img src="https://raw.githubusercontent.com/i18next/i18next/master/assets/locize_sponsor_240.gif" width="240px">
   </a>
 </p>
