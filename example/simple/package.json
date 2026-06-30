@@ -13,6 +13,6 @@
     "express": "4.20.0",
     "i18next": "19.5.0",
     "i18next-http-middleware": "3.9.7",
-    "i18next-fs-backend": "2.6.4"
+    "i18next-fs-backend": "2.6.6"
   }
 }
