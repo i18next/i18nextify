@@ -1,3 +1,7 @@
+### 5.0.1
+
+- update i18next dependencies
+
 ### 5.0.0
 
 - BREAKING: bumped `i18next-http-backend` to v4. v4 dropped its `cross-fetch` dependency, so i18nextify no longer ships the `cross-fetch` / `node-fetch` fallback in its bundle. Native `fetch` is now required (Node ≥ 18, modern browsers, Deno, Bun — all of which ship it). For runtimes without native `fetch`, supply a ponyfill via `i18next-http-backend`'s new `alternateFetch` option, or stay on i18nextify v4.
