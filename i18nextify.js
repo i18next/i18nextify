@@ -799,6 +799,10 @@ var i18nextify = (function() {
 			this.options = options;
 			this.supportedLngs = this.options.supportedLngs || false;
 			this.logger = baseLogger.create("languageUtils");
+			this.resolveHierarchyCache = {};
+		}
+		clearCache() {
+			this.resolveHierarchyCache = {};
 		}
 		getScriptPartFromCode(code) {
 			code = getCleanedCode(code);
@@ -871,6 +875,27 @@ var i18nextify = (function() {
 			return found || [];
 		}
 		toResolveHierarchy(code, fallbackCode) {
+			const fallbackLng = this.options.fallbackLng;
+			const fallbackLngKey = Array.isArray(fallbackLng) ? fallbackLng.join("|") : fallbackLng;
+			if (fallbackLngKey !== this._cachedFallbackLng) {
+				this.resolveHierarchyCache = {};
+				this._cachedFallbackLng = fallbackLngKey;
+			}
+			const hasCacheableFallback = fallbackCode === void 0 || fallbackCode === false || isString(fallbackCode);
+			const usesUncacheableOptionsFallback = fallbackCode === void 0 && typeof this.options.fallbackLng === "function";
+			const cacheable = isString(code) && hasCacheableFallback && !usesUncacheableOptionsFallback;
+			let cacheKey = null;
+			if (cacheable) {
+				let fallbackCacheKey;
+				if (fallbackCode === void 0) fallbackCacheKey = "undefined";
+				else if (fallbackCode === false) fallbackCacheKey = "boolean:false";
+				else fallbackCacheKey = `string:${fallbackCode}`;
+				cacheKey = `${code.length}:${code}|${fallbackCacheKey}`;
+			}
+			if (cacheKey !== null) {
+				const cached = this.resolveHierarchyCache[cacheKey];
+				if (cached !== void 0) return cached.slice();
+			}
 			const fallbackCodes = this.getFallbackCodes((fallbackCode === false ? [] : fallbackCode) || this.options.fallbackLng || [], code);
 			const codes = [];
 			const addCode = (c) => {
@@ -886,6 +911,10 @@ var i18nextify = (function() {
 			fallbackCodes.forEach((fc) => {
 				if (!codes.includes(fc)) addCode(this.formatLanguageCode(fc));
 			});
+			if (cacheKey !== null) {
+				this.resolveHierarchyCache[cacheKey] = codes;
+				return codes.slice();
+			}
 			return codes;
 		}
 	};
@@ -2021,7 +2050,7 @@ var i18nextify = (function() {
 		if (UNSAFE_KEYS$1.indexOf(v) > -1) return false;
 		if (v.indexOf("..") > -1) return false;
 		if (v.indexOf("\\") > -1) return false;
-		if (/[?#%\s]/.test(v)) return false;
+		if (/[?#%:\s]/.test(v)) return false;
 		if (/[\x00-\x1F\x7F]/.test(v)) return false;
 		return true;
 	}
@@ -2031,7 +2060,9 @@ var i18nextify = (function() {
 		return true;
 	}
 	function isSafeNsUrlSegment(v) {
-		return isSafeUrlSegmentBase(v);
+		if (!isSafeUrlSegmentBase(v)) return false;
+		if (v.indexOf("//") > -1) return false;
+		return true;
 	}
 	const SAFETY_CHECK_BY_KEY = {
 		lng: isSafeLangUrlSegment,
