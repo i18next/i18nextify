@@ -1,6 +1,6 @@
 {
   "name": "i18nextify",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "enables localization of any page with zero effort",
   "type": "module",
   "sideEffects": false,
