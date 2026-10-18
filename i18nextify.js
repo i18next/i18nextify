@@ -277,6 +277,7 @@ var i18nextify = (function() {
 			});
 		}
 	};
+	const nonEmptyBundles = /* @__PURE__ */ new WeakSet();
 	var ResourceStore = class extends EventEmitter$1 {
 		constructor(data, options = {
 			ns: ["translation"],
@@ -371,7 +372,13 @@ var i18nextify = (function() {
 		}
 		hasLanguageSomeTranslations(lng) {
 			const data = this.getDataByLanguage(lng);
-			return !!(data && Object.keys(data) || []).find((v) => data[v] && Object.keys(data[v]).length > 0);
+			return !!(data && Object.keys(data) || []).find((v) => {
+				const bundle = data[v];
+				if (nonEmptyBundles.has(bundle)) return true;
+				if (!bundle || Object.keys(bundle).length === 0) return false;
+				if (typeof bundle === "object") nonEmptyBundles.add(bundle);
+				return true;
+			});
 		}
 		toJSON() {
 			return this.data;
@@ -909,7 +916,8 @@ var i18nextify = (function() {
 				if (this.options.load !== "currentOnly") addCode(this.getLanguagePartFromCode(code));
 			} else if (isString(code)) addCode(this.formatLanguageCode(code));
 			fallbackCodes.forEach((fc) => {
-				if (!codes.includes(fc)) addCode(this.formatLanguageCode(fc));
+				const formattedFc = this.formatLanguageCode(fc);
+				if (!codes.includes(formattedFc)) addCode(formattedFc);
 			});
 			if (cacheKey !== null) {
 				this.resolveHierarchyCache[cacheKey] = codes;
@@ -1031,7 +1039,7 @@ var i18nextify = (function() {
 			};
 			this.regexp = getOrResetRegExp(this.regexp, `${this.prefix}(.+?)${this.suffix}`);
 			this.regexpUnescape = getOrResetRegExp(this.regexpUnescape, `${this.prefix}${this.unescapePrefix}(.+?)${this.unescapeSuffix}${this.suffix}`);
-			this.nestingRegexp = getOrResetRegExp(this.nestingRegexp, `${this.nestingPrefix}((?:[^()"']+|"[^"]*"|'[^']*'|\\((?:[^()]|"[^"]*"|'[^']*')*\\))*?)${this.nestingSuffix}`);
+			this.nestingRegexp = getOrResetRegExp(this.nestingRegexp, `${this.nestingPrefix}((?:[^()"']|"[^"]*"|'[^']*'|\\((?:[^()"']|"[^"]*"|'[^']*')*\\))*?)${this.nestingSuffix}`);
 		}
 		interpolate(str, data, lng, options) {
 			let match;
@@ -1122,7 +1130,10 @@ var i18nextify = (function() {
 				if (clonedOptions.defaultValue && clonedOptions.defaultValue.includes(this.prefix)) delete clonedOptions.defaultValue;
 				return key;
 			};
-			while (match = this.nestingRegexp.exec(str)) {
+			const nestingRegexp = new RegExp(this.nestingRegexp);
+			let out = "";
+			let lastEnd = 0;
+			while (match = nestingRegexp.exec(str)) {
 				let formatters = [];
 				clonedOptions = { ...options };
 				clonedOptions = clonedOptions.replace && !isString(clonedOptions.replace) ? clonedOptions.replace : clonedOptions;
@@ -1144,10 +1155,11 @@ var i18nextify = (function() {
 					...options,
 					interpolationkey: match[1].trim()
 				}), value.trim());
-				str = str.replace(match[0], value);
+				out += str.slice(lastEnd, match.index) + makeString(value);
+				lastEnd = nestingRegexp.lastIndex;
 				this.regexp.lastIndex = 0;
 			}
-			return str;
+			return lastEnd ? out + str.slice(lastEnd) : str;
 		}
 	};
 	const parseFormatStr = (formatStr) => {
@@ -1841,7 +1853,9 @@ var i18nextify = (function() {
 			}
 			if (this.hasResourceBundle(lng, ns)) return true;
 			if (!this.services.backendConnector.backend || this.options.resources && !this.options.partialBundledLanguages) return true;
-			if (loadNotPending(lng, ns) && (!fallbackLng || loadNotPending(lastLng, ns))) return true;
+			const { languageUtils } = this.services;
+			const loadLng = !options.lng ? lng : languageUtils.isSupportedCode(lng) && languageUtils.toResolveHierarchy(lng, false)[0];
+			if ((!loadLng || loadNotPending(loadLng, ns)) && (!fallbackLng || loadNotPending(lastLng, ns))) return true;
 			return false;
 		}
 		loadNamespaces(ns, callback) {
@@ -1964,6 +1978,7 @@ var i18nextify = (function() {
 			if (forkResourceStore) delete options.forkResourceStore;
 			const mergedOptions = {
 				...this.options,
+				preload: false,
 				...options,
 				isClone: true
 			};
@@ -2050,7 +2065,7 @@ var i18nextify = (function() {
 		if (UNSAFE_KEYS$1.indexOf(v) > -1) return false;
 		if (v.indexOf("..") > -1) return false;
 		if (v.indexOf("\\") > -1) return false;
-		if (/[?#%:\s]/.test(v)) return false;
+		if (/[?#%:&=;\s]/.test(v)) return false;
 		if (/[\x00-\x1F\x7F]/.test(v)) return false;
 		return true;
 	}
@@ -2111,6 +2126,7 @@ var i18nextify = (function() {
 		return Promise.resolve(maybePromise);
 	}
 	const interpolationRegexp = /\{\{(.+?)\}\}/g;
+	const LEADING_DOUBLE_SLASH = /^[/\\]{2}/;
 	function interpolateUrl(str, data) {
 		let unsafe = false;
 		const result = str.replace(interpolationRegexp, (match, key) => {
@@ -2126,7 +2142,9 @@ var i18nextify = (function() {
 			}
 			return segments.join("+");
 		});
-		return unsafe ? null : result;
+		if (unsafe) return null;
+		if (LEADING_DOUBLE_SLASH.test(result) && !LEADING_DOUBLE_SLASH.test(str)) return null;
+		return result;
 	}
 	const g = typeof globalThis !== "undefined" ? globalThis : typeof global !== "undefined" ? global : typeof window !== "undefined" ? window : void 0;
 	let fetchApi;
