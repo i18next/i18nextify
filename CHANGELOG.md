@@ -1,3 +1,10 @@
+### 6.0.0
+
+- BREAKING: bundles i18next 27 (from 26.5.2), with i18next-browser-languagedetector 8.3.0 and i18next-http-backend 4.0.10. Sites that load `https://unpkg.com/i18nextify@^5` stay on 5.x and are not affected; switch the URL to `@^6` to update.
+- BREAKING: an empty translation (`""`) now shows the page's own text, like a missing one, instead of an empty element (i18next 27 defaults `returnEmptyString` to `false`). To keep empty translations blank, pass `returnEmptyString: true` to `i18nextify.init()`.
+- BREAKING: minimum Node version is now 22 (`engines.node = ">=22"`), as for i18next 27.
+- i18next 27 also refuses language codes that look like markup or paths, for example from a `?lng=` parameter, unless they are listed in `supportedLngs`. The [i18next migration guide](https://www.i18next.com/misc/migration-guide#v26.x.x-to-v27.0.0) lists every change.
+
 ### 5.0.3
 
 - update i18next dependencies
