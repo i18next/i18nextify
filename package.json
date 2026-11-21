@@ -34,9 +34,9 @@
   "homepage": "https://github.com/i18next/i18nextify",
   "bugs": "https://github.com/i18next/i18nextify/issues",
   "dependencies": {
-    "i18next": "27.0.0",
-    "i18next-browser-languagedetector": "8.3.0",
-    "i18next-http-backend": "4.0.10",
+    "i18next": "27.2.3",
+    "i18next-browser-languagedetector": "8.3.1",
+    "i18next-http-backend": "4.1.0",
     "udc": "1.0.1",
     "vdom-parser": "1.4.1",
     "vdom-to-html": "2.3.1",

@@ -89,7 +89,7 @@ var i18nextify = (function() {
 	};
 	const pushPath = (object, path, newValue, concat) => {
 		const { obj, k } = getLastOfPath$1(object, path, Object);
-		obj[k] = obj[k] || [];
+		if (!Object.prototype.hasOwnProperty.call(obj, k) || !obj[k]) obj[k] = [];
 		obj[k].push(newValue);
 	};
 	const getPath$1 = (object, path) => {
@@ -103,8 +103,9 @@ var i18nextify = (function() {
 		if (value !== void 0) return value;
 		return getPath$1(defaultData, key);
 	};
+	const isLeaf = (value) => value === null || typeof value !== "object" || value instanceof String;
 	const deepExtend = (target, source, overwrite) => {
-		for (const prop in source) if (prop !== "__proto__" && prop !== "constructor") if (Object.prototype.hasOwnProperty.call(target, prop)) if (isString(target[prop]) || target[prop] instanceof String || isString(source[prop]) || source[prop] instanceof String) {
+		for (const prop in source) if (prop !== "__proto__" && prop !== "constructor") if (Object.prototype.hasOwnProperty.call(target, prop)) if (isLeaf(target[prop]) || isLeaf(source[prop])) {
 			if (overwrite) target[prop] = source[prop];
 		} else deepExtend(target[prop], source[prop], overwrite);
 		else target[prop] = source[prop];
@@ -254,6 +255,7 @@ var i18nextify = (function() {
 		}
 	};
 	var baseLogger = new Logger();
+	const onceListeners = /* @__PURE__ */ new WeakSet();
 	var EventEmitter$1 = class {
 		constructor() {
 			this.observers = {};
@@ -274,13 +276,18 @@ var i18nextify = (function() {
 					return;
 				}
 				this.observers[event].delete(listener);
+				if (onceListeners.has(listener)) this.observers[event].forEach((_, observer) => {
+					if (observer.listener === listener) this.observers[event].delete(observer);
+				});
 			});
 		}
 		once(event, listener) {
 			const wrapper = (...args) => {
-				listener(...args);
 				this.off(event, wrapper);
+				listener(...args);
 			};
+			wrapper.listener = listener;
+			onceListeners.add(listener);
 			this.on(event, wrapper);
 			return this;
 		}
@@ -464,7 +471,7 @@ var i18nextify = (function() {
 				};
 				const parts = key.split(nsSeparator);
 				if (nsSeparator !== keySeparator || nsSeparator === keySeparator && this.options.ns.includes(parts[0])) namespaces = parts.shift();
-				key = parts.join(keySeparator);
+				key = parts.join(keySeparator === false ? nsSeparator : keySeparator);
 			}
 			return {
 				key,
@@ -532,7 +539,8 @@ var i18nextify = (function() {
 			const defaultValueSuffix = needsPluralHandling ? this.pluralResolver.getSuffix(lng, opt.count, opt) : "";
 			const defaultValueSuffixOrdinalFallback = opt.ordinal && needsPluralHandling ? this.pluralResolver.getSuffix(lng, opt.count, { ordinal: false }) : "";
 			const needsZeroSuffixLookup = needsPluralHandling && !opt.ordinal && opt.count === 0;
-			const defaultValue = needsZeroSuffixLookup && opt[`defaultValue${this.options.pluralSeparator}zero`] || opt[`defaultValue${defaultValueSuffix}`] || opt[`defaultValue${defaultValueSuffixOrdinalFallback}`] || opt.defaultValue;
+			const sep = this.options.pluralSeparator;
+			const defaultValue = needsZeroSuffixLookup && opt[`defaultValue${sep}zero`] || opt[`defaultValue${defaultValueSuffix}`] || opt[`defaultValue${defaultValueSuffixOrdinalFallback}`] || (opt.defaultValue ?? (needsPluralHandling ? opt[`defaultValue${opt.ordinal ? `${sep}ordinal${sep}` : sep}other`] : void 0));
 			let resForObjHndl = res;
 			if (handleAsObjectInI18nFormat && !res && hasDefaultValue) resForObjHndl = defaultValue;
 			const handleAsObject = shouldHandleAsObject(resForObjHndl);
@@ -647,7 +655,7 @@ var i18nextify = (function() {
 				const skipOnVariables = isString(res) && (opt?.interpolation?.skipOnVariables !== void 0 ? opt.interpolation.skipOnVariables : this.options.interpolation.skipOnVariables);
 				let nestBef;
 				if (skipOnVariables) {
-					const nb = res.match(this.interpolator.nestingRegexp);
+					const nb = res.includes(this.interpolator.nestingPrefixText) ? res.match(this.interpolator.nestingRegexp) : null;
 					nestBef = nb && nb.length;
 				}
 				let data = opt.replace && !isString(opt.replace) ? opt.replace : opt;
@@ -657,7 +665,7 @@ var i18nextify = (function() {
 				};
 				res = this.interpolator.interpolate(res, data, opt.lng || this.language || resolved.usedLng, opt);
 				if (skipOnVariables) {
-					const na = res.match(this.interpolator.nestingRegexp);
+					const na = res.includes(this.interpolator.nestingPrefixText) ? res.match(this.interpolator.nestingRegexp) : null;
 					const nestAft = na && na.length;
 					if (nestBef < nestAft) opt.nest = false;
 				}
@@ -743,6 +751,13 @@ var i18nextify = (function() {
 									if (opt.ordinal && pluralSuffix.startsWith(ordinalPrefix)) finalKeys.push(contextKey + pluralSuffix.replace(ordinalPrefix, this.options.pluralSeparator));
 									finalKeys.push(contextKey + pluralSuffix);
 									if (needsZeroSuffixLookup) finalKeys.push(contextKey + zeroSuffix);
+								}
+							}
+							if (needsPluralHandling) {
+								const otherSuffix = `${opt.ordinal ? ordinalPrefix : this.options.pluralSeparator}other`;
+								if (pluralSuffix !== otherSuffix) {
+									if (needsContextHandling) finalKeys.unshift(`${key}${this.options.contextSeparator || "_"}${opt.context}${otherSuffix}`);
+									finalKeys.unshift(key + otherSuffix);
 								}
 							}
 						}
@@ -859,7 +874,10 @@ var i18nextify = (function() {
 		}
 		isSupportedCode(code) {
 			if (this.options.load === "languageOnly" || this.options.nonExplicitSupportedLngs) code = this.getLanguagePartFromCode(code);
-			return !this.supportedLngs || !this.supportedLngs.length || this.supportedLngs.includes(code);
+			if (!this.supportedLngs || !this.supportedLngs.length) return true;
+			if (!Array.isArray(this.supportedLngs)) return this.supportedLngs.includes(code);
+			const formatted = this.formatLanguageCode(code);
+			return this.supportedLngs.some((supportedLng) => this.formatLanguageCode(supportedLng) === formatted);
 		}
 		getBestMatchFromCodes(codes) {
 			if (!codes) return null;
@@ -875,7 +893,7 @@ var i18nextify = (function() {
 				if (this.isSupportedCode(lngScOnly)) return found = lngScOnly;
 				const lngOnly = this.getLanguagePartFromCode(code);
 				if (this.isSupportedCode(lngOnly)) return found = lngOnly;
-				found = this.options.supportedLngs.find((supportedLng) => {
+				found = this.options.supportedLngs.map((supportedLng) => this.formatLanguageCode(supportedLng)).find((supportedLng) => {
 					if (supportedLng === lngOnly) return true;
 					if (!supportedLng.includes("-") && !lngOnly.includes("-")) return false;
 					if (supportedLng.includes("-") && !lngOnly.includes("-") && supportedLng.slice(0, supportedLng.indexOf("-")) === lngOnly) return true;
@@ -890,12 +908,13 @@ var i18nextify = (function() {
 			if (typeof fallbacks === "function") fallbacks = fallbacks(code);
 			if (isString(fallbacks)) fallbacks = [fallbacks];
 			if (Array.isArray(fallbacks)) return fallbacks;
-			if (!code) return fallbacks.default || [];
-			let found = fallbacks[code];
-			if (!found) found = fallbacks[this.getScriptPartFromCode(code)];
-			if (!found) found = fallbacks[this.formatLanguageCode(code)];
-			if (!found) found = fallbacks[this.getLanguagePartFromCode(code)];
-			if (!found) found = fallbacks.default;
+			const getOwnFallback = (key) => Object.prototype.hasOwnProperty.call(fallbacks, key) ? fallbacks[key] : void 0;
+			if (!code) return getOwnFallback("default") || [];
+			let found = getOwnFallback(code);
+			if (!found) found = getOwnFallback(this.getScriptPartFromCode(code));
+			if (!found) found = getOwnFallback(this.formatLanguageCode(code));
+			if (!found) found = getOwnFallback(this.getLanguagePartFromCode(code));
+			if (!found) found = getOwnFallback("default");
 			return found || [];
 		}
 		toResolveHierarchy(code, fallbackCode) {
@@ -937,6 +956,7 @@ var i18nextify = (function() {
 				if (!codes.includes(formattedFc)) addCode(formattedFc);
 			});
 			if (cacheKey !== null) {
+				if (Object.keys(this.resolveHierarchyCache).length >= 1e3) this.resolveHierarchyCache = {};
 				this.resolveHierarchyCache[cacheKey] = codes;
 				return codes.slice();
 			}
@@ -985,6 +1005,7 @@ var i18nextify = (function() {
 				const lngPart = this.languageUtils.getLanguagePartFromCode(code);
 				rule = this.getRule(lngPart, options);
 			}
+			if (Object.keys(this.pluralRulesCache).length >= 1e3) this.pluralRulesCache = {};
 			this.pluralRulesCache[cacheKey] = rule;
 			return rule;
 		}
@@ -1017,6 +1038,7 @@ var i18nextify = (function() {
 		}
 		return path;
 	};
+	const escapeNestingOptionsValue = (value) => makeString(value).replace(/["'\\&<>\u0000-\u001f]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
 	var Interpolator = class {
 		constructor(options = {}, logger = baseLogger) {
 			this.logger = logger.create("interpolator");
@@ -1035,6 +1057,8 @@ var i18nextify = (function() {
 			this.formatSeparator = formatSeparator || ",";
 			this.unescapePrefix = unescapeSuffix ? "" : unescapePrefix ? regexEscape(unescapePrefix) : "-";
 			this.unescapeSuffix = this.unescapePrefix ? "" : unescapeSuffix ? regexEscape(unescapeSuffix) : "";
+			this.prefixText = prefix || "{{";
+			this.nestingPrefixText = nestingPrefix || "$t(";
 			this.nestingPrefix = regexEscape(nestingPrefix || "$t(");
 			this.nestingSuffix = regexEscape(nestingSuffix || ")");
 			this.nestingOptionsSeparator = nestingOptionsSeparator || ",";
@@ -1057,7 +1081,7 @@ var i18nextify = (function() {
 			this.regexpUnescape = getOrResetRegExp(this.regexpUnescape, `${this.prefix}${this.unescapePrefix}(.+?)${this.unescapeSuffix}${this.suffix}`);
 			this.nestingRegexp = getOrResetRegExp(this.nestingRegexp, `${this.nestingPrefix}((?:[^()"']|"[^"]*"|'[^']*'|\\((?:[^()"']|"[^"]*"|'[^']*')*\\))*?)${this.nestingSuffix}`);
 		}
-		interpolate(str, data, lng, options) {
+		interpolate(str, data, lng, options, escape) {
 			let match;
 			let value;
 			let replaces;
@@ -1082,15 +1106,37 @@ var i18nextify = (function() {
 				});
 			};
 			this.resetRegExp();
-			if (!this.escapeValue && typeof str === "string" && /\$t\([^)]*\{[^}]*\{\{/.test(str)) this.logger.warn("nesting options string contains interpolated variables with escapeValue: false — if any of those values are attacker-controlled they can inject additional nesting options (e.g. redirect lng/ns). Sanitise untrusted input before passing it to t(), or keep escapeValue: true.");
+			if (typeof str === "string" && /\$t\([^)]*\{[^}]*\{\{-/.test(str)) this.logger.warn("nesting options string contains a variable inserted unescaped with {{- }}: if its value is attacker-controlled it can inject additional nesting options (e.g. redirect lng/ns). Use {{var}} there, which is escaped for the options, or sanitise untrusted input before passing it to t().");
 			const missingInterpolationHandler = options?.missingInterpolationHandler || this.options.missingInterpolationHandler;
 			const skipOnVariables = options?.interpolation?.skipOnVariables !== void 0 ? options.interpolation.skipOnVariables : this.options.interpolation.skipOnVariables;
+			if (isString(str) && !str.includes(this.prefixText)) return str;
+			if (!escape) {
+				escape = (val) => this.escapeValue ? this.escape(val) : val;
+				if (isString(str) && str.includes(this.nestingPrefixText)) {
+					const nestingRegexp = new RegExp(this.nestingRegexp);
+					const optionsRegexp = new RegExp(`${regexEscape(this.nestingOptionsSeparator)}[ ]*{`);
+					let out = "";
+					let lastEnd = 0;
+					let nesting;
+					while (nesting = nestingRegexp.exec(str)) {
+						const inner = nesting.index + this.nestingPrefixText.length;
+						const opts = optionsRegexp.exec(nesting[1]);
+						const start = opts ? inner + opts.index + opts[0].length - 1 : -1;
+						const end = inner + nesting[1].lastIndexOf("}") + 1;
+						if (start !== -1 && end > start && !str.startsWith(this.prefixText, start)) {
+							out += this.interpolate(str.slice(lastEnd, start), data, lng, options, escape) + str.slice(start, end);
+							lastEnd = end;
+						}
+					}
+					if (lastEnd) return out + this.interpolate(str.slice(lastEnd), data, lng, options, escape);
+				}
+			}
 			const todos = [{
 				regex: this.regexpUnescape,
 				safeValue: (val) => val
 			}, {
 				regex: this.regexp,
-				safeValue: (val) => this.escapeValue ? this.escape(val) : val
+				safeValue: escape
 			}];
 			const unescapedValues = [];
 			let shift = 0;
@@ -1108,7 +1154,7 @@ var i18nextify = (function() {
 					if (value === void 0) if (typeof missingInterpolationHandler === "function") {
 						const temp = missingInterpolationHandler(str, match, options);
 						value = isString(temp) ? temp : "";
-					} else if (options && Object.prototype.hasOwnProperty.call(options, matchedVar)) value = "";
+					} else if (options && Object.prototype.hasOwnProperty.call(options, matchedVar.split(this.formatSeparator)[0].trim())) value = "";
 					else if (skipOnVariables) {
 						if (this.logger.debug) this.logger.once(`${original}\u0000${match[0]}`, "warn", `missed to pass in variable ${matchedVar} for interpolating ${original}`);
 						value = match[0];
@@ -1140,18 +1186,29 @@ var i18nextify = (function() {
 				const sep = this.nestingOptionsSeparator;
 				if (!key.includes(sep)) return key;
 				const c = key.split(new RegExp(`${regexEscape(sep)}[ ]*{`));
-				let optionsString = `{${c[1]}`;
+				const template = `{${c[1]}`;
 				key = c[0];
-				optionsString = this.interpolate(optionsString, clonedOptions);
-				const matchedSingleQuotes = optionsString.match(/'/g);
-				const matchedDoubleQuotes = optionsString.match(/"/g);
-				if ((matchedSingleQuotes?.length ?? 0) % 2 === 0 && !matchedDoubleQuotes || (matchedDoubleQuotes?.length ?? 0) % 2 !== 0) optionsString = optionsString.replace(/'/g, "\"");
+				let optionsString;
+				const parse = (escape) => {
+					optionsString = this.interpolate(template, inheritedOptions, options.lng, options, escape);
+					const matchedSingleQuotes = optionsString.match(/'/g);
+					const matchedDoubleQuotes = optionsString.match(/"/g);
+					if ((matchedSingleQuotes?.length ?? 0) % 2 === 0 && !matchedDoubleQuotes || (matchedDoubleQuotes?.length ?? 0) % 2 !== 0) optionsString = optionsString.replace(/'/g, "\"");
+					return JSON.parse(optionsString);
+				};
 				try {
-					clonedOptions = JSON.parse(optionsString);
-					if (inheritedOptions) clonedOptions = {
+					const parsed = parse(escapeNestingOptionsValue);
+					const verbatim = this.escapeValue ? Object.keys(parsed).filter((k) => k.startsWith("defaultValue") || k === "joinArrays") : [];
+					if (verbatim.length) {
+						const escaped = parse((val) => escapeNestingOptionsValue(this.escape(val)));
+						verbatim.forEach((k) => {
+							parsed[k] = escaped[k];
+						});
+					}
+					clonedOptions = inheritedOptions ? {
 						...inheritedOptions,
-						...clonedOptions
-					};
+						...parsed
+					} : parsed;
 				} catch (e) {
 					this.logger.warn(`failed parsing options string in nesting for key ${key}`, e);
 					return `${key}${sep}${optionsString}`;
@@ -1159,6 +1216,7 @@ var i18nextify = (function() {
 				if (clonedOptions.defaultValue && clonedOptions.defaultValue.includes(this.prefix)) delete clonedOptions.defaultValue;
 				return key;
 			};
+			if (isString(str) && !str.includes(this.nestingPrefixText)) return str;
 			const nestingRegexp = new RegExp(this.nestingRegexp);
 			let out = "";
 			let lastEnd = 0;
@@ -1219,8 +1277,9 @@ var i18nextify = (function() {
 			formatOptions
 		};
 	};
+	const cachedFormattersLimit = 1e3;
 	const createCachedFormatter = (fn) => {
-		const cache = {};
+		const cache = /* @__PURE__ */ new Map();
 		return (v, l, o) => {
 			let optForCache = o;
 			if (o && o.interpolationkey && o.formatParams && o.formatParams[o.interpolationkey] && o[o.interpolationkey]) optForCache = {
@@ -1233,10 +1292,11 @@ var i18nextify = (function() {
 			} catch (e) {
 				return fn(getCleanedCode(l), o)(v);
 			}
-			let frm = cache[key];
+			let frm = cache.get(key);
 			if (!frm) {
 				frm = fn(getCleanedCode(l), o);
-				cache[key] = frm;
+				if (cache.size >= cachedFormattersLimit) cache.delete(cache.keys().next().value);
+				cache.set(key, frm);
 			}
 			return frm(v);
 		};
@@ -1315,6 +1375,7 @@ var i18nextify = (function() {
 			}, value);
 		}
 	};
+	const maxFailedLoads = 1e3;
 	const removePending = (q, name) => {
 		if (q.pending[name] !== void 0) {
 			delete q.pending[name];
@@ -1336,6 +1397,7 @@ var i18nextify = (function() {
 			this.maxRetries = options.maxRetries >= 0 ? options.maxRetries : 5;
 			this.retryTimeout = options.retryTimeout >= 1 ? options.retryTimeout : 350;
 			this.state = {};
+			this.failed = /* @__PURE__ */ new Set();
 			this.queue = [];
 			this.backend?.init?.(services, options.backend, options);
 			this.callbackApi = callbackApiOf(this.backend);
@@ -1386,26 +1448,41 @@ var i18nextify = (function() {
 			if (!err && data) this.store.addResourceBundle(lng, ns, data, void 0, void 0, { skipCopy: true });
 			this.state[name] = err ? -1 : 2;
 			if (err && data) this.state[name] = 0;
+			this.failed.delete(name);
+			if (err) {
+				this.failed.add(name);
+				if (this.failed.size > maxFailedLoads) {
+					const oldest = this.failed.values().next().value;
+					this.failed.delete(oldest);
+					if (this.state[oldest] < 1) delete this.state[oldest];
+				}
+			}
 			const loaded = {};
+			const thrown = [];
 			this.queue.forEach((q) => {
 				pushPath(q.loaded, [lng], ns);
 				removePending(q, name);
 				if (err) q.errors.push(err);
 				if (q.pendingCount === 0 && !q.done) {
 					Object.keys(q.loaded).forEach((l) => {
-						if (!loaded[l]) loaded[l] = {};
+						if (!Object.prototype.hasOwnProperty.call(loaded, l)) loaded[l] = {};
 						const loadedKeys = q.loaded[l];
 						if (loadedKeys.length) loadedKeys.forEach((n) => {
 							if (loaded[l][n] === void 0) loaded[l][n] = true;
 						});
 					});
 					q.done = true;
-					if (q.errors.length) q.callback(q.errors);
-					else q.callback();
+					try {
+						if (q.errors.length) q.callback(q.errors);
+						else q.callback();
+					} catch (e) {
+						thrown.push(e);
+					}
 				}
 			});
-			this.emit("loaded", loaded);
 			this.queue = this.queue.filter((q) => !q.done);
+			this.emit("loaded", loaded);
+			if (thrown.length) throw thrown[0];
 		}
 		read(lng, ns, fcName, tried = 0, wait = this.retryTimeout, callback) {
 			if (!lng.length) return callback(null, {});
@@ -1437,13 +1514,15 @@ var i18nextify = (function() {
 			};
 			const fc = this.backend[fcName].bind(this.backend);
 			if (this.callbackApi === false || this.callbackApi === void 0 && fc.length === 2) {
+				let r;
 				try {
-					const r = fc(lng, ns);
-					if (r && typeof r.then === "function") r.then((data) => resolver(null, data)).catch(resolver);
-					else resolver(null, r);
+					r = fc(lng, ns);
 				} catch (err) {
 					resolver(err);
+					return;
 				}
+				if (r && typeof r.then === "function") r.then((data) => resolver(null, data), resolver);
+				else resolver(null, r);
 				return;
 			}
 			return fc(lng, ns, resolver);
@@ -1946,6 +2025,7 @@ var i18nextify = (function() {
 		}
 		setDefaultNamespace(ns) {
 			this.options.defaultNS = ns;
+			if (this.translator?.options) this.translator.options.defaultNS = ns;
 		}
 		hasLoadedNamespace(ns, options = {}) {
 			if (!this.isInitialized) {
@@ -2296,7 +2376,13 @@ var i18nextify = (function() {
 		}
 		return url;
 	};
-	const fetchIt = (url, fetchOptions, callback, altFetch) => {
+	const fetchIt = (url, fetchOptions, cb, altFetch) => {
+		let completed = false;
+		const callback = (err, res) => {
+			if (completed) throw err;
+			completed = true;
+			cb(err, res);
+		};
 		const resolver = (response) => {
 			if (!response.ok) return callback(response.statusText || "Error", { status: response.status });
 			response.text().then((data) => {
@@ -2548,6 +2634,13 @@ var i18nextify = (function() {
 		});
 		return obj;
 	}
+	function decode(value) {
+		try {
+			return decodeURIComponent(value);
+		} catch (e) {
+			return value;
+		}
+	}
 	function isSafeLanguageCode(code) {
 		return typeof code === "string" && /^[A-Za-z0-9_@.-]{1,128}$/.test(code) && code.indexOf("..") < 0 && [
 			"__proto__",
@@ -2614,7 +2707,7 @@ var i18nextify = (function() {
 			for (let i = 0; i < ca.length; i++) {
 				let c = ca[i];
 				while (c.charAt(0) === " ") c = c.substring(1, c.length);
-				if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+				if (c.indexOf(nameEQ) === 0) return decode(c.substring(nameEQ.length, c.length));
 			}
 			return null;
 		},
@@ -2642,7 +2735,7 @@ var i18nextify = (function() {
 				for (let i = 0; i < params.length; i++) {
 					const pos = params[i].indexOf("=");
 					if (pos > 0) {
-						if (params[i].substring(0, pos) === lookupQuerystring) found = params[i].substring(pos + 1);
+						if (params[i].substring(0, pos) === lookupQuerystring) found = decode(params[i].substring(pos + 1));
 					}
 				}
 			}
@@ -2662,7 +2755,7 @@ var i18nextify = (function() {
 						for (let i = 0; i < params.length; i++) {
 							const pos = params[i].indexOf("=");
 							if (pos > 0) {
-								if (params[i].substring(0, pos) === lookupHash) found = params[i].substring(pos + 1);
+								if (params[i].substring(0, pos) === lookupHash) found = decode(params[i].substring(pos + 1));
 							}
 						}
 					}

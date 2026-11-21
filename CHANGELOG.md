@@ -1,3 +1,8 @@
+### 6.0.1
+
+- fix: bundles i18next 27.2.3 (from 27.0.0). A value passed on through the options of a nested translation (`$t(key, { "name": "{{name}}" })`) is now escaped once instead of twice, so `Tom & Jerry` no longer turns into `Tom &amp;amp; Jerry`. See the [i18next changelog](https://github.com/i18next/i18next/blob/master/CHANGELOG.md) for the other fixes since 27.0.0.
+- fix: bundles i18next-browser-languagedetector 8.3.1 (a language with an `@`, like `sr@latin`, is detected again from the cookie, query string and hash) and i18next-http-backend 4.1.0 (a callback that throws is no longer called a second time with its own error).
+
 ### 6.0.0
 
 - BREAKING: bundles i18next 27 (from 26.5.2), with i18next-browser-languagedetector 8.3.0 and i18next-http-backend 4.0.10. Sites that load `https://unpkg.com/i18nextify@^5` stay on 5.x and are not affected; switch the URL to `@^6` to update.
