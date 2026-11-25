@@ -1,3 +1,7 @@
+### 6.0.2
+
+- fix: bundles i18next 27.2.9 (from 27.2.3). A language code without region in other casing matches again (`?lng=EN` or a capitalised cookie finds `en-US` in `supportedLngs` instead of falling back), `dir()` returns `rtl` for `AR`, an empty plural default value counts like `defaultValue: ''`, and a missing key below a number or an array is stored flat instead of throwing. See the [i18next changelog](https://github.com/i18next/i18next/blob/master/CHANGELOG.md) for the type fixes.
+
 ### 6.0.1
 
 - fix: bundles i18next 27.2.3 (from 27.0.0). A value passed on through the options of a nested translation (`$t(key, { "name": "{{name}}" })`) is now escaped once instead of twice, so `Tom & Jerry` no longer turns into `Tom &amp;amp; Jerry`. See the [i18next changelog](https://github.com/i18next/i18next/blob/master/CHANGELOG.md) for the other fixes since 27.0.0.

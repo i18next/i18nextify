@@ -52,7 +52,7 @@ var i18nextify = (function() {
 	};
 	const lastOfPathSeparatorRegExp = /###/g;
 	const cleanKey = (key) => key && key.includes("###") ? key.replace(lastOfPathSeparatorRegExp, ".") : key;
-	const canNotTraverseDeeper = (object) => !object || isString(object);
+	const canNotTraverseDeeper = (object) => !object || typeof object !== "object" && typeof object !== "function";
 	const getLastOfPath$1 = (object, path, Empty) => {
 		const stack = !isString(path) ? path : path.split(".");
 		let stackIndex = 0;
@@ -72,7 +72,7 @@ var i18nextify = (function() {
 	};
 	const setPath$1 = (object, path, newValue) => {
 		const { obj, k } = getLastOfPath$1(object, path, Object);
-		if (obj !== void 0 || path.length === 1) {
+		if (obj !== void 0 && !(Array.isArray(obj) && k === "length") || path.length === 1) {
 			obj[k] = newValue;
 			return;
 		}
@@ -425,6 +425,7 @@ var i18nextify = (function() {
 		}
 		return path.join(keySeparator);
 	}
+	const isZeroCount = (count) => count === 0 || typeof count === "bigint" && !count;
 	const shouldHandleAsObject = (res) => !isString(res) && typeof res !== "boolean" && typeof res !== "number";
 	var Translator = class Translator extends EventEmitter$1 {
 		constructor(services, options = {}) {
@@ -538,9 +539,11 @@ var i18nextify = (function() {
 			const hasDefaultValue = Translator.hasDefaultValue(opt);
 			const defaultValueSuffix = needsPluralHandling ? this.pluralResolver.getSuffix(lng, opt.count, opt) : "";
 			const defaultValueSuffixOrdinalFallback = opt.ordinal && needsPluralHandling ? this.pluralResolver.getSuffix(lng, opt.count, { ordinal: false }) : "";
-			const needsZeroSuffixLookup = needsPluralHandling && !opt.ordinal && opt.count === 0;
+			const needsZeroSuffixLookup = needsPluralHandling && !opt.ordinal && isZeroCount(opt.count);
 			const sep = this.options.pluralSeparator;
-			const defaultValue = needsZeroSuffixLookup && opt[`defaultValue${sep}zero`] || opt[`defaultValue${defaultValueSuffix}`] || opt[`defaultValue${defaultValueSuffixOrdinalFallback}`] || (opt.defaultValue ?? (needsPluralHandling ? opt[`defaultValue${opt.ordinal ? `${sep}ordinal${sep}` : sep}other`] : void 0));
+			const otherDefaultValue = opt.defaultValue ?? (needsPluralHandling ? opt[`defaultValue${opt.ordinal ? `${sep}ordinal${sep}` : sep}other`] : void 0);
+			const countDefaultValue = opt[`defaultValue${defaultValueSuffix}`] ?? opt[`defaultValue${defaultValueSuffixOrdinalFallback}`] ?? otherDefaultValue;
+			const defaultValue = (needsZeroSuffixLookup ? opt[`defaultValue${sep}zero`] : void 0) ?? countDefaultValue;
 			let resForObjHndl = res;
 			if (handleAsObjectInI18nFormat && !res && hasDefaultValue) resForObjHndl = defaultValue;
 			const handleAsObject = shouldHandleAsObject(resForObjHndl);
@@ -621,9 +624,10 @@ var i18nextify = (function() {
 					};
 					if (this.options.saveMissing) if (this.options.saveMissingPlurals && needsPluralHandling) lngs.forEach((language) => {
 						const suffixes = this.pluralResolver.getSuffixes(language, opt);
-						if (needsZeroSuffixLookup && opt[`defaultValue${this.options.pluralSeparator}zero`] && !suffixes.includes(`${this.options.pluralSeparator}zero`)) suffixes.push(`${this.options.pluralSeparator}zero`);
+						const zeroDefaultValue = opt[`defaultValue${sep}zero`];
+						if (needsZeroSuffixLookup && zeroDefaultValue !== void 0 && zeroDefaultValue !== null && !suffixes.includes(`${sep}zero`)) suffixes.push(`${sep}zero`);
 						suffixes.forEach((suffix) => {
-							send([language], key + suffix, opt[`defaultValue${suffix}`] || defaultValue);
+							send([language], key + suffix, opt[`defaultValue${suffix}`] ?? (suffix === defaultValueSuffix ? countDefaultValue : otherDefaultValue) ?? defaultValue);
 						});
 					});
 					else send(lngs, key, defaultValue);
@@ -719,7 +723,7 @@ var i18nextify = (function() {
 				let namespaces = extracted.namespaces;
 				if (this.options.fallbackNS) namespaces = namespaces.concat(this.options.fallbackNS);
 				const needsPluralHandling = opt.count !== void 0 && !isString(opt.count);
-				const needsZeroSuffixLookup = needsPluralHandling && !opt.ordinal && opt.count === 0;
+				const needsZeroSuffixLookup = needsPluralHandling && !opt.ordinal && isZeroCount(opt.count);
 				const needsContextHandling = opt.context !== void 0 && (isString(opt.context) || typeof opt.context === "number") && opt.context !== "";
 				const codes = opt.lngs ? opt.lngs : this.languageUtils.toResolveHierarchy(opt.lng || this.language, opt.fallbackLng);
 				namespaces.forEach((ns) => {
@@ -847,7 +851,8 @@ var i18nextify = (function() {
 		}
 		getLanguagePartFromCode(code) {
 			code = getCleanedCode(code);
-			if (!code || !code.includes("-")) return code;
+			if (!code) return code;
+			if (!code.includes("-")) return this.formatLanguageCode(code);
 			const p = code.split("-");
 			return this.formatLanguageCode(p[0]);
 		}
@@ -1025,7 +1030,10 @@ var i18nextify = (function() {
 		}
 		getSuffix(code, count, options = {}) {
 			const rule = this.getRule(code, options);
-			if (rule) return `${this.options.prepend}${options.ordinal ? `ordinal${this.options.prepend}` : ""}${rule.select(count)}`;
+			if (rule) {
+				const n = typeof count === "bigint" ? Number(count) : count;
+				return `${this.options.prepend}${options.ordinal ? `ordinal${this.options.prepend}` : ""}${rule.select(n)}`;
+			}
 			this.logger.warn(`no plural rule found for: ${code}`);
 			return this.getSuffix("dev", count, options);
 		}
@@ -2163,7 +2171,7 @@ var i18nextify = (function() {
 			];
 			const languageUtils = this.services?.languageUtils || new LanguageUtil(get());
 			if (lng.toLowerCase().indexOf("-latn") > 1) return "ltr";
-			return rtlLngs.includes(languageUtils.getLanguagePartFromCode(lng)) || lng.toLowerCase().indexOf("-arab") > 1 ? "rtl" : "ltr";
+			return rtlLngs.includes(languageUtils.getLanguagePartFromCode(lng)?.toLowerCase()) || lng.toLowerCase().indexOf("-arab") > 1 ? "rtl" : "ltr";
 		}
 		static createInstance(options = {}, callback) {
 			const instance = new I18n(options, callback);
