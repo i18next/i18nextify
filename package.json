@@ -36,7 +36,7 @@
   "dependencies": {
     "i18next": "27.2.9",
     "i18next-browser-languagedetector": "8.3.1",
-    "i18next-http-backend": "4.1.0",
+    "i18next-http-backend": "4.1.2",
     "udc": "1.0.1",
     "vdom-parser": "1.4.1",
     "vdom-to-html": "2.3.1",

@@ -1,6 +1,7 @@
 ### 6.0.2
 
 - fix: bundles i18next 27.2.9 (from 27.2.3). A language code without region in other casing matches again (`?lng=EN` or a capitalised cookie finds `en-US` in `supportedLngs` instead of falling back), `dir()` returns `rtl` for `AR`, an empty plural default value counts like `defaultValue: ''`, and a missing key below a number or an array is stored flat instead of throwing. See the [i18next changelog](https://github.com/i18next/i18next/blob/master/CHANGELOG.md) for the type fixes.
+- fix: bundles i18next-http-backend 4.1.2 (from 4.1.0): with `reloadInterval` on a server, the reload timer no longer keeps an i18next instance that is no longer used in memory.
 
 ### 6.0.1
 
